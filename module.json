@@ -1,9 +1,9 @@
 {
   "id": "alternate-classes-55e",
   "title": "Alternate Classes (5.5e)",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "manifest": "https://github.com/Ramleton/alternate-classes-55e/releases/latest/download/module.json",
-  "download": "https://github.com/Ramleton/alternate-classes-55e/releases/download/1.1.0/module.zip",
+  "download": "https://github.com/Ramleton/alternate-classes-55e/releases/download/1.2.0/module.zip",
   "esmodules": [
     "script.js"
   ],
@@ -86,6 +86,17 @@
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
       }
+    },
+    {
+      "name": "macros",
+      "label": "Macros",
+      "path": "packs/macros",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "dnd5e"
     }
   ],
   "packFolders": [
@@ -99,7 +110,8 @@
         "journals",
         "character-origins",
         "equipment",
-        "feats"
+        "feats",
+        "macros"
       ],
       "folders": []
     }
