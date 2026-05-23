@@ -1,14 +1,14 @@
-2026/05/21-12:53:25.819 6274 Recovering log #6
-2026/05/21-12:53:25.827 6274 Delete type=0 #6
-2026/05/21-12:53:25.827 6274 Delete type=3 #4
-2026/05/21-16:00:26.673 6e34 Level-0 table #10: started
-2026/05/21-16:00:26.677 6e34 Level-0 table #10: 10706 bytes OK
-2026/05/21-16:00:26.679 6e34 Delete type=0 #8
-2026/05/21-16:00:26.680 6e34 Manual compaction at level-0 from '!folders!4w3Mocct0NCUUlgL' @ 72057594037927935 : 1 .. '!macros!6W6PLcvwBebIoaff' @ 0 : 0; will stop at '!macros!x0VhsKOQgcFvZKcm' @ 1 : 1
-2026/05/21-16:00:26.680 6e34 Compacting 2@0 + 0@1 files
-2026/05/21-16:00:26.686 6e34 Generated table #11@0: 4 keys, 1939 bytes
-2026/05/21-16:00:26.686 6e34 Compacted 2@0 + 0@1 files => 1939 bytes
-2026/05/21-16:00:26.688 6e34 compacted to: files[ 0 1 0 0 0 0 0 ]
-2026/05/21-16:00:26.689 6e34 Delete type=2 #5
-2026/05/21-16:00:26.689 6e34 Delete type=2 #10
-2026/05/21-16:00:26.689 6e34 Manual compaction at level-0 from '!macros!x0VhsKOQgcFvZKcm' @ 1 : 1 .. '!macros!6W6PLcvwBebIoaff' @ 0 : 0; will stop at (end)
+2026/05/22-13:02:22.971 1784 Recovering log #18
+2026/05/22-13:02:22.978 1784 Delete type=0 #18
+2026/05/22-13:02:22.978 1784 Delete type=3 #17
+2026/05/22-13:02:39.659 56cc Level-0 table #22: started
+2026/05/22-13:02:39.659 56cc Level-0 table #22: 0 bytes OK
+2026/05/22-13:02:39.662 56cc Delete type=0 #20
+2026/05/22-13:02:39.667 56cc Manual compaction at level-0 from '!folders!4w3Mocct0NCUUlgL' @ 72057594037927935 : 1 .. '!macros!6W6PLcvwBebIoaff' @ 0 : 0; will stop at '!macros!ErumGYkPhDFvT5Co' @ 22 : 1
+2026/05/22-13:02:39.667 56cc Compacting 1@0 + 1@1 files
+2026/05/22-13:02:39.675 56cc Generated table #23@0: 4 keys, 2126 bytes
+2026/05/22-13:02:39.675 56cc Compacted 1@0 + 1@1 files => 2126 bytes
+2026/05/22-13:02:39.678 56cc compacted to: files[ 0 1 0 0 0 0 0 ]
+2026/05/22-13:02:39.678 56cc Delete type=2 #11
+2026/05/22-13:02:39.679 56cc Delete type=2 #15
+2026/05/22-13:02:39.690 56cc Manual compaction at level-0 from '!macros!ErumGYkPhDFvT5Co' @ 22 : 1 .. '!macros!6W6PLcvwBebIoaff' @ 0 : 0; will stop at (end)
