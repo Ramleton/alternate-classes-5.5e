@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build:macros": "tsc -p tsconfig.json",
+    "watch:macros": "tsc -p tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}

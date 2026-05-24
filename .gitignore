@@ -1,5 +1,6 @@
-./automated-conditions-5e/*
-./chris-premades/*
-./gambits-premades/*
-./midi-qol/*
-./node_modules/*
+automated-conditions-5e
+chris-premades
+gambits-premades
+midi-qol
+node_modules
+dist

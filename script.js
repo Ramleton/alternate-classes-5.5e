@@ -1,4 +1,4 @@
-// Adds a new "Knack" class feature type
+// Adds the class feature types from LaserLlama's Alternate Classes
 Hooks.once("init", () => {
   CONFIG.DND5E.featureTypes.class.subtypes.knack = "Knack";
   CONFIG.DND5E.featureTypes.class.subtypes.deviousExploit = "Devious Exploit";
