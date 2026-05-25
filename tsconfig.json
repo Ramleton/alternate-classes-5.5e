@@ -18,8 +18,20 @@
     "declaration": false,
     "sourceMap": true,
     "noEmitOnError": false,
-    "typeRoots": ["types", "node_modules/@types"]
+    "typeRoots": [
+      "types",
+      "node_modules/@types"
+    ]
   },
-  "include": ["macros/**/*.ts", "macros/**/*.js", "types/**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "macros/**/DIME/**", "**/*.test.ts"]
+  "include": [
+    "macros/**/*.ts",
+    "macros/**/*.js",
+    "types/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "macros/**/DIME/**",
+    "**/*.test.ts"
+  ]
 }
