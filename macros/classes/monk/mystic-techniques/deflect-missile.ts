@@ -22,13 +22,12 @@ async function damageApplication({
   if (!altMonk) return;
   const altMonkLevels = altMonk.system.levels;
   const actionType = workflowUtils.getActionType(workflow);
-  const allowedAttacks = altMonkLevels >= 11 ? ['mwak', 'msak'] : ['mwak'];
+  const allowedAttacks = altMonkLevels >= 11 ? ['rwak', 'rsak'] : ['rwak'];
   if (!allowedAttacks.includes(actionType)) return;
   let mysticTechniques = itemUtils.getItemByIdentifier(
     item.actor,
     'mysticTechniques',
   );
-  if (!mysticTechniques?.system?.uses?.value) return;
   let selection = await dialogUtils.confirmUseItem(item, {
     userId: socketUtils.firstOwner(item.actor, true),
   });
@@ -46,28 +45,67 @@ async function damageApplication({
     -targetWorkflow.utilityRolls[0].total,
   );
   if (ditem.newHP != ditem.oldHP) return;
-  let unarmedStrike = itemUtils.getItemByIdentifier(
-    item.actor,
-    'unarmedStrike',
+  if (!mysticTechniques?.system?.uses?.value) return;
+  let nearby = tokenUtils.findNearby(workflow.hitTargets.first(), 60, 'all', {
+    includeIncapacitated: true,
+  });
+  if (!nearby.length) return;
+  let userId = socketUtils.firstOwner(item.actor, true);
+  let targetSelection = await dialogUtils.selectTargetDialog(
+    item.name,
+    'CHRISPREMADES.Macros.DeflectAttacks.UseAndTarget',
+    nearby,
+    { skipDeadAndUnconscious: false, userId, buttons: 'yesNo' },
   );
-  let activity = activityUtils.getActivityByIdentifier(unarmedStrike, 'punch', {
+  if (!targetSelection || !targetSelection[0]) return;
+  const distance = tokenUtils.getDistance(
+    targetSelection[0],
+    workflow.hitTargets.first(),
+  );
+  let attackDisadvantageEffect: any = undefined;
+  if (distance > 20) {
+    const effectData = {
+      name: 'Long Range Deflect Disadvantage',
+      icon: item.img,
+      origin: item.uuid,
+      duration: { turns: 1 },
+      changes: [
+        {
+          key: 'flags.midi-qol.disadvantage.attack.all',
+          mode: 0,
+          value: 1,
+          priority: 0,
+        },
+      ],
+    };
+    attackDisadvantageEffect = await effectUtils.createEffect(
+      item.actor,
+      effectData,
+    );
+  }
+  let activity = activityUtils.getActivityByIdentifier(item, 'attack', {
     strict: true,
   });
   if (!activity) return;
   let activityData = genericUtils.duplicate(activity.toObject());
+  activityData.damage.parts[0].types = [workflow.defaultDamageType];
   await workflowUtils.syntheticActivityDataRoll(
     activityData,
-    unarmedStrike,
+    item,
     item.actor,
-    [workflow.token],
+    [targetSelection[0]],
     { consumeResources: true, consumeUsage: true },
   );
+  if (attackDisadvantageEffect) {
+    await attackDisadvantageEffect.delete();
+  }
   await genericUtils.update(mysticTechniques, {
     'system.uses.spent': mysticTechniques.system.uses.spent + 1,
   });
 }
-export const ac55eDeflectStrike = {
-  name: 'Deflect Strike',
+
+export const ac55eDeflectMissile = {
+  name: 'Deflect Missile',
   version: '1.3.141',
   rules: 'modern',
   midi: {
