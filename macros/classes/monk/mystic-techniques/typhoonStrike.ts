@@ -1,5 +1,5 @@
 import {
-  activityUtil,
+  activityUtils,
   constants,
   actorUtils,
   dialogUtils,
