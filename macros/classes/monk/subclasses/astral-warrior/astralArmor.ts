@@ -16,7 +16,6 @@ async function manifestSave({ trigger: { entity: item }, workflow, ditem }) {
     includeIncapacitated: true,
     includeToken: false,
   });
-  if (!nearbyTargets.length) return;
   const saveActivity = activityUtils.getActivityByIdentifier(item, 'save', {
     strict: true,
   });
@@ -29,8 +28,9 @@ async function manifestSave({ trigger: { entity: item }, workflow, ditem }) {
     },
   );
   if (!enchantActivity) return;
-  await workflowUtils.syntheticActivityRoll(saveActivity, nearbyTargets);
   await workflowUtils.syntheticActivityRoll(enchantActivity);
+  if (!nearbyTargets.length) return;
+  await workflowUtils.syntheticActivityRoll(saveActivity, nearbyTargets);
 }
 
 export const ac55eAstralArmor = {

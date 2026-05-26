@@ -22,12 +22,36 @@ async function damageApplication({
   if (!altMonk) return;
   const altMonkLevels = altMonk.system.levels;
   const actionType = workflowUtils.getActionType(workflow);
-  const allowedAttacks = altMonkLevels >= 11 ? ['rwak', 'rsak'] : ['rwak'];
+  const astralArmorEffect = effectUtils.getEffectByIdentifier(
+    item.actor,
+    'ac55eAstralArmorEffect',
+  );
+  const astralWarrior = itemUtils.getItemByIdentifier(
+    item.actor,
+    'ac55eAstralWarrior',
+  );
+  /**
+   * 10th level Astral Warriors can benefit from this technique's 11th level
+   * bonus one level early
+   */
+  const minLevel = astralWarrior ? 10 : 11;
+  const allowedAttacks =
+    altMonkLevels >= minLevel ? ['rwak', 'rsak'] : ['rwak'];
   if (!allowedAttacks.includes(actionType)) return;
   let mysticTechniques = itemUtils.getItemByIdentifier(
     item.actor,
     'mysticTechniques',
   );
+  /**
+   * If the monk is a 10th level Astral Warrior, and they have the Astral Armor
+   * effect, then they can use this technique for free
+   */
+  if (
+    !mysticTechniques?.system?.uses?.value &&
+    !astralArmorEffect &&
+    altMonkLevels >= 10
+  )
+    return;
   let selection = await dialogUtils.confirmUseItem(item, {
     userId: socketUtils.firstOwner(item.actor, true),
   });
@@ -99,6 +123,11 @@ async function damageApplication({
   if (attackDisadvantageEffect) {
     await attackDisadvantageEffect.delete();
   }
+  /**
+   * If the monk is a 10th level Astral Warrior, and they have the Astral Armor
+   * effect, then they can use this technique for free
+   */
+  if (astralArmorEffect && altMonkLevels >= 10) return;
   await genericUtils.update(mysticTechniques, {
     'system.uses.spent': mysticTechniques.system.uses.spent + 1,
   });
