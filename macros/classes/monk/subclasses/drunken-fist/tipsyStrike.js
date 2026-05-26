@@ -1,14 +1,3 @@
-import {
-  activityUtils,
-  actorUtils,
-  dialogUtils,
-  genericUtils,
-  itemUtils,
-  tokenUtils,
-  socketUtils,
-  workflowUtils,
-} from '../../../../../utils.js';
-
 async function tipsyStrike({ trigger: { entity: item }, workflow, ditem }) {
   /**
    * Make sure the attack is a melee weapon attack

@@ -1,16 +1,30 @@
 {
+  "name": "alternate-classes-55e",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Ramleton/alternate-classes-55e#readme",
+  "bugs": {
+    "url": "https://github.com/Ramleton/alternate-classes-55e/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ramleton/alternate-classes-55e.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "eslint.config.js",
   "scripts": {
-    "build:macros": "tsc -p tsconfig.json",
-    "watch:macros": "tsc -p tsconfig.json --watch"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@typescript-eslint/eslint-plugin": "^8.59.4",
-    "@typescript-eslint/parser": "^8.59.4",
+    "dnd5e": "github:adriangaro/dnd5e-types",
     "eslint": "^10.4.0",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.6.0",
-    "prettier": "^3.8.3",
-    "typescript": "^6.0.3"
+    "sequencer": "^0.0.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.0"
+  },
+  "dependencies": {
+    "@eslint/compat": "^2.1.0"
   }
 }

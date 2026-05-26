@@ -1,16 +1,3 @@
-import {
-  activityUtils,
-  constants,
-  actorUtils,
-  dialogUtils,
-  effectUtils,
-  genericUtils,
-  itemUtils,
-  socketUtils,
-  tokenUtils,
-  workflowUtils,
-} from 'chris-premades/scripts/utils.js';
-
 async function manifestSave({ trigger: { entity: item }, workflow, ditem }) {
   const nearbyTargets = tokenUtils.findNearby(workflow.token, 10, 'all', {
     includeIncapacitated: true,
