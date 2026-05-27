@@ -20,11 +20,13 @@ export default [
     'semi': true,
     'no-extra-semi': 'error',
   }),
+  js.configs.recommended,
   {
     files: ['**/*.{js,mjs,cjs}'],
     plugins: { js, '@stylistic': stylistic },
     languageOptions: { globals: globals.browser },
     rules: {
+      'no-undef': 'allow',
       '@stylistic/max-len': ['error', { code: 80, tabWidth: 2 }],
       '@stylistic/no-multiple-empty-lines': [
         'error',

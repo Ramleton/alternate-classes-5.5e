@@ -1,4 +1,4 @@
-async function touchOfLife({ trigger: { entity: item }, workflow, ditem }) {
+async function touchOfLife({ trigger: { entity: item }, workflow }) {
   const altMonk = itemUtils.getItemByIdentifier(item.actor, 'altMonk');
   if (!altMonk) return;
   const altMonkLevels = altMonk.system.levels;
@@ -7,7 +7,6 @@ async function touchOfLife({ trigger: { entity: item }, workflow, ditem }) {
   const target = workflow.targets.first();
   const targetActor = target.actor;
   if (!targetActor) return;
-  const userId = socketUtils.firstOwner(workflow.token, true);
   const conditions = [];
   const diseased = effectUtils.getEffectByStatusID(targetActor, 'diseased');
   const blinded = effectUtils.getEffectByStatusID(targetActor, 'blinded');

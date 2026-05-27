@@ -18,7 +18,7 @@ async function tipsyStrike({ trigger: { entity: item }, workflow, ditem }) {
       includeIncapacitated: true,
       includeToken: false,
     })
-    .filter((t) => t.id !== originalTarget.id);
+    .filter(t => t.id !== originalTarget.id);
   let newTarget = await dialogUtils.selectTargetDialog(
     item.name,
     genericUtils.format('CHRISPREMADES.Macros.CloudRune.Reaction', {

@@ -37,10 +37,10 @@ async function empoweredStrike({ trigger: { entity: item }, workflow, ditem }) {
     huge: 5,
     grg: 6,
   };
-  const saveAdvantage =
-    sizeMap[opponentActor.system.traits.size] >
-    sizeMap[item.actor.system.traits.size];
-  let saveAdvantageEffect: any = undefined;
+  const saveAdvantage
+    = sizeMap[opponentActor.system.traits.size]
+      > sizeMap[item.actor.system.traits.size];
+  let saveAdvantageEffect = undefined;
   if (saveAdvantage) {
     const effectData = {
       name: 'Empowered Strike Advantage',

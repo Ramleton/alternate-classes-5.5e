@@ -13,13 +13,13 @@ import {
 
 async function typhoonStrike({ trigger: { entity: item }, workflow, ditem }) {
   let validWeapons = workflow.actor.items.filter(
-    (i) =>
-      i.type === 'weapon' &&
-      i.system.equipped &&
-      i.system.prof.hasProficiency &&
-      (i.system.type.value === 'simpleM' ||
-        (i.system.type.value === 'martialM' &&
-          !i.system.properties.some((p) => p === 'hvy' || p === 'spc'))),
+    i =>
+      i.type === 'weapon'
+      && i.system.equipped
+      && i.system.prof.hasProficiency
+      && (i.system.type.value === 'simpleM'
+        || (i.system.type.value === 'martialM'
+          && !i.system.properties.some(p => p === 'hvy' || p === 'spc'))),
   );
   if (!validWeapons.length) {
     genericUtils.notify('CHRISPREMADES.Macros.TrueStrike.NoWeapons', 'warn');
@@ -28,7 +28,8 @@ async function typhoonStrike({ trigger: { entity: item }, workflow, ditem }) {
   let selectedWeapon;
   if (validWeapons.length === 1) {
     selectedWeapon = validWeapons[0];
-  } else {
+  }
+  else {
     selectedWeapon = await dialogUtils.selectDocumentDialog(
       workflow.item.name,
       'CHRISPREMADES.Macros.TrueStrike.SelectWeapon',

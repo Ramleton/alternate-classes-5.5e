@@ -1,42 +1,10 @@
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "[typescript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true
-    },
-=======
-=======
->>>>>>> 4320213 (Changed worksspace)
-    // 1. Explicitly set ESLint as the formatter for JavaScript files
     "[javascript]": {
         "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
-    "[javascriptreact]": {
-        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-    },
-    // 3. Keep your working save actions
-    "editor.formatOnSave": true,
-<<<<<<< HEAD
->>>>>>> 4320213 (Changed worksspace)
-=======
->>>>>>> 4320213 (Changed worksspace)
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "explicit"
     },
-    "editor.rulers": [
-        80
-<<<<<<< HEAD
-<<<<<<< HEAD
-    ]
-=======
-    ],
-    "eslint.useFlatConfig": true,
-    "eslint.experimental.useFlatConfig": null,
->>>>>>> 4320213 (Changed worksspace)
-=======
-    ],
-    "eslint.useFlatConfig": true,
-    "eslint.experimental.useFlatConfig": null,
->>>>>>> 4320213 (Changed worksspace)
+    "editor.formatOnSave": true,
+    "editor.rulers": [80],
 }
