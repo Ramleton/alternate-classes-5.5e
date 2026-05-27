@@ -4,12 +4,12 @@ async function drunkenStyle({ trigger: { entity: item }, workflow, ditem }) {
    * Make sure the attack is a Martial Arts attack
    */
   if (
-    workflow.item.flags['chris-premades']?.info?.identifier !==
-      'unarmedStrike' &&
-    workflow.item.system.type.value !== 'simpleM' &&
-    !(
-      workflow.item.system.type.value === 'martialM' &&
-      workflow.item.system.properties.some((p) => p !== 'hvy' && p !== 'spc')
+    workflow.item.flags['chris-premades']?.info?.identifier
+    !== 'unarmedStrike'
+    && workflow.item.system.type.value !== 'simpleM'
+    && !(
+      workflow.item.system.type.value === 'martialM'
+      && workflow.item.system.properties.some(p => p !== 'hvy' && p !== 'spc')
     )
   )
     return;
