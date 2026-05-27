@@ -21,6 +21,7 @@ async function touchOfLife({ trigger: { entity: item }, workflow }) {
   if (poisoned) conditions.push(poisoned);
   if (stunned) conditions.push(stunned);
   let selection;
+  if (!conditions.length) return;
   if (conditions.length === 1) {
     selection = conditions[0];
   }
