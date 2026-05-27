@@ -14,17 +14,21 @@
   "author": "",
   "type": "commonjs",
   "main": "eslint.config.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.60.0",
+    "@typescript-eslint/parser": "^8.60.0",
     "dnd5e": "github:adriangaro/dnd5e-types",
-    "eslint": "^10.4.0",
-    "sequencer": "^0.0.3",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.0"
+    "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
+    "globals": "^17.6.0",
+    "jiti": "^2.7.0",
+    "sequencer": "github:fantasycalendar/FoundryVTT-Sequencer#master",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@eslint/compat": "^2.1.0"
+    "@eslint/compat": "^2.1.0",
+    "eslint": "^10.4.0"
   }
 }
