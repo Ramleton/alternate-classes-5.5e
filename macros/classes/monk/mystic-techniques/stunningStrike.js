@@ -13,13 +13,12 @@ async function preStunningStrike({
   mysticTechniques,
   practicedStrikes,
 }) {
-  const martialArts = itemUtils.getEffectByIdentifier(
-    workflow.item,
-    'ac55eMartialArtsEnchantment',
-  );
-  if (!martialArts) return false;
-  if (!workflowUtils.isAttackType(workflow, 'attack')) return false;
-  if (workflowUtils.getActionType(workflow) !== 'mwak') return false;
+  if (!game
+    .modules
+    .get('alternate-classes-55e')
+    .api
+    .isMeleeMartialArtsAttack({ workflow })
+  ) return false;
   if (!workflow.hitTargets.size) return false;
   if (!item.system.uses.value) return false;
   /**
