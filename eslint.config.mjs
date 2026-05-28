@@ -19,6 +19,9 @@ export default [
     'quotes': 'single',
     'semi': true,
     'no-extra-semi': 'error',
+    'no-trailing-spaces': 'warn',
+    'max-len': ['error', { code: 80, tabWidth: 2 }],
+    'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0, maxBOF: 0 }],
   }),
   js.configs.recommended,
   {
@@ -26,13 +29,7 @@ export default [
     plugins: { js, '@stylistic': stylistic },
     languageOptions: { globals: globals.browser },
     rules: {
-      'no-undef': 'allow',
-      '@stylistic/max-len': ['error', { code: 80, tabWidth: 2 }],
-      '@stylistic/no-multiple-empty-lines': [
-        'error',
-        { max: 1, maxEOF: 0, maxBOF: 0 },
-      ],
-      '@stylistic/no-trailing-spaces': 'warn',
+      'no-undef': 'off',
     },
   },
 ];
