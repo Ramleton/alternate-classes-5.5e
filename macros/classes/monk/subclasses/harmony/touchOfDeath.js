@@ -1,4 +1,4 @@
-async function touchOfDeath({ trigger: { entity: item }, workflow, ditem }) {
+async function touchOfDeath({ trigger: { entity: item }, workflow }) {
   if (!workflowUtils.isAttackType(workflow, 'attack')) return;
   if (workflowUtils.getActionType(workflow) !== 'mwak') return;
   if (workflow
