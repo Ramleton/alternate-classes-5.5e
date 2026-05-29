@@ -21,6 +21,11 @@ async function preStunningStrike({
   ) return false;
   if (!workflow.hitTargets.size) return false;
   if (!item.system.uses.value) return false;
+  const mysticTechniqueUsed = effectUtils.getEffectByIdentifier(
+    workflow.actor,
+    'ac55eMysticTechniqueUsed',
+  );
+  if (mysticTechniqueUsed) return false;
   /**
    * Way of the Open Hand monk can use Practiced Strikes instead of Mystic
    * Techniques for this feature
@@ -55,6 +60,21 @@ async function stunningStrike({
       consumeUsage: true,
     },
   );
+  const usedEffectData = {
+    name: 'Mystic Technique Used',
+    icon: item.img,
+    origin: item.uuid,
+    duration: { turns: 1 },
+    flags: {
+      'chris-premades': {
+        info: {
+          identifier: 'ac55eMysticTechniqueUsed',
+        },
+      },
+    },
+  };
+  const usedEffect = await effectUtils.createEffect(item.actor, usedEffectData);
+  await workflowUtils.addEntityRemoval(workflow, [usedEffect]);
   return true;
 }
 

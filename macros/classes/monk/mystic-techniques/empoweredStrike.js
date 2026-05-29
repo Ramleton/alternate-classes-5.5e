@@ -1,19 +1,23 @@
 import {
   activityUtils,
-  actorUtils,
   dialogUtils,
   effectUtils,
   genericUtils,
   itemUtils,
   socketUtils,
   tokenUtils,
-  workflowUtils,
+  workflowUtils
 } from '../../../../../utils.js';
 
 async function empoweredStrike({ trigger: { entity: item }, workflow, ditem }) {
   if (!workflowUtils.isAttackType(workflow, 'attack')) return;
   if (workflowUtils.getActionType(workflow) !== 'mwak') return;
   if (!workflow.hitTargets.size) return;
+  const mysticTechniqueUsed = effectUtils.getEffectByIdentifier(
+    workflow.actor,
+    'ac55eMysticTechniqueUsed',
+  );
+  if (mysticTechniqueUsed) return false;
   const opponentActor = workflow.hitTargets.first().actor;
   const mysticTechniques = itemUtils.getItemByIdentifier(
     item.actor,
@@ -78,6 +82,21 @@ async function empoweredStrike({ trigger: { entity: item }, workflow, ditem }) {
     workflow.hitTargets.first(),
     range,
   );
+  const usedEffectData = {
+    name: 'Mystic Technique Used',
+    icon: item.img,
+    origin: item.uuid,
+    duration: { turns: 1 },
+    flags: {
+      'chris-premades': {
+        info: {
+          identifier: 'ac55eMysticTechniqueUsed',
+        },
+      },
+    },
+  };
+  const usedEffect = await effectUtils.createEffect(item.actor, usedEffectData);
+  await workflowUtils.addEntityRemoval(workflow, [usedEffect]);
 }
 
 export const ac55eEmpoweredStrike = {
