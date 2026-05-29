@@ -1,14 +1,15 @@
-2026/05/27-11:51:06.424 844 Recovering log #200
-2026/05/27-11:51:06.424 844 Level-0 table #203: started
-2026/05/27-11:51:06.429 844 Level-0 table #203: 74612 bytes OK
-2026/05/27-11:51:06.435 844 Delete type=2 #195
-2026/05/27-11:51:06.435 844 Delete type=2 #199
-2026/05/27-11:51:06.435 844 Delete type=0 #200
-2026/05/27-11:51:06.435 844 Delete type=3 #198
-2026/05/27-11:51:09.178 6f28 Moved #203 to level-1 74612 bytes OK: files[ 0 1 1 0 0 0 0 ]
-2026/05/27-11:51:09.185 6f28 Compacting 1@1 + 1@2 files
-2026/05/27-11:51:09.198 6f28 Generated table #205@1: 790 keys, 837281 bytes
-2026/05/27-11:51:09.199 6f28 Compacted 1@1 + 1@2 files => 837281 bytes
-2026/05/27-11:51:09.200 6f28 compacted to: files[ 0 0 1 0 0 0 0 ]
-2026/05/27-11:51:09.200 6f28 Delete type=2 #201
-2026/05/27-11:51:09.201 6f28 Delete type=2 #203
+2026/05/29-17:17:32.077 3ef0 Recovering log #312
+2026/05/29-17:17:32.084 3ef0 Delete type=0 #312
+2026/05/29-17:17:32.084 3ef0 Delete type=3 #310
+2026/05/29-17:50:15.547 4ab4 Level-0 table #317: started
+2026/05/29-17:50:15.569 4ab4 Level-0 table #317: 329389 bytes OK
+2026/05/29-17:50:15.572 4ab4 Delete type=0 #315
+2026/05/29-17:50:15.581 4ab4 Manual compaction at level-0 from '!folders!0PVaC0DCxrsl3LHA' @ 72057594037927935 : 1 .. '!items.effects!znqzasSolDywj1FK.Mv3NF8WMYeSWwLzs' @ 0 : 0; will stop at (end)
+2026/05/29-17:50:15.581 4ab4 Manual compaction at level-1 from '!folders!0PVaC0DCxrsl3LHA' @ 72057594037927935 : 1 .. '!items.effects!znqzasSolDywj1FK.Mv3NF8WMYeSWwLzs' @ 0 : 0; will stop at '!items!bYBflFRRTZ2JA9Cn' @ 13681 : 1
+2026/05/29-17:50:15.581 4ab4 Compacting 1@1 + 1@2 files
+2026/05/29-17:50:15.595 4ab4 Generated table #318@1: 886 keys, 950016 bytes
+2026/05/29-17:50:15.595 4ab4 Compacted 1@1 + 1@2 files => 950016 bytes
+2026/05/29-17:50:15.598 4ab4 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/05/29-17:50:15.598 4ab4 Delete type=2 #273
+2026/05/29-17:50:15.598 4ab4 Delete type=2 #317
+2026/05/29-17:50:15.608 4ab4 Manual compaction at level-1 from '!items!bYBflFRRTZ2JA9Cn' @ 13681 : 1 .. '!items.effects!znqzasSolDywj1FK.Mv3NF8WMYeSWwLzs' @ 0 : 0; will stop at (end)
