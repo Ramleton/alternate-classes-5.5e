@@ -12,12 +12,18 @@ Hooks.once('init', () => {
   game.modules.get('alternate-classes-55e').api = {
     isMartialArtsAttack: function ({ workflow }) {
       const { utils: { itemUtils, workflowUtils } } = chrisPremades;
+      if (!workflowUtils.isAttackType(workflow, 'attack')) return false;
+      const signatureWeapon = itemUtils
+        .getEffectByIdentifier(
+          workflow.item,
+          'ac55eSignatureWeapon',
+        );
+      if (signatureWeapon) return true;
       const martialArts = itemUtils.getEffectByIdentifier(
         workflow.item,
         'ac55eMartialArtsEnchantment',
       );
       if (!martialArts) return false;
-      if (!workflowUtils.isAttackType(workflow, 'attack')) return false;
       return true;
     },
 
