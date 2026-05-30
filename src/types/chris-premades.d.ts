@@ -565,4 +565,85 @@ declare module 'chrisPremades' {
       }
     ): Promise<object>;
   };
+
+  export const genericUtils: {
+    sleep(ms: number): Promise<void>;
+    translate(key: string): string;
+    format(key: string, obj: object): string;
+    setProperty(object: object, key: string, value: any): void;
+    getProperty(object: object, key: string): any;
+    duplicate(object: any): any;
+    deepClone(object: object): object;
+    mergeObject(original: object, other: object, options: object): object;
+    update(
+      entity: object,
+      updates: object,
+      options: object,
+      forceGM: boolean
+    ): Promise<void>;
+    setFlag(
+      entity: object,
+      scope: string,
+      key: string,
+      value: any,
+    ): Promise<void>;
+    unsetFlag(entity: object, scope: string, key: string): Promise<void>;
+    remove(entity: object): Promise<void>;
+    decimalToFraction(decimal: number): string;
+    getCPRSetting(key: string): object;
+    setCPRSetting(key: string, value: any): Promise<void>;
+    createUpdateSetting({ key: string, value: any }): Promise<void>;
+    isNewerVersion(v1: string, v0: string): boolean;
+    randomID(value: any): string;
+    checkMedkitPermission(
+      permission:
+        | 'update'
+        | 'automate'
+        | 'configure'
+        | 'homebrew',
+      userId: string
+    ): boolean | undefined;
+    notify(
+      message: string,
+      type: string,
+      options?: {
+        localize?: boolean;
+        permanent?: boolean;
+      }
+    ): void;
+    createEmbeddedDocuments(
+      entity: object,
+      type: string,
+      updates: object,
+      options: object
+    ): Promise<object>;
+    updateEmbeddedDocuments(
+      entity: object,
+      type: string,
+      updates: object,
+      options: object
+    ): Promise<object>;
+    deleteEmbeddedDocuments(
+      entity: object,
+      type: string,
+      options: object
+    ): Promise<object>;
+    updateTargets(targets: Token[], user: any): Promise<void>;
+    collapseObjects(...objects: object[]): object;
+    log(type: string, message: string): void;
+    titleCase(inputString: string): string;
+    camelCaseToWords(inputString: string): string;
+    getIdentifier(inputString: string): string;
+    checkPlayerOwnership(entity: object): boolean;
+    getRules(entity: object): 'modern' | 'legacy' | string;
+    getCPRIdentifier(
+      name: string,
+      rules?: 'modern' | 'legacy' | string
+    ): string;
+    getCPRIdentifiers(
+      name: string,
+      rules?: 'modern' | 'legacy' | string
+    ): string[];
+    convertDistance(ft: number): number;
+  };
 }

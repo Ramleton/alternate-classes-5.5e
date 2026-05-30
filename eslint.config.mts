@@ -23,6 +23,15 @@ export default [
     rules: {
       '@stylistic/eol-last': ['error', 'always'],
       '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1, maxBOF: 0 }],
+      '@stylistic/max-len': ['error', {
+        code: 80,
+        tabWidth: 2,
+        ignoreUrls: true,
+        ignoreRegExpLiterals: true,
+        // ADD THESE THREE EXCLUSIONS TO BREAK THE CIRCULAR LOOP:
+        ignoreTrailingComments: true,
+        ignoreComments: true,
+      }],
     },
   },
 ];
