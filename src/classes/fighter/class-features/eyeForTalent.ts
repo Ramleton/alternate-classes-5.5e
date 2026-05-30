@@ -1,5 +1,11 @@
 import type { Workflow } from '@midi-qol/types/module/Workflow';
-import { activityUtils, dialogUtils, effectUtils, workflowUtils } from 'chrisPremades';
+import {
+  activityUtils,
+  dialogUtils,
+  effectUtils,
+  genericUtils,
+  workflowUtils,
+} from 'chrisPremades';
 
 async function preApplyEyeForTalent({ workflow }: { workflow: Workflow }) {
   return workflow.hitTargets.size;
@@ -9,20 +15,31 @@ async function applyEyeForTalent({
   trigger: { entity: item },
   workflow,
 }) {
+  const targetActor = workflow.hitTargets.first().actor;
+  const hitEffect = effectUtils.getEffectByIdentifier(
+    targetActor,
+    `ac55eEyeForTalentBonus|${workflow.actor.id}`,
+  );
+  if (hitEffect) await hitEffect.delete();
   const effectData = {
-    name: item.name,
+    name: `Eye for Talent: Bonus`,
     img: item.img,
     origin: item.uuid,
     duration: { seconds: 60 },
     flags: {
       'chris-premades': {
         info: {
-          identifier: 'ac55eEyeForTalentBonus',
+          identifier: `ac55eEyeForTalentBonus|${workflow.actor.id}`,
         },
       },
     },
   };
-  await effectUtils.createEffect(workflow.hitTargets.first().actor, effectData);
+  await effectUtils.createEffect(targetActor, effectData);
+  const failEffect = effectUtils.getEffectByIdentifier(
+    targetActor,
+    `ac55eEyeForTalentFail|${workflow.actor.id}`,
+  );
+  if (failEffect) await failEffect.delete();
   return true;
 }
 
@@ -53,7 +70,7 @@ async function eyeForTalent({
   const targetActor = workflow.targets.first().actor;
   const effect = await effectUtils.getEffectByIdentifier(
     targetActor,
-    'ac55eEyeForTalentBonus',
+    `ac55eEyeForTalentBonus|${workflow.actor.id}`,
   );
   const checkActivity = activityUtils.getActivityByIdentifier(
     item,
@@ -102,7 +119,26 @@ async function eyeForTalent({
     bonusEffect.delete();
   }
   if (!checkWorkflow) return;
-  if (!checkWorkflow.saves.size) return;
+  if (!checkWorkflow.saves.size) {
+    const failEffectData = {
+      name: 'Eye for Talent: Fail',
+      img: item.img,
+      origin: item.uuid,
+      duration: {},
+      flags: {
+        'chris-premades': {
+          info: {
+            identifier: `ac55eEyeForTalentFail|${workflow.actor.id}`,
+          },
+        },
+        'dae': {
+          specialDuration: ['longRest'],
+        },
+      },
+    };
+    await effectUtils.createEffect(targetActor, failEffectData);
+    return;
+  }
   const options: [string, string][] = [
     ['Armor Class', 'armorClass'],
     ['Highest Ability Score', 'highestAbilityScore'],
@@ -123,6 +159,18 @@ async function eyeForTalent({
     },
   );
   if (!selection) return;
+  const endsWithS = targetActor.name.endsWith('s');
+  const referenceTarget = endsWithS
+    ? `${targetActor.name}'`
+    : `${targetActor.name}'s`;
+  const gmID = socketUtils.gmID();
+  if (selection === 'armorClass') {
+    return ChatMessage.create({
+      user: gmID,
+      content: `Eye for Talent: ${referenceTarget} Armor Class: \
+        ${targetActor.system.attributes.ac.value}`,
+    });
+  }
   const mappedAbilities = {
     cha: 'Charisma',
     con: 'Constitution',
@@ -131,10 +179,6 @@ async function eyeForTalent({
     str: 'Strength',
     wis: 'Wisdom',
   };
-  if (selection === 'armorClass') {
-    console.log('Armor Class', targetActor.system.attributes.ac.value);
-    return;
-  }
   const targetAbilities: Record<
     string,
     {
@@ -153,13 +197,88 @@ async function eyeForTalent({
     }))
     .sort((a, b) => b.value - a.value);
   if (selection === 'highestAbilityScore') {
-    console.log('Highest Ability Score', sortedAbilityScores[0].ability);
-    return;
+    return ChatMessage.create({
+      user: gmID,
+      content: `Eye for Talent: ${referenceTarget} Highest Ability Score: \
+        ${sortedAbilityScores[0].ability}`,
+    });
   }
   if (selection === 'lowestAbilityScore') {
-    const lowestAbility = sortedAbilityScores[sortedAbilityScores.length - 1];
-    console.log('Lowest Ability Score', lowestAbility.ability);
-    return;
+    return ChatMessage.create({
+      user: gmID,
+      content: `Eye for Talent: ${referenceTarget} Lowest Ability Score: \
+        ${sortedAbilityScores[sortedAbilityScores.length - 1].ability}`,
+    });
+  }
+  if (selection === 'allSpecialSenses') {
+    const blindsight = targetActor.system.attributes.senses.ranges.blindsight;
+    const darkvision = targetActor.system.attributes.senses.ranges.darkvision;
+    const tremorsense = targetActor.system.attributes.senses.ranges.tremorsense;
+    const truesight = targetActor.system.attributes.senses.ranges.truesight;
+    const special = targetActor.system.attributes.senses.special;
+    const message = `Eye for Talent: ${referenceTarget} Special Senses:\ 
+      Blindsight: ${blindsight} ft, \
+      Darkvision: ${darkvision} ft, \
+      Tremorsense: ${tremorsense} ft, \
+      Truesight: ${truesight} ft, \
+      Other senses: ${special}`;
+    return ChatMessage.create({
+      user: gmID,
+      content: message,
+    });
+  }
+  if (selection === 'resistancesImmunitiesVulnerabilities') {
+    const resistances = targetActor.system.traits.dr.value;
+    const immunities = targetActor.system.traits.di.value;
+    const vulnerabilities = targetActor.system.traits.dv.value;
+    const message = `Eye for Talent: ${referenceTarget} Resistances, \
+      Immunities, & Vulnerabilities:\ 
+      Resistances: ${resistances}, \
+      Immunities: ${immunities}, \
+      Vulnerabilities: ${vulnerabilities}`;
+    return ChatMessage.create({
+      user: gmID,
+      content: message,
+    });
+  }
+  else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const targetActorActions = targetActor.items.filter((i: any) => {
+      if (!['feat', 'weapon'].includes(i.type)) return false;
+
+      const rawActivities = i.system?.activities;
+
+      const activities = rawActivities
+        ? (typeof rawActivities.values === 'function'
+            ? Array.from(rawActivities.values())
+            : Object.values(rawActivities)
+          )
+        : [];
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return activities.some((a: any) =>
+        ['action', 'bonus', 'reaction'].includes(a.activation?.type),
+      );
+    });
+    const targetActorTraits = targetActor.items.filter((i) => {
+      const properties = i.system.properties || [];
+      return properties.has('trait');
+    });
+    const actionsOrTraits = new Set([
+      ...targetActorActions,
+      ...targetActorTraits,
+    ]);
+    if (!actionsOrTraits.size) return;
+    // Randomly get one of the actions or traits
+    const randomActionOrTrait = Array.from(actionsOrTraits)[
+      Math.floor(Math.random() * actionsOrTraits.size)
+    ];
+    const message = `Eye for Talent: ${referenceTarget} Action or Trait: \
+      ${randomActionOrTrait.name}`;
+    return ChatMessage.create({
+      user: gmID,
+      content: message,
+    });
   }
 }
 
