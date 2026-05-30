@@ -14,18 +14,22 @@
   "author": "",
   "type": "commonjs",
   "main": "eslint.config.js",
-  "scripts": {},
+  "scripts": {
+    "gen-types:chris": "tsc -p tsconfig.chrisPremades.json",
+    "build": "npm run gen-types:chris && tsc"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@ethaks/fvtt-quench": "^0.10.0",
     "@stylistic/eslint-plugin": "^5.10.0",
-    "@typescript-eslint/eslint-plugin": "^8.60.0",
     "@typescript-eslint/parser": "^8.60.0",
     "dnd5e": "github:adriangaro/dnd5e-types",
     "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
     "globals": "^17.6.0",
     "jiti": "^2.7.0",
     "sequencer": "github:fantasycalendar/FoundryVTT-Sequencer#master",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.0"
   },
   "dependencies": {
     "@eslint/compat": "^2.1.0",

@@ -5,3 +5,4 @@ midi-qol
 midi-item-showcase-community
 node_modules
 dist
+subrepos/*

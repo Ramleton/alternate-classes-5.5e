@@ -1,0 +1,55 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    "allowJs": true,
+    "checkJs": false,
+    "useDefineForClassFields": true,
+    "resolveJsonModule": true,
+    "sourceMap": false,
+    "rootDir": "./src",
+    "outDir": "./dist/src",
+    "declarationDir": "./types",
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "noEmit": false,
+    "isolatedModules": false,
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "noImplicitThis": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": false,
+    "noImplicitOverride": false,
+    "moduleResolution": "bundler",
+    "paths": {
+      "@midi-qol/types/*": [
+        "./subrepos/midi-qol/types/*"
+      ],
+      "@midi-qol/types/module/*": [
+        "./subrepos/midi-qol/types/module/*"
+      ]
+    },
+    "types": [
+      "@ethaks/fvtt-quench",
+      "fvtt-types"
+    ],
+    "esModuleInterop": true,
+    "newLine": "lf",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "subrepos/*"
+  ]
+}

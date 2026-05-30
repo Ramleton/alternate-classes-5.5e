@@ -6,7 +6,7 @@ import {
   itemUtils,
   socketUtils,
   tokenUtils,
-  workflowUtils
+  workflowUtils,
 } from '../../../../../utils.js';
 
 async function empoweredStrike({ trigger: { entity: item }, workflow, ditem }) {
