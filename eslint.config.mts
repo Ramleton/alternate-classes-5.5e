@@ -6,26 +6,23 @@ export default [
   {
     ignores: [
       'node_modules/**',
-      'dist/**',
       'subrepos/**',
-      'src/**/*.d.ts',
     ],
   },
   ...ts.configs.recommended,
+  ...ts.configs.stylistic,
   stylistic.configs.customize({
     indent: 2,
     quotes: 'single',
-    semi: true,
+    semi: true, // Set to false if you prefer no semicolons
   }),
   {
-    files: ['./src/**/*.{js,mjs,cjs,ts}'],
+    files: ['./src/**/*.{js,mjs,cjs,ts,.d.ts}'],
     plugins: { ts, '@stylistic': stylistic },
     languageOptions: { globals: globals.browser },
     rules: {
-      'no-undef': 'off',
-      'no-trailing-spaces': 'warn',
-      'max-len': ['error', { code: 80, tabWidth: 2 }],
-      'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0, maxBOF: 0 }],
+      '@stylistic/eol-last': ['error', 'always'],
+      '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1, maxBOF: 0 }],
     },
   },
 ];

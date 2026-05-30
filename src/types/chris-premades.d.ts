@@ -21,7 +21,7 @@ declare module 'chrisPremades' {
       item: Item,
       identifier: string,
       options?: { strict?: boolean }
-    ): Item | null;
+    ): any | null;
 
     getIdentifier(activity: object): string | null;
 
@@ -162,7 +162,7 @@ declare module 'chrisPremades' {
       modificationAmount: number,
       options?: {
         type?: string;
-        multiplier?: number
+        multiplier?: number;
       }
     ): void;
 
@@ -404,12 +404,12 @@ declare module 'chrisPremades' {
       buttons: [
         string,
         string,
-        { image?: string; displayAsRows?: boolean }
+        options?: { image?: string; displayAsRows?: boolean },
       ][],
       options?: {
         userId?: string;
       }
-    ): Promise<object>;
+    ): Promise<string>;
 
     numberDialog(
       title: string,
@@ -564,5 +564,5 @@ declare module 'chrisPremades' {
         buttons?: string;
       }
     ): Promise<object>;
-  }
+  };
 }

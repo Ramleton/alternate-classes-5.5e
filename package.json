@@ -16,7 +16,8 @@
   "main": "eslint.config.js",
   "scripts": {
     "gen-types:chris": "tsc -p tsconfig.chrisPremades.json",
-    "build": "npm run gen-types:chris && tsc"
+    "build": "tsc && npm run format-dist",
+    "format-dist": "eslint dist/**/*.js --fix"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

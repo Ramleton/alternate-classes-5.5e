@@ -28,17 +28,17 @@ async function preDeflectMissile({
    * bonus one level early
    */
   const minLevel = astralWarrior ? 10 : 11;
-  const allowedAttacks =
-    altMonkLevels >= minLevel ? ['rwak', 'rsak'] : ['rwak'];
+  const allowedAttacks
+    = altMonkLevels >= minLevel ? ['rwak', 'rsak'] : ['rwak'];
   if (!allowedAttacks.includes(actionType)) return false;
   /**
    * If the monk is a 10th level Astral Warrior, and they have the Astral Armor
    * effect, then they can use this technique for free
    */
   if (
-    !mysticTechniques?.system?.uses?.value &&
-    !astralArmorEffect &&
-    altMonkLevels >= 10
+    !mysticTechniques?.system?.uses?.value
+    && !astralArmorEffect
+    && altMonkLevels >= 10
   )
     return false;
   return true;
@@ -86,7 +86,7 @@ async function deflectMissile({
     targetSelection[0],
     workflow.hitTargets.first(),
   );
-  let attackDisadvantageEffect: any = undefined;
+  let attackDisadvantageEffect = undefined;
   if (distance > 20) {
     const effectData = {
       name: 'Long Range Deflect Disadvantage',
@@ -211,8 +211,8 @@ function mysticalDefenseBonus({ trigger: { entity: item } }) {
         key: 'flags.automated-conditions-5e.damage.bonus',
         mode: 0,
         value:
-          "bonus=@scale.alternate-monk.martial-arts; once; \
-          item.flags['chris-premades']?.info?.identifier === 'unarmedStrike';",
+          'bonus=@scale.alternate-monk.martial-arts; once; \
+          item.flags[\'chris-premades\']?.info?.identifier === \'unarmedStrike\';',
       },
     ],
   };

@@ -1,1 +1,2 @@
-import "fvtt-types/packages/foundry-vtt-types";
+import 'fvtt-types/packages/foundry-vtt-types';
+
