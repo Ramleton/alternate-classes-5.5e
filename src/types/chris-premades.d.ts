@@ -56,7 +56,7 @@ declare module 'chrisPremades' {
   export const workflowUtils: {
     bonusDamage(
       workflow: Workflow,
-      formula: DamageFormulaObject,
+      formula: string,
       options?: {
         ignoreCrit?: boolean;
         damageType?: string;
@@ -755,6 +755,80 @@ declare module 'chrisPremades' {
     fixScales(item: Item.Implementation): Promise<void>;
     canUse(item: Item.Implementation): boolean;
   };
+
+  export const tokenUtils: {
+    getDistance(
+      sourceToken: Token,
+      targetToken: Token,
+      options?: {
+        wallsBlock?: boolean;
+        checkCover?: boolean;
+      }
+    ): number;
+    checkCollision(token: Token, ray: foundry.canvas.geometry.Ray): boolean;
+    moveTokenAlongRay(
+      targetToken: Token,
+      origRay: foundry.canvas.geometry.Ray,
+      distance: number
+    ): Promise<void>;
+    pushToken(
+      sourceToken: Token,
+      targetToken: Token,
+      distance: number
+    ): Promise<void>;
+    findNearby(
+      token: Token,
+      range: number,
+      disposition: 'ally' | 'neutral' | 'enemy',
+      options?: {
+        includeIncapacitated?: boolean;
+        includeToken?: boolean;
+      }
+    ): Token[];
+    checkIncapacitated(token: Token, logResult?: boolean): boolean;
+    checkForRoom(token: Token, gridSquares: number): object;
+    findDirection(room: object): string;
+    canSee(sourceToken: Token, targetToken: Token): boolean;
+    canSense(
+      sourceToken: Token,
+      targetToken: Token,
+      senseModes: string[]
+    ): boolean;
+    attachToToken(token: Token, uuidsToAttach: string[]): Promise<void>;
+    detachFromToken(token: Token, uuidsToDetatch: string[]): Promise<void>;
+    getLightLevel(token: Token): string;
+    grappleHelper(
+      sourceToken: Token,
+      targetToken: Token,
+      item: Item,
+      options?: {
+        noContest?: boolean;
+        flatDC?: boolean;
+        escapeDisadvantage?: boolean;
+        sourceEffect: ActiveEffect;
+        targetEffect: ActiveEffect;
+        restrained?: boolean;
+        ignoreSizeLimit?: boolean;
+      }
+    );
+    isGrappledBy(target: Token, source: Token): boolean;
+    getMovementHitTokens(
+      startPoint: { x: number; y: number },
+      endPoint: { x: number; y: number },
+      radius: number
+    );
+    getLinearDistanceMoved(token: Token): number;
+    mountToken(
+      rider: Token,
+      target: Token,
+      options?: {
+        vae?: boolean;
+        unhideActivities?: boolean;
+      }
+    );
+    getBaseActor(token: Token): Actor;
+  };
+
   export const constants: {
     attacks: ['msak', 'rsak', 'mwak', 'rwak'];
     meleeAttacks: ['mwak', 'msak'];
