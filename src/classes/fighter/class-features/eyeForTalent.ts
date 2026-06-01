@@ -4,6 +4,7 @@ import {
   dialogUtils,
   effectUtils,
   genericUtils,
+  socketUtils,
   workflowUtils,
 } from 'chrisPremades';
 

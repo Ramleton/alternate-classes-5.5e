@@ -578,8 +578,8 @@ declare module 'chrisPremades' {
     update(
       entity: object,
       updates: object,
-      options: object,
-      forceGM: boolean
+      options?: object,
+      forceGM?: boolean
     ): Promise<void>;
     setFlag(
       entity: object,
@@ -645,5 +645,176 @@ declare module 'chrisPremades' {
       rules?: 'modern' | 'legacy' | string
     ): string[];
     convertDistance(ft: number): number;
+  };
+
+  export const socketUtils: {
+    gmID(): string;
+    isTheGM(): boolean;
+    hasPermission(entity: any, userId: string): boolean;
+    firstOwner(document: any, useId?: boolean): string | any;
+    remoteRollItem(
+      item: Item.Implementation,
+      config: object,
+      options: object,
+      userId: string
+    ): Promise<void>;
+  };
+
+  export const itemUtils: {
+    getSaveDC(item: Item.Implementation): number;
+    createItems(
+      actor: Actor.Implementation,
+      updates: object[],
+      options?: {
+        favorite?: boolean;
+        section?: string;
+        parentEntity?: object;
+        identifier?: string;
+        castData?: object;
+      }
+    );
+    getItemDescription(name: string): string;
+    isSpellFeature(item: Item.Implementation): boolean;
+    getConfig(item: Item.Implementation, key: string): any;
+    setConfig(
+      item: Item.Implementation,
+      key: string,
+      value: any
+    ): Promise<void>;
+    getItemByIdentifier(
+      actor: Actor.Implementation,
+      identifier: string
+    ): Item.Implementation;
+    getAllItemsByIdentifier(
+      actor: Actor.Implementation,
+      identifier: string
+    ): Item.Implementation[];
+    getVersion(item: Item.Implementation): string | undefined;
+    getSource(item: Item.Implementation): string | undefined;
+    isUpToDate(item: Item.Implementation): Promise<boolean>;
+    syntheticItem(
+      itemData: Item,
+      actor: Actor.Implementation
+    ): Item.Implementation;
+    enchantItem(
+      item: Item.Implementation,
+      effectData: ActiveEffect,
+      options?: {
+        effects?: ActiveEffect[];
+        items?: Item.Implementation[];
+        concentrationItem?: Item;
+        parentEntity?: object;
+        identifier?: string;
+        vae?: boolean;
+        interdependent?: boolean;
+        strictlyInterdependent?: boolean;
+      }
+    );
+    convertDuration(entity: any): any;
+    getEquipmentState(item: Item.Implementation): boolean;
+    getToolProficiency(
+      actor: Actor.Implementation,
+      tool: Item.Implementation
+    ): 0 | 0.5 | 1 | 2;
+    getSavedCastData(item: Item.Implementation): any;
+    getGenericFeatureConfig(item: Item.Implementation, key: string): any;
+    getItemByGenericFeature(actor: Actor.Implementation, key: string): any;
+    isWeaponProficient(item: Item.Implementation): boolean;
+    itemUpdate(item: Item.Implementation): Promise<Item.Implementation>;
+    setHiddenActivities(
+      item: Item.Implementation,
+      activityIdentifiers: string[],
+      replace?: boolean
+    ): Promise<void>;
+    setSpellActivities(
+      item: Item.Implementation,
+      activityIdentifiers: string[],
+      replace?: boolean
+    ): Promise<void>;
+    getHiddenActivities(item: Item.Implementation): string[];
+    getSpellActivities(item: Item.Implementation): string[];
+    getActivity(item: Item.Implementation, type: string): any;
+    getEffectByIdentifier(item: Item.Implementation, identifier: string): any;
+    cloneItem(
+      item: Item.Implementation,
+      updates?: object,
+      options?: {
+        keepId?: boolean;
+      }
+    ): Item.Implementation;
+    correctActivityItemConsumption(
+      item: Item.Implementation,
+      activityIdentifiers: string[],
+      targetIdentifier: string
+    ): Promise<void>;
+    multiCorrectActivityItemConsumption(
+      item: Item.Implementation,
+      activityIdentifiers: string[],
+      corrections: object
+    ): Promise<void>;
+    fixScales(item: Item.Implementation): Promise<void>;
+    canUse(item: Item.Implementation): boolean;
+  };
+  export const constants: {
+    attacks: ['msak', 'rsak', 'mwak', 'rwak'];
+    meleeAttacks: ['mwak', 'msak'];
+    rangedAttacks: ['rwak', 'rsak'];
+    weaponAttacks: ['mwak', 'rwak'];
+    spellAttacks: ['msak', 'rsak'];
+    rangedWeaponAttacks: ['rwak'];
+    meleeWeaponAttacks: ['mwak'];
+    unarmedAttacks: [
+      'unarmedStrike',
+      'monkUnarmedStrike',
+      'tavernBrawlerUnarmedStrike',
+      'fightingStyleUnarmedFightingUnarmedStrike',
+      'predatoryStrike',
+      'unarmedFightingUnarmedStrike',
+      'formOfTheBeast',
+      'pugilistUnarmedStrike',
+    ];
+    weaponTypes: [
+      'martialM',
+      'simpleM',
+      'martialR',
+      'simpleR',
+    ];
+    meleeWeaponTypes: [
+      'martialM',
+      'simpleM',
+    ];
+    rangedWeaponTypes: [
+      'martialR',
+      'simpleR',
+    ];
+    armorTypes: [
+      'light',
+      'medium',
+      'heavy',
+    ];
+    autoOptions: () => { label: string; value: string }[];
+    damageTypeOptions: () => { label: string; value: string }[];
+    creatureTypeOptions: () => { label: string; value: string }[];
+    actorCompendiumPacks: () => { label: string; value: string }[];
+    itemCompendiumPacks: () => { label: string; value: string }[];
+    abilityOptions: () => { label: string; value: string }[];
+    healingTypeOptions: () => { label: string; value: string }[];
+    statusOptions: () => { label: string; value: string }[];
+    skillOptions: () => { label: string; value: string }[];
+    diceSizeOptions: () => { label: string; value: string }[];
+    teleportOptions: () => { label: string; value: string }[];
+    itemProperties: () => { label: string; value: string }[];
+    itemOptions: () => { label: string; value: string }[];
+    armorOptions: () => { label: string; value: string }[];
+    spellSlotOptions: () => { label: string; value: string }[];
+    spellSchoolOptions: () => { label: string; value: string }[];
+    baseWeaponOptions: [];
+    baseMeleeWeaponOptions: [];
+    baseRangedWeaponOptions: [];
+    getBaseWeaponOptions: () => [];
+    getBaseMeleeWeaponOptions: () => [];
+    getBaseRangedWeaponOptions: () => [];
+    toolNames: object;
+    featOptions: [];
   };
 }
