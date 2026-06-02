@@ -829,6 +829,75 @@ declare module 'chrisPremades' {
     getBaseActor(token: Token): Actor;
   };
 
+  export const rollUtils: {
+    getCriticalFormula(formula: string, rollData: any): any;
+    contestedRoll({
+      sourceToken,
+      targetToken,
+      sourceRollType,
+      targetRollType,
+      sourceAbilities,
+      targetAbilities,
+      sourceRollOptions,
+      targetRollOptions,
+    }: {
+      sourceToken: Token;
+      targetToken: Token;
+      sourceRollType: string;
+      targetRollType: string;
+      sourceAbilities: string[];
+      targetAbilities: string[];
+      sourceRollOptions?: any;
+      targetRollOptions?: any;
+    }): Promise<any>;
+    requestRoll(
+      token: Token,
+      request: string,
+      ability: string,
+      options?: any
+    ): Promise<any>;
+    getChangedDamageRoll(origRoll, newType): Promise<any>;
+    rollDice(
+      formula: string,
+      options?: {
+        entity?: any;
+        chatMessage?: any;
+        flavor?: any;
+        mode?: 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll';
+        options?: any;
+      }
+    ): Promise<any>;
+    rollDiceSync(
+      formula: string,
+      options?: {
+        entity?: any;
+        options?: {
+          strict?: boolean;
+          maximize?: boolean;
+          minimize?: boolean;
+        };
+      }
+    );
+    damageRoll(
+      formula: string,
+      entity: any,
+      options?: any,
+      evaluateOptions?: any
+    ): Promise<any>;
+    addToRoll(roll: any, formula: string, options?: any): Promise<any>;
+    remoteRoll(roll: any, userId: any): Promise<any>;
+    remoteDamageRolls(rolls: any, userId: any): Promise<any>;
+    hasDuplicateDie(rolls: any[]): boolean;
+    replaceD20(roll: any, number: any): Promise<any>;
+    makeCritical(roll: any): Promise<any>;
+    updateDieResult(
+      roll: any,
+      termIndex: number,
+      resultIndex: number,
+      newValue: any
+    ): void;
+  };
+
   export const constants: {
     attacks: ['msak', 'rsak', 'mwak', 'rwak'];
     meleeAttacks: ['mwak', 'msak'];
