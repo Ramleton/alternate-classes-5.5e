@@ -221,7 +221,7 @@ declare module 'chrisPremades' {
       options?: { userId: string }
     ): Promise<void>;
 
-    getActionType(workflow: Workflow): string;
+    getActionType(workflow: Workflow): 'mwak' | 'rwak' | 'msak' | 'rsak';
 
     isAttackType(
       workflow: Workflow,

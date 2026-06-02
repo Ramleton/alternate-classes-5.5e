@@ -37,7 +37,8 @@
     },
     "types": [
       "@ethaks/fvtt-quench",
-      "fvtt-types"
+      "fvtt-types",
+      "@league-of-foundry-developers/foundry-vtt-dnd5e-types"
     ],
     "esModuleInterop": true,
     "newLine": "lf",

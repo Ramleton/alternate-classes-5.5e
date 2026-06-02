@@ -22,6 +22,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@ethaks/fvtt-quench": "^0.10.0",
+    "@league-of-foundry-developers/foundry-vtt-dnd5e-types": "^1.2.4-2",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^8.60.0",
     "dnd5e": "github:adriangaro/dnd5e-types",
