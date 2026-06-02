@@ -12,6 +12,7 @@ Hooks.once('init', () => {
     .spellcasting
     .SingleLevelSpellcasting {
     /** @override */
+    // eslint-disable-next-line @typescript-eslint/class-literal-property-style
     static get TYPE() {
       return 'wuJen';
     }
@@ -95,6 +96,158 @@ Hooks.once('init', () => {
         .get('alternate-classes-55e')
         .api
         .isMartialArtsAttack({ workflow });
+    },
+
+    getAlternateMartialExploits: function (actor) {
+      const { utils: { itemUtils } } = chrisPremades;
+      const martialExploits = itemUtils.getItemByIdentifier(
+        actor,
+        'martialExploits',
+      );
+      const savageExploits = itemUtils.getItemByIdentifier(
+        actor,
+        'savageExploits',
+      );
+      const deviousExploits = itemUtils.getItemByIdentifier(
+        actor,
+        'deviousExploits',
+      );
+      return {
+        martialExploits,
+        savageExploits,
+        deviousExploits,
+      };
+    },
+
+    alternateMartialExploitMulticlassingTable: [
+      { totalLevel: 1, exploitDie: 'd4', exploitDice: 2 },
+      { totalLevel: 2, exploitDie: 'd4', exploitDice: 2 },
+      { totalLevel: 3, exploitDie: 'd4', exploitDice: 2 },
+      { totalLevel: 4, exploitDie: 'd4', exploitDice: 2 },
+      { totalLevel: 5, exploitDie: 'd6', exploitDice: 3 },
+      { totalLevel: 6, exploitDie: 'd6', exploitDice: 3 },
+      { totalLevel: 7, exploitDie: 'd6', exploitDice: 3 },
+      { totalLevel: 8, exploitDie: 'd6', exploitDice: 3 },
+      { totalLevel: 9, exploitDie: 'd6', exploitDice: 3 },
+      { totalLevel: 10, exploitDie: 'd6', exploitDice: 3 },
+      { totalLevel: 11, exploitDie: 'd8', exploitDice: 4 },
+      { totalLevel: 12, exploitDie: 'd8', exploitDice: 4 },
+      { totalLevel: 13, exploitDie: 'd8', exploitDice: 4 },
+      { totalLevel: 14, exploitDie: 'd8', exploitDice: 4 },
+      { totalLevel: 15, exploitDie: 'd8', exploitDice: 4 },
+      { totalLevel: 16, exploitDie: 'd8', exploitDice: 4 },
+      { totalLevel: 17, exploitDie: 'd10', exploitDice: 5 },
+      { totalLevel: 18, exploitDie: 'd10', exploitDice: 5 },
+      { totalLevel: 19, exploitDie: 'd10', exploitDice: 5 },
+      { totalLevel: 20, exploitDie: 'd10', exploitDice: 5 },
+    ],
+
+    alternateMartialExploitMulticlassingValues: function (totalLevel) {
+      return game.modules.get('alternate-classes-55e').api.alternateMartialExploitMulticlassingTable[totalLevel - 1];
+    },
+
+    getAltMartialExploitDieForMulticlassLevel: function (totalLevel) {
+      const formula = game.modules.get('alternate-classes-55e').api.alternateMartialExploitMulticlassingTable[totalLevel - 1].exploitDie;
+      return { faces: Number.fromString(formula.replace('d', '')), formula };
+    },
+
+    getAltMartialMCTotalLevel: function (actor) {
+      const fighterLevels = actor.items.filter(
+        item => item.system.identifier === 'alternate-fighter',
+      )[0]?.system?.levels || 0;
+      const barbarianLevels = actor.items.filter(
+        item => item.system.identifier === 'alternate-barbarian',
+      )[0]?.system?.levels || 0;
+      const rogueLevels = actor.items.filter(
+        item => item.system.identifier === 'alternate-rogue',
+      )[0]?.system?.levels || 0;
+      const multiclassingLevel = fighterLevels + barbarianLevels + rogueLevels;
+      return multiclassingLevel;
+    },
+
+    getAltMartialMCExploitsRemaining: function (totalLevel) {
+      return game.modules.get('alternate-classes-55e').api.alternateMartialExploitMulticlassingTable[totalLevel - 1].exploitDice;
+    },
+
+    getAltMartialExploitsRemaining: function (actor) {
+      const { utils: { itemUtils } } = chrisPremades;
+      const moduleAPI = game.modules.get('alternate-classes-55e').api;
+      const totalLevel = moduleAPI.getAltMartialMCTotalLevel(actor);
+      const multiclassUses = moduleAPI.getAltMartialMCExploitsRemaining(totalLevel);
+      const martialExploits = itemUtils.getItemByIdentifier(actor, 'martialExploits');
+      const martialExploitsUsesRemaining = martialExploits?.system?.uses?.value || 0;
+      const savageExploits = itemUtils.getItemByIdentifier(actor, 'savageExploits');
+      const savageExploitsUsesRemaining = savageExploits?.system?.uses?.value || 0;
+      const deviousExploits = itemUtils.getItemByIdentifier(actor, 'deviousExploits');
+      const deviousExploitsUsesRemaining = deviousExploits?.system?.uses?.value || 0;
+      const singleClassMax = Math.max(
+        martialExploitsUsesRemaining,
+        savageExploitsUsesRemaining,
+        deviousExploitsUsesRemaining,
+      );
+      const remainingMulticlassUses = multiclassUses
+        - martialExploits?.system?.uses?.spent || 0
+        - savageExploits?.system?.uses?.spent || 0
+        - deviousExploits?.system?.uses?.spent || 0;
+      return remainingMulticlassUses > 0
+        ? singleClassMax
+        : remainingMulticlassUses;
+    },
+
+    spendAlternateMartialExploitUses: async function (uses, actor) {
+      const { utils: { genericUtils } } = chrisPremades;
+      const moduleAPI = game.modules.get('alternate-classes-55e').api;
+      const {
+        martialExploits,
+        savageExploits,
+        deviousExploits,
+      } = moduleAPI.getAlternateMartialExploits(actor);
+      if (deviousExploits) {
+        const remainingUses = deviousExploits.system.uses.max - deviousExploits.system.uses.spent;
+        await genericUtils.update(deviousExploits, {
+          'system.uses.spent': deviousExploits.system.uses.spent + Math.min(uses, remainingUses),
+        });
+        uses -= Math.min(uses, remainingUses);
+      }
+      if (savageExploits && uses) {
+        const remainingUses = savageExploits.system.uses.max - savageExploits.system.uses.spent;
+        return await genericUtils.update(savageExploits, {
+          'system.uses.spent': savageExploits.system.uses.spent + Math.min(uses, remainingUses),
+        });
+        uses -= Math.min(uses, remainingUses);
+      }
+      if (martialExploits && uses) {
+        const remainingUses = martialExploits.system.uses.max - martialExploits.system.uses.spent;
+        return await genericUtils.update(martialExploits, {
+          'system.uses.spent': martialExploits.system.uses.spent + Math.min(uses, remainingUses),
+        });
+        uses -= Math.min(uses, remainingUses);
+      }
+      if (uses) {
+        genericUtils.notify('Unknown class', 'error');
+      }
+    },
+
+    getAlternateMartialExploitDie: function (item) {
+      const moduleAPI = game.modules.get('alternate-classes-55e').api;
+      const multiclassingLevel = moduleAPI.getAltMartialMCTotalLevel(item.actor);
+      const multiclassingDie = moduleAPI.getAltMartialExploitDieForMulticlassLevel(multiclassingLevel);
+      const fighterDie = item.actor.system.scale?.
+        ['alternate-fighter']?.['exploit-die'];
+      const barbarianDie = item.actor.system.scale?.
+        ['alternate-barbarian']?.['exploit-die'];
+      const rogueDie = item.actor.system.scale?.
+        ['alternate-rogue']?.['exploit-die'];
+      const maxSingleClassDie = [
+        fighterDie,
+        barbarianDie,
+        rogueDie,
+      ]
+        .filter(maxDie => maxDie)
+        .sort((die1, die2) => die2.faces - die1.faces)[0];
+      if (maxSingleClassDie?.faces < multiclassingDie.faces)
+        return multiclassingDie;
+      return maxSingleClassDie;
     },
   };
   console.log('Alternate Classes 5e | Initialized API');
