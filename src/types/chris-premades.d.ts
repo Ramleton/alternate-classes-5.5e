@@ -280,13 +280,13 @@ declare module 'chrisPremades' {
       effectData: object,
       options?: {
         concentrationItem?: Item;
-        parentEntity: object;
+        parentEntity?: object;
         identifier?: string;
         vae?: boolean;
         interdependent?: boolean;
         strictlyInterdependent?: boolean;
         unhideActivities?: boolean;
-        rules?: object;
+        rules?: 'modern' | 'legacy';
         macros?: object;
         conditions?: object;
         animate?: boolean;
@@ -959,5 +959,20 @@ declare module 'chrisPremades' {
     getBaseRangedWeaponOptions: () => [];
     toolNames: object;
     featOptions: [];
+  };
+
+  export const combatUtils: {
+    currentTurn(): `${number} - ${number}`;
+    inCombat(): boolean;
+    combatStarted(): boolean;
+    perTurnCheck(
+      entity: any,
+      name: string,
+      ownTurnOnly: boolean,
+      tokenId: string
+    ): boolean;
+    setTurnCheck(entity: any, name: string, reset: boolean): Promise<void>;
+    getCurrentCombatantToken(): Token;
+    isOwnTurn(token: Token): boolean;
   };
 }
