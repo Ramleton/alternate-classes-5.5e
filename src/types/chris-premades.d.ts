@@ -456,7 +456,7 @@ declare module 'chrisPremades' {
         buttons?: string;
         maxes?: {};
       }
-    ): Promise<false | object[]>;
+    ): Promise<false | [any, boolean] | any>;
 
     confirm(
       title: string,
@@ -779,7 +779,7 @@ declare module 'chrisPremades' {
     findNearby(
       token: Token,
       range: number,
-      disposition: 'ally' | 'neutral' | 'enemy',
+      disposition: 'ally' | 'neutral' | 'enemy' | 'any',
       options?: {
         includeIncapacitated?: boolean;
         includeToken?: boolean;
