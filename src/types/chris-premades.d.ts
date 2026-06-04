@@ -975,4 +975,82 @@ declare module 'chrisPremades' {
     getCurrentCombatantToken(): Token;
     isOwnTurn(token: Token): boolean;
   };
+
+  export const actorUtils: {
+    getEffects(
+      actor: Actor,
+      options?: { includeItemEffects?: boolean }
+    ): ActiveEffect[];
+    addFavorites(
+      actor: Actor,
+      entities: any[]
+    ): Promise<void>;
+    removeFavorites(
+      actor: Actor,
+      entities: any[]
+    ): Promise<void>;
+    getTokens(actor: Actor): Token[];
+    getFirstToken(actor: Actor): Token;
+    getLevelOrCR(actor: Actor): number;
+    checkTrait(actor: Actor, type: string, trait: string): boolean;
+    typeOrRace(actor: Actor): string;
+    raceOrType(actor: Actor): string;
+    getAlignment(actor: Actor): string;
+    getCRFromProf(prof: number): number;
+    getSidebarActor(actor: Actor, options?: { autoImport?: boolean }): Actor;
+    getSize<B extends boolean>(
+      actor: Actor,
+      returnString: B
+    ): B extends true ? string : number;
+    hasUsedReaction(actor: Actor): boolean;
+    setReactionUsed(actor: Actor): Promise<void>;
+    removeReactionUsed(actor: Actor, force?: boolean): Promise<void>;
+    hasUsedBonusAction(actor: Actor): boolean;
+    setBonusActionUsed(actor: Actor): Promise<void>;
+    removeBonusActionUsed(actor: Actor, force?: boolean): Promise<void>;
+    hasSpellSlots(actor: Actor, atLeast?: number): boolean;
+    getCastableSpells(actor: Actor): Item[];
+    isShapeChanger(actor: Actor): boolean;
+    doConcentrationCheck(actor: Actor, saveDC: number): Promise<void>;
+    polymorph(
+      origActor: Actor,
+      newActor: Actor,
+      options: object,
+      renderSheet?: boolean
+    ): Promise<void>;
+    updateAll(actor: Actor): Promise<string>;
+    getEquivalentSpellSlotName(
+      actor: Actor,
+      level: number,
+      options?: {
+        canCast?: boolean;
+      }
+    );
+    getEquippedArmor(actor: Actor, types?: string[]): Item?;
+    getEquippedShield(actor: Actor): Item?;
+    getAllEquippedArmor(actor: Actor): Item[];
+    hasConditionBy(
+      sourceActor: Actor,
+      targetActor: Actor,
+      statusId: string
+    ): Promise<boolean>;
+    compareSize(
+      source: Actor | Token,
+      target: Actor | Token,
+      goal:
+        | 'equal'
+        | '='
+        | '==='
+        | 'greaterThan'
+        | '>'
+        | 'greaterThanOrEqualTo'
+        | '>='
+        | 'lessThan'
+        | '<'
+        | 'lessThanOrEqualTo'
+        | '<='
+    ): boolean;
+    getBestAbility(actor: Actor, abilities: string[]): string;
+    giveHeroicInspiration(actor: Actor): Promise<void>;
+  };
 }
