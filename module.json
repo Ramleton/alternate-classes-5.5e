@@ -1,9 +1,9 @@
 {
   "id": "alternate-classes-55e",
   "title": "Alternate Classes (5.5e)",
-  "version": "1.3.2",
+  "version": "1.4.1",
   "manifest": "https://github.com/Ramleton/alternate-classes-55e/releases/latest/download/module.json",
-  "download": "https://github.com/Ramleton/alternate-classes-55e/releases/download/1.3.2/module.zip",
+  "download": "https://github.com/Ramleton/alternate-classes-55e/releases/download/1.4.1/module.zip",
   "esmodules": [
     "script.js"
   ],
