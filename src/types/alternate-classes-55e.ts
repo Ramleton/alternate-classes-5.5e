@@ -55,6 +55,57 @@ type ExploitMulticlassingTable = [
   { totalLevel: 20; exploitDie: 'd10'; exploitDice: 5 },
 ];
 
+interface ExploitsToDegrees {
+  // 1st Degree Exploits
+  'arresting-strike': 1;
+  'brace-up': 1;
+  'disarm': 1;
+  'feat-of-strength': 1;
+  'feint': 1;
+  'first-aid': 1;
+  'heroic-fortitude': 1;
+  'hurl': 1;
+  'imposing-presence': 1;
+  'mighty-leap': 1;
+  'mighty-thrust': 1;
+  'parry': 1;
+  'precision-strike': 1;
+  'riposte': 1;
+  'ruthless-strike': 1;
+  'shield-impact': 1;
+  'skilled-rider': 1;
+  'sweeping-strike': 1;
+  // 2nd Degree Exploits
+  'blinding-debris': 2;
+  'concussive-blow': 2;
+  'crippling-strike': 2;
+  'defensive-stance': 2;
+  'heroic-will': 2;
+  'honor-duel': 2;
+  'martial-focus': 2;
+  'menacing-shout': 2;
+  'redirect': 2;
+  'rending-strike': 2;
+  'volley': 2;
+  'whirlwind-strike': 2;
+  // 3rd Degree Exploits
+  'disorienting-blow': 3;
+  'heroic-focus': 3;
+  'mighty-shot': 3;
+  'mythic-athleticism': 3;
+  'mythic-resilience': 3;
+  'war-cry': 3;
+  // 4th Degree Exploits
+  'expert-focus': 4;
+  'fluid-movements': 4;
+  'quick-draw': 4;
+  'staggering-blow': 4;
+  'unbreakable': 4;
+  // 5th Degree Exploits
+  'steel-wind-slash': 5;
+  'storm-of-arrows': 5;
+}
+
 export interface AlternateClasses55eAPI {
   api: {
     isMartialArtsAttack(
@@ -66,6 +117,8 @@ export interface AlternateClasses55eAPI {
     ): boolean;
 
     alternateMartialExploitMulticlassingTable: ExploitMulticlassingTable;
+
+    altMartialExploitsToDegrees: ExploitsToDegrees;
 
     alternateMartialExploitMulticlassingValues(
       totalLevel: number
@@ -79,7 +132,7 @@ export interface AlternateClasses55eAPI {
       totalLevel: number
     ): number;
 
-    getAltMartialExploitsRemaining(actor: Actor): number;
+    getAltMartialExploitsRemaining(item: Item): number;
 
     getAlternateMartialExploits(actor: Actor): {
       martialExploits: Item | undefined;
