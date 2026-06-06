@@ -2,19 +2,16 @@ import { Workflow } from '@midi-qol/types/module/Workflow';
 import {
   activityUtils,
   dialogUtils,
+  itemUtils,
   socketUtils,
   workflowUtils,
 } from 'chrisPremades';
-import {
-  AlternateClasses55eAPI,
-} from '../../../../types/alternate-classes-55e';
 
 async function pre(
   item,
   workflow: Workflow,
 ): Promise<boolean> {
   if (!workflow.hitTargets.size) return false;
-  if (!item.system.uses.value) return false;
   const selection = await dialogUtils.confirmUseItem(item, {
     userId: socketUtils.firstOwner(item.actor, true),
   });
@@ -50,14 +47,17 @@ async function workflow({
   trigger: { entity: item },
   workflow,
 }) {
-  const altClassesModule = game.modules
-    ?.get('alternate-classes-55e') as AlternateClasses55eAPI | undefined;
-  if (!altClassesModule) return;
+  const unyieldingKnight = itemUtils.getItemByIdentifier(
+    item.actor,
+    'ac55eUnyieldingKnight',
+  );
+  if (!item.system.uses.value && !unyieldingKnight) return;
   const res1 = await pre(item, workflow);
   if (!res1) return;
   const res2 = await during(item, workflow);
   if (!res2) return;
-  await post(item);
+  if (!unyieldingKnight)
+    await post(item);
 }
 
 export const ac55eExploitChivalricMarkApply = {
