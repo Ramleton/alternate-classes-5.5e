@@ -15,9 +15,7 @@ async function saveBonus(
     ?.api
     ?.getAlternateMartialExploitDie(item);
   if (!exploitDie) return 0;
-  const bonusRoll = await (new Roll(`1d${exploitDie.faces}`)).roll();
-  const checkBonus = bonusRoll.total;
-  return await rollUtils.addToRoll(roll, String(checkBonus));
+  return await rollUtils.addToRoll(roll, `1d${exploitDie.faces}`);
 }
 
 async function skillBonus(
@@ -33,9 +31,7 @@ async function skillBonus(
     ?.api
     ?.getAlternateMartialExploitDie(item);
   if (!exploitDie) return 0;
-  const bonusRoll = await (new Roll(`1d${exploitDie.faces}`)).roll();
-  const checkBonus = bonusRoll.total;
-  return await rollUtils.addToRoll(roll, String(checkBonus));
+  return await rollUtils.addToRoll(roll, `1d${exploitDie.faces}`);
 }
 
 export const ac55eEliteReflexes = {
