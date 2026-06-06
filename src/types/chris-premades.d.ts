@@ -1093,5 +1093,42 @@ declare module 'chrisPremades' {
       y: number;
       rotation: number;
     };
-  }
+  };
+
+  export const thirdPartyUtils: {
+    attacked(
+      workflow: Workflow,
+      itemIdentifier: string,
+      activityIdentifier: string,
+      options: {
+        canSee?: boolean;
+        reaction?: boolean;
+        distance?: number;
+        canUse?: boolean;
+        attacker?: boolean;
+        dispositionType?: 'ally' | 'neutral' | 'enemy' | 'any';
+        dialogType?: 'use' | 'attackRoll';
+        creatureTypes?: string[];
+        isOwner?: boolean;
+      }
+    );
+    damaged(
+      workflow: Workflow,
+      ditem: any,
+      targetToken: any,
+      itemIdentifier: string,
+      activityIdentifier: string,
+      options?: {
+        canSee?: boolean;
+        reaction?: boolean;
+        distance?: number;
+        canUse?: boolean;
+        dispositionType?: 'ally' | 'neutral' | 'enemy' | 'any';
+        dialogType?: 'use' | 'attackRoll';
+        checkHits?: boolean;
+        preventZeroHP?: boolean;
+        halfDamage?: boolean;
+      }
+    );
+  };
 }
