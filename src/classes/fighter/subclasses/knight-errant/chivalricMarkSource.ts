@@ -1,6 +1,7 @@
 import {
   actorUtils,
   dialogUtils,
+  effectUtils,
   itemUtils,
   socketUtils,
   tokenUtils,
@@ -13,6 +14,11 @@ async function pre(token, sourceToken, targetToken): Promise<any> {
     return [];
   if (token.id === targetToken.id)
     return [];
+  const markEffect = effectUtils.getEffectByIdentifier(
+    sourceToken.actor,
+    'ac55eChivalricMarkEffect',
+  );
+  if (!markEffect) return [];
   if (actorUtils.hasUsedReaction(token.actor)) {
     const legendaryKnightErrant = itemUtils.getItemByIdentifier(
       token.actor,

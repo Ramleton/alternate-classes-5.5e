@@ -34,9 +34,6 @@ async function during(
     useActivity,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [workflow.hitTargets.first() as any],
-    {
-      consumeResources: true,
-    },
   );
   return true;
 }
