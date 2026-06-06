@@ -10,12 +10,16 @@ import {
 async function pre(
   item,
   workflow: Workflow,
+  unyieldingKnight,
 ): Promise<boolean> {
   if (!workflow.hitTargets.size) return false;
-  const selection = await dialogUtils.confirmUseItem(item, {
-    userId: socketUtils.firstOwner(item.actor, true),
-  });
-  return selection;
+  if (!unyieldingKnight) {
+    const selection = await dialogUtils.confirmUseItem(item, {
+      userId: socketUtils.firstOwner(item.actor, true),
+    });
+    return selection;
+  }
+  return true;
 }
 
 async function during(
@@ -52,7 +56,7 @@ async function workflow({
     'ac55eUnyieldingKnight',
   );
   if (!item.system.uses.value && !unyieldingKnight) return;
-  const res1 = await pre(item, workflow);
+  const res1 = await pre(item, workflow, unyieldingKnight);
   if (!res1) return;
   const res2 = await during(item, workflow);
   if (!res2) return;
