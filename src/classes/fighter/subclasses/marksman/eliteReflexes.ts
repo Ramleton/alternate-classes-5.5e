@@ -1,0 +1,59 @@
+import { rollUtils } from 'chrisPremades';
+import {
+  AlternateClasses55eAPI,
+} from '../../../../types/alternate-classes-55e';
+
+async function saveBonus(
+  { trigger: { entity: item, roll, saveId } },
+) {
+  const altClassesModule = game
+    .modules
+    ?.get('alternate-classes-55e') as AlternateClasses55eAPI | undefined;
+  if (!altClassesModule) return;
+  if (saveId !== 'dex') return;
+  const exploitDie = altClassesModule
+    ?.api
+    ?.getAlternateMartialExploitDie(item);
+  if (!exploitDie) return 0;
+  const bonusRoll = await (new Roll(`1d${exploitDie.faces}`)).roll();
+  const checkBonus = bonusRoll.total;
+  return await rollUtils.addToRoll(roll, String(checkBonus));
+}
+
+async function skillBonus(
+  { trigger: { entity: item, roll } },
+) {
+  const altClassesModule = game
+    .modules
+    ?.get('alternate-classes-55e') as AlternateClasses55eAPI | undefined;
+  if (!altClassesModule) return;
+  if (roll.data.abilityId !== 'dex')
+    return;
+  const exploitDie = altClassesModule
+    ?.api
+    ?.getAlternateMartialExploitDie(item);
+  if (!exploitDie) return 0;
+  const bonusRoll = await (new Roll(`1d${exploitDie.faces}`)).roll();
+  const checkBonus = bonusRoll.total;
+  return await rollUtils.addToRoll(roll, String(checkBonus));
+}
+
+export const ac55eEliteReflexes = {
+  name: 'Elite Reflexes',
+  version: '1.3.141',
+  rules: 'modern',
+  save: [
+    {
+      pass: 'bonus',
+      macro: saveBonus,
+      priority: 50,
+    },
+  ],
+  skill: [
+    {
+      pass: 'bonus',
+      macro: skillBonus,
+      priority: 50,
+    },
+  ],
+};
