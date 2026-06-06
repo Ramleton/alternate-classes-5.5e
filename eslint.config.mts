@@ -19,7 +19,13 @@ export default [
   {
     files: ['./src/**/*.{js,mjs,cjs,ts,.d.ts}'],
     plugins: { ts, '@stylistic': stylistic },
-    languageOptions: { globals: globals.browser },
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: {
+        tsconfigRootDir: __dirname,
+        project: true,
+      },
+    },
     rules: {
       '@stylistic/eol-last': ['error', 'always'],
       '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1, maxBOF: 0 }],
