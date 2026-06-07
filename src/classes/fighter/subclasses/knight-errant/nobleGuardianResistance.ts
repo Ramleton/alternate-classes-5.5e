@@ -1,12 +1,12 @@
 import { Workflow } from '@midi-qol/types/module/Workflow';
 import {
-  dialogUtils,
-  effectUtils,
-  socketUtils,
-  workflowUtils,
+    dialogUtils,
+    effectUtils,
+    socketUtils,
+    workflowUtils,
 } from 'chrisPremades';
 import {
-  AlternateClasses55eAPI,
+    AlternateClasses55e,
 } from '../../../../types/alternate-classes-55e';
 
 async function pre(
@@ -15,7 +15,7 @@ async function pre(
   sourceToken,
   targetToken,
   workflow: Workflow,
-  altClassesModule: AlternateClasses55eAPI,
+  altClassesModule: AlternateClasses55e,
 ): Promise<boolean> {
   // Don't prompt if the attacker is the user
   if (token.id === sourceToken.id)
@@ -44,7 +44,7 @@ async function during(
   item,
   targetToken,
   workflow: Workflow,
-  altClassesModule: AlternateClasses55eAPI,
+  altClassesModule: AlternateClasses55e,
 ) {
   const exploitDie = altClassesModule.api.getAlternateMartialExploitDie(item);
   if (!exploitDie) return false;
@@ -84,7 +84,7 @@ async function workflow({
 }) {
   const altClassesModule = game
     .modules
-    .get('alternate-classes-55e') as AlternateClasses55eAPI | undefined;
+    .get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
   const res1 = await pre(
     item,

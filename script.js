@@ -142,6 +142,26 @@ Hooks.once('init', () => {
       { totalLevel: 20, exploitDie: 'd10', exploitDice: 5 },
     ],
 
+    macroPassToExploit: {
+      attackRollComplete: [
+        'arresting-strike',
+        'disarm',
+        'ruthless-strike',
+        'sweeping-strike',
+        'concussive-blow',
+        'crippling-strike',
+        'rending-strike',
+        'disorienting-blow',
+        'staggering-blow',
+      ],
+      postWaitForAttackRoll: [
+        'precision-strike',
+        'martial-focus',
+      ],
+    },
+
+    exploitTypes: ['martialExploit', 'savageExploit', 'deviousExploit'],
+
     altMartialExploitsToDegrees: {
       // 1st Degree Exploits
       'arresting-strike': 1,

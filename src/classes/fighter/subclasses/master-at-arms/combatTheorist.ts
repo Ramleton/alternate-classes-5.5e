@@ -1,6 +1,6 @@
 import { dialogUtils, rollUtils, socketUtils } from 'chrisPremades';
 import {
-  AlternateClasses55eAPI,
+    AlternateClasses55e,
 } from '../../../../types/alternate-classes-55e';
 
 async function skillBonus(
@@ -8,7 +8,7 @@ async function skillBonus(
 ) {
   const altClassesModule = game
     .modules
-    ?.get('alternate-classes-55e') as AlternateClasses55eAPI | undefined;
+    ?.get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
   if (skillId !== 'his') return;
   if (roll.data.abilityId !== 'int')

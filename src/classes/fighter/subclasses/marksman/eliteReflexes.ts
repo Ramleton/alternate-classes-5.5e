@@ -1,6 +1,6 @@
 import { rollUtils } from 'chrisPremades';
 import {
-  AlternateClasses55eAPI,
+    AlternateClasses55e,
 } from '../../../../types/alternate-classes-55e';
 
 async function saveBonus(
@@ -8,7 +8,7 @@ async function saveBonus(
 ) {
   const altClassesModule = game
     .modules
-    ?.get('alternate-classes-55e') as AlternateClasses55eAPI | undefined;
+    ?.get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
   if (saveId !== 'dex') return;
   const exploitDie = altClassesModule
@@ -23,7 +23,7 @@ async function skillBonus(
 ) {
   const altClassesModule = game
     .modules
-    ?.get('alternate-classes-55e') as AlternateClasses55eAPI | undefined;
+    ?.get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
   if (roll.data.abilityId !== 'dex')
     return;
