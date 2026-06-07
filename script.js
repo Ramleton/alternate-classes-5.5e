@@ -154,7 +154,7 @@ Hooks.once('init', () => {
         'disorienting-blow',
         'staggering-blow',
       ],
-      postWaitForAttackRoll: [
+      postAttackRoll: [
         'precision-strike',
         'martial-focus',
       ],

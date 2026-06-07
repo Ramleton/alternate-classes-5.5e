@@ -108,7 +108,7 @@ interface ExploitsToDegrees {
 
 interface MacroPassToExploit {
   attackRollComplete: string[];
-  postWaitForAttackRoll: string[];
+  postAttackRoll: string[];
 }
 
 export interface AlternateClasses55e {
