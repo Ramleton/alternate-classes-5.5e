@@ -1,4 +1,3 @@
-import { Workflow } from '@midi-qol/types/module/Workflow';
 import {
   activityUtils,
   dialogUtils,
@@ -12,17 +11,14 @@ import { AlternateClasses55e } from '../../../../types/alternate-classes-55e';
 
 async function pre(
   item,
-  workflow: Workflow,
+  target: Token,
   altClassesModule: AlternateClasses55e,
 ): Promise<boolean> {
   const inscriptions = item.actor.items.filter(i =>
-    itemUtils.getEffectByIdentifier(i, 'ac55eFireRuneInscription'));
+    itemUtils.getEffectByIdentifier(i, 'ac55eStoneRuneInscription'));
   if (inscriptions.length < 2) return false;
-  if (workflow.activity?.getActionType() !== 'mwak')
-    return false;
-  if (!workflow.hitTargets.size) return false;
   const actorFlags = item.actor.flags['alternate-classes-55e'];
-  if (actorFlags?.macros?.runeCarver?.fire)
+  if (actorFlags?.macros?.runeCarver?.stone)
     return false;
   if (item.system.uses.spent) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,27 +27,28 @@ async function pre(
       'ac55eElderInsight',
     );
     if (!elderInsight) return false;
-    if (actorFlags?.macros?.runeCarver?.elderInsight?.fire) return false;
+    if (actorFlags?.macros?.runeCarver?.elderInsight?.stone) return false;
     if (!altClassesModule.api.getAltMartialExploitsRemaining(item))
       return false;
   }
   return await dialogUtils.confirm(
     item.name,
-    'You hit a creature with a melee weapon attack. Invoke Fire Rune?',
+    `${target.actor.name} ended their turn within 30 feet of you, \
+    invoke Stone Rune?`,
     { userId: socketUtils.firstOwner(item.actor, true) },
   );
 }
 
 async function during(
   item,
-  workflow: Workflow,
+  target,
   altClassesModule: AlternateClasses55e,
 ): Promise<boolean> {
   const exploitDie = altClassesModule.api.getAlternateMartialExploitDie(item);
   if (!exploitDie) return false;
   const invokeActivity = activityUtils.getActivityByIdentifier(
     item,
-    'invokeFireRune',
+    'invoke',
     { strict: true },
   );
   if (!invokeActivity) return false;
@@ -59,7 +56,6 @@ async function during(
     strict: true,
   });
   if (!saveDCActivity) return false;
-  const target = workflow.hitTargets.first()! as Token;
   const invokeWorkflow = await workflowUtils.syntheticActivityRoll(
     invokeActivity,
     [target],
@@ -70,37 +66,42 @@ async function during(
     [],
   );
   const saveDC = saveDCWorkflow.utilityRolls?.[0].total ?? 0;
-  const dmgFormula = `2d${exploitDie.faces}`;
   await genericUtils.setFlag(
     item.actor,
     'alternate-classes-55e',
-    'macros.runeCarver.fire',
-    dmgFormula,
+    'macros.runeCarver.stone',
+    1,
   );
-  const fireRuneEffect = {
-    name: 'Fire Rune: Restrained',
+  const stoneRuneEffect = {
+    name: 'Stone Rune: Dreaming',
     icon: item.img,
     duration: { seconds: 60 },
     flags: {
       'chris-premades': {
         info: {
-          identifier: 'ac55eFireRuneEffect',
+          identifier: 'ac55eStoneRuneEffect',
         },
       },
     },
-    statuses: new Set(['restrained']),
+    statuses: new Set(['incapacitated']),
     changes: [
       {
         key: 'flags.midi-qol.OverTime',
         mode: 0,
-        value: `turn=start, label=Fire Rune, saveAbility=str, \
-        saveDC=${saveDC}, saveMagic=true, damageRoll=${dmgFormula}, \
-        damageType=fire, damageBeforeSave=true, saveCount=1-, actionSave=roll, \
+        value: `turn=end, label=Stone Rune: Dreaming, saveAbility=wis, \
+        saveDC=${saveDC}, saveMagic=true, saveCount=1-, \
         allowIncapacitated=true`,
+        priority: 20,
+      },
+      {
+        key: 'system.attributes.movement.all',
+        mode: 0,
+        value: '*0',
+        priority: 20,
       },
     ],
   };
-  await effectUtils.createEffect(target.actor, fireRuneEffect);
+  await effectUtils.createEffect(target.actor, stoneRuneEffect);
   return true;
 }
 
@@ -118,7 +119,7 @@ async function post(
     await genericUtils.setFlag(
       item.actor,
       'alternate-classes-55e',
-      'macros.runeCarver.elderInsight.fire',
+      'macros.runeCarver.elderInsight.stone',
       1,
     );
     altClassesModule.api.spendAlternateMartialExploitUses(1, item);
@@ -128,31 +129,27 @@ async function post(
   }
 }
 
-async function workflow({
-  trigger: { entity: item },
-  workflow,
-}) {
+async function workflow({ trigger: { entity: item, target } }) {
   const altClassesModule = game.modules
     ?.get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
-  const res1 = await pre(item, workflow, altClassesModule);
+  const res1 = await pre(item, target, altClassesModule);
   if (!res1) return;
-  const res2 = await during(item, workflow, altClassesModule);
+  const res2 = await during(item, target, altClassesModule);
   if (!res2) return;
   await post(item, altClassesModule);
 }
 
-export const ac55eInvokeFireRune = {
-  name: 'Fire Rune: Invoke',
+export const ac55eInvokeStoneRune = {
+  name: 'Stone Rune: Invoke',
   version: '1.3.141',
   rules: 'modern',
-  midi: {
-    actor: [
-      {
-        pass: 'attackRollComplete',
-        macro: workflow,
-        priority: 200,
-      },
-    ],
-  },
+  combat: [
+    {
+      pass: 'turnEndNear',
+      macro: workflow,
+      priority: 200,
+      disposition: 'enemy',
+    },
+  ],
 };
