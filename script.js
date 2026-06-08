@@ -158,6 +158,17 @@ Hooks.once('init', () => {
         'precision-strike',
         'martial-focus',
       ],
+      targetAttackRollComplete: [
+        'riposte',
+        'redirect',
+      ],
+      targetApplyDamage: [
+        'mythic-resilience',
+        'unbreakable',
+      ],
+      targetDamageRollComplete: [
+        'shield-impact',
+      ],
     },
 
     exploitTypes: ['martialExploit', 'savageExploit', 'deviousExploit'],
@@ -337,8 +348,17 @@ Hooks.once('init', () => {
       const moduleAPI = game.modules.get('alternate-classes-55e').api;
       const multiclassingLevel = moduleAPI.getAltMartialMCTotalLevel(item.actor);
       const multiclassingDie = moduleAPI.getAltMartialExploitDieForMulticlassLevel(multiclassingLevel);
-      const fighterDie = item.actor.system.scale?.
+      let fighterDie = item.actor.system.scale?.
         ['alternate-fighter']?.['exploit-die'];
+      const masterAtArms = item
+        .actor
+        .classes['alternate-fighter']
+        ?.subclass
+        ?.identifier === 'master-at-arms';
+      if (masterAtArms) {
+        fighterDie = item.actor.system.scale
+          ?.['master-at-arms']?.['exploit-die'];
+      }
       const barbarianDie = item.actor.system.scale?.
         ['alternate-barbarian']?.['exploit-die'];
       const rogueDie = item.actor.system.scale?.
