@@ -899,6 +899,69 @@ declare module 'chrisPremades' {
   };
 
   export const constants: {
+    summonAnimationOptions: [
+      {
+        value: 'default';
+        label: 'CHRISPREMADES.Config.Animations.Default';
+        requiredModules: ['jb2a_patreon', 'animated-spell-effects-cartoon'];
+      },
+      {
+        value: 'celestial';
+        label: 'CHRISPREMADES.Config.Animations.Celestial';
+        requiredModules: ['jb2a_patreon', 'animated-spell-effects-cartoon'];
+      },
+      {
+        value: 'fiend';
+        label: 'CHRISPREMADES.Config.Animations.Fiend';
+        requiredModules: ['jb2a_patreon', 'animated-spell-effects-cartoon'];
+      },
+      {
+        value: 'fire';
+        label: 'CHRISPREMADES.Config.Animations.Fire';
+        requiredModules: ['jb2a_patreon'];
+      },
+      {
+        value: 'water';
+        label: 'CHRISPREMADES.Config.Animations.Water';
+        requiredModules: ['jb2a_patreon'];
+      },
+      {
+        value: 'air';
+        label: 'CHRISPREMADES.Config.Animations.Air';
+        requiredModules: ['jb2a_patreon', 'animated-spell-effects-cartoon'];
+      },
+      {
+        value: 'earth';
+        label: 'CHRISPREMADES.Config.Animations.Earth';
+        requiredModules: ['jb2a_patreon', 'animated-spell-effects-cartoon'];
+      },
+      {
+        value: 'nature';
+        label: 'CHRISPREMADES.Config.Animations.Nature';
+        requiredModules: ['jb2a_patreon'];
+      },
+      {
+        value: 'shadow';
+        label: 'CHRISPREMADES.Config.Animations.Shadow';
+        requiredModules: ['jb2a_patreon'];
+      },
+      {
+        value: 'smoke';
+        label: 'CHRISPREMADES.Config.Animations.Smoke';
+        requiredModules: [];
+      },
+      {
+        value: 'future';
+        label: 'CHRISPREMADES.Config.Animations.Future';
+        requiredModules: ['jb2a_patreon'];
+      },
+      {
+        value: 'none';
+        label: 'CHRISPREMADES.Config.Animations.None';
+        requiredModules: [];
+      },
+    ];
+    tempConditionIcon: 'icons/magic/time/arrows-circling-green.webp';
     attacks: ['msak', 'rsak', 'mwak', 'rwak'];
     meleeAttacks: ['mwak', 'msak'];
     rangedAttacks: ['rwak', 'rsak'];
@@ -1131,4 +1194,165 @@ declare module 'chrisPremades' {
       }
     );
   };
+  export const compendiumUtils: {
+    getCPRAutomation(
+      item,
+      options?: {
+        identifier?: string;
+        rules?: 'modern' | 'legacy';
+        type?: 'character' | 'spell' | 'npc';
+      }
+    );
+    getGPSAutomation(
+      item,
+      options?: {
+        identifier?: string;
+        rules?: 'modern' | 'legacy';
+        type?: 'character' | 'spell' | 'npc';
+      }
+    );
+    getMISCAutomation(
+      item,
+      options?: {
+        identifier?: string;
+        rules?: 'modern' | 'legacy';
+        type?: 'character' | 'spell' | 'npc';
+      }
+    );
+
+    getACCAutomation(
+      item,
+      options?: {
+        identifier?: string;
+        rules?: 'modern' | 'legacy';
+        type?: 'character' | 'spell' | 'npc';
+      }
+    );
+    getAllAutomations(
+      item,
+      options?: {
+        identifier?: string;
+        rules?: 'modern' | 'legacy';
+        type?: 'character' | 'spell' | 'npc';
+      }
+    );
+    getPreferredAutomation(
+      item,
+      options?: {
+        identifier?: string;
+        rules?: 'modern' | 'legacy';
+        type?: 'character' | 'spell' | 'npc';
+      }
+    );
+    getItemFromCompendium(
+      key: string,
+      name: string,
+      options?: {
+        ignoreNotFound?: boolean;
+        folderId?: string;
+        object?: boolean;
+        getDescription?: boolean;
+        translate?: boolean;
+        flatAttack?: number;
+        flatDC?: number;
+        castDataWorkflow?: Workflow;
+        matchType?: string;
+        rules?: 'modern' | 'legacy';
+        byIdentifier?: boolean;
+        bySystemIdentifier?: boolean;
+      }
+    );
+    getActorFromCompendium(
+      key: string,
+      name: string,
+      options?: {
+        ignoreNotFound?: boolean;
+        folderId?: string;
+        object?: boolean;
+        translate?: boolean;
+        identifier?: string;
+      }
+    );
+    getFilteredActorDocumentsFromCompendium(
+      key: string,
+      options?: {
+        maxCR: number;
+        actorTypes: string[];
+        creatureTypes: string[];
+        creatureSubtypes: string[];
+        specificNames: string[];
+      }
+    );
+    getFilteredItemDocumentsFromCompendium(
+      key: string,
+      options?: {
+        specificNames: string[];
+        types: string[];
+        typeValues: string[];
+        badProperties: string[];
+      }
+    );
+    getAppliedOrPreferredAutomation(
+      item,
+      options?: {
+        identifier?: string;
+        rules?: 'modern' | 'legacy';
+        type?: 'character' | 'spell' | 'npc';
+      }
+    );
+  };
+
+  export class Summons {
+    constructor(sourceActors, updates, originItem, summonerToken, options);
+    static spawn(
+      sourceActors,
+      updates?: any,
+      originItem: Item,
+      summonerToken: Token,
+      options?: {
+        duration?: number;
+        callbacks?: any;
+        range?: number;
+        animation?: 'default' | string;
+        onDeleteMacros?: any;
+        concentrationNonDependent?: boolean;
+        initiativeType?: 'separate' | 'all' | 'follows';
+        additionalVaeButtons?: any[];
+        additionalSummonVaeButtons?: any[];
+        dontDismissOnDefeat?: boolean;
+        dismissActivity?: any;
+        unhideActivities?: any;
+        customIdentifier?: string;
+      }
+    ): Promise<Token[]>;
+    static socketSpawn(
+      actorUuid: string,
+      updates: any[],
+      sceneUuid: string
+    ): Promise<string>;
+    static dismiss({ trigger }): Promise<void>;
+    static dismissIfDead({ trigger, ditem }): Promise<boolean>;
+    static getSummonItem(
+      name: string,
+      updates: any[],
+      originItem: Item,
+      options?: {
+        flatAttack?: boolean;
+        flatDC?: boolean;
+        damageBonus?: number;
+        translate?: boolean;
+        identifier?: string;
+        damageFlat?: number;
+        rules?: 'legacy' | 'modern';
+        compendium?: string;
+      }
+    ): Promise<any>;
+    prepareAllData(): Promise<void>;
+    prepareData(): Promise<void>;
+    spawnAll(): Promise<void>;
+    handleSpecialUpdates(): Promise<void>;
+    handleEffects(): Promise<void>;
+    handleInitiative(): Promise<void>;
+    mergeUpdates(updates): void;
+  }
 }
