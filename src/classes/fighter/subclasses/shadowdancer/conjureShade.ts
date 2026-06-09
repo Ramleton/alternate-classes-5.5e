@@ -170,7 +170,7 @@ async function use({ workflow }): Promise<void> {
   if (!effect) return;
   await genericUtils.update(
     effect,
-    { 'flags.chris-premades.macros.combat': ['conjureShadeActive'] },
+    { 'flags.chris-premades.macros.combat': ['ac55eConjureShadeActive'] },
   );
   const applyFilter = (itemUtils.getConfig(workflow.item, 'filter') ?? true)
     && game.modules.get('tokenmagic')?.active;
@@ -238,12 +238,12 @@ async function use({ workflow }): Promise<void> {
     if (!restorativeShadows) continue;
     const targetEffect = effectUtils.getEffectByIdentifier(
       i.actor,
-      'ac55eSummonedEffect',
+      'summonedEffect',
     );
     await genericUtils.update(
       targetEffect,
       { 'flags.chris-premades.macros.midi.actor':
-        ['conjureShadeActive'],
+        ['ac55eConjureShadeActive'],
       },
     );
   }

@@ -1,4 +1,7 @@
 import {
+  activityUtils,
+  actorUtils,
+  constants,
   dialogUtils,
   effectUtils,
   genericUtils,
@@ -8,10 +11,11 @@ import {
   tokenUtils,
   workflowUtils,
 } from 'chrisPremades';
+import AlternateClasses55e from '../../../../types/alternate-classes-55e';
 
 async function turnEnd({ trigger: { entity: effect, token } }) {
   const sceneShades = effect
-    .flags['alternate-classes-55e']
+    .flags['chris-premades']
     .summons
     .ids[effect.name]
     .map(i => token.scene.tokens.get(i)?.object)
@@ -26,31 +30,25 @@ async function turnEnd({ trigger: { entity: effect, token } }) {
   )
     ? 1000
     : 30;
-  let echosLeft = sceneShades.length;
+  let shadesLeft = sceneShades.length;
   for (const i of sceneShades) {
     const distance = tokenUtils.getDistance(token, i);
     if (distance > maxRange) {
-      const selection = await dialogUtils.confirm(
-        effect.name,
-        genericUtils.format(
-          'Your Shade is too far away, it is destroyed',
-          { actorName: token.actor.name },
-        ),
-        { userId: socketUtils.gmID() },
+      genericUtils.notify(
+        'Your Shade is too far away, it is destroyed',
+        'info',
       );
-      if (!selection) continue;
       const tokenEffect = effectUtils.getEffectByIdentifier(
         i.actor,
         'ac55eSummonedEffect',
       );
       if (tokenEffect) await genericUtils.remove(tokenEffect);
-      echosLeft -= 1;
+      shadesLeft -= 1;
     }
   }
-  if (!echosLeft) await genericUtils.remove(effect);
+  if (!shadesLeft) await genericUtils.remove(effect);
 }
 async function targetApplyDamage({ trigger, ditem }) {
-  if (!(await Summons.dismissIfDead({ trigger, ditem }))) return;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const effect: any = await fromUuid(trigger
     .entity
@@ -61,26 +59,69 @@ async function targetApplyDamage({ trigger, ditem }) {
   if (!effect) return;
   const originActor = effect.parent;
   if (!originActor) return;
-  if (originActor.system.attributes.hp.temp) return;
   const originItem = itemUtils.getItemByIdentifier(
     originActor,
     'ac55eRestorativeShadows',
   );
+  if (!originItem) return;
+  const altClassesModule = game
+    .modules.get('alternate-classes-55e') as AlternateClasses55e | undefined;
+  if (!altClassesModule) return;
+  const exploitDie = altClassesModule.api
+    .getAlternateMartialExploitDie(originItem);
+  if (!exploitDie) return;
+  const healActivity = activityUtils.getActivityByIdentifier(
+    originItem,
+    'heal',
+    { strict: true },
+  );
+  const healData = await genericUtils.duplicate(healActivity);
+  healData.healing.custom.formula = `2d${exploitDie.faces}`;
+  await workflowUtils.syntheticActivityDataRoll(
+    healData,
+    originItem,
+    originActor,
+    [],
+  );
+  await Summons.dismissIfDead({ trigger, ditem });
+}
+
+async function darkSacrifice({ trigger, workflow, ditem }) {
+  if (!constants.attacks.includes(workflow.activity.getActionType()))
+    return;
+  const token = trigger.token;
+  const sourceToken = trigger.sourceToken;
+  const targetToken = workflow.hitTargets.first();
+  if (token.id === targetToken.id) return;
+  if (token.id === sourceToken.id) return;
+  const distance = tokenUtils.getDistance(token, targetToken);
+  if (distance > 10) return;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!originItem || !(originItem as any).system.uses.value) return;
+  const effect: any = await fromUuid(trigger
+    .entity
+    ?.flags
+    ?.['chris-premades']
+    ?.parentEntityUuid,
+  );
+  if (!effect) return;
+  const originActor = effect.parent;
+  if (!originActor) return;
+  if (actorUtils.hasUsedReaction(originActor)) return;
+  const darkSacrifice = itemUtils.getItemByIdentifier(
+    originActor,
+    'ac55eDarkSacrifice',
+  );
+  if (!darkSacrifice) return;
+  const fighterLevels = originActor.classes['alternate-fighter'].system.levels;
   const selection = await dialogUtils.confirm(
-    originItem.name,
-    genericUtils.format(
-      'CHRISPREMADES.Dialog.Use',
-      { itemName: originItem.name },
-    ),
+    'Dark Sacrifice',
+    'A creature within 10 feet of a Shade is hit, sacrifice it?',
+    { userId: socketUtils.firstOwner(token.actor, true) },
   );
   if (!selection) return;
-  await workflowUtils.completeItemUse(
-    originItem,
-    {},
-    { configureDialog: false },
-  );
+  workflowUtils.modifyDamageAppliedFlat(ditem, -fighterLevels);
+  await actorUtils.setReactionUsed(originActor);
+  await Summons.dismiss({ trigger });
 }
 
 export const ac55eConjureShadeActive = {
@@ -91,6 +132,11 @@ export const ac55eConjureShadeActive = {
       {
         pass: 'targetApplyDamage',
         macro: targetApplyDamage,
+        priority: 50,
+      },
+      {
+        pass: 'sceneDamageRoll',
+        macro: darkSacrifice,
         priority: 50,
       },
     ],
