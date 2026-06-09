@@ -1,12 +1,16 @@
 import {
+  activityUtils,
+  dialogUtils,
   effectUtils,
   genericUtils,
   itemUtils,
+  workflowUtils,
 } from 'chrisPremades';
 import { AlternateClasses55e } from '../../../../types/alternate-classes-55e';
 
 async function runicMight(
   item,
+  token: Token,
   altClassesModule: AlternateClasses55e,
 ): Promise<boolean> {
   const exploitDie = altClassesModule
@@ -17,6 +21,41 @@ async function runicMight(
     item.actor,
     'ac55eLegendaryRuneLord',
   );
+  const frostRune = await itemUtils.getItemByIdentifier(
+    item.actor,
+    'ac55eFrostRune',
+  );
+  const hillRune = await itemUtils.getItemByIdentifier(
+    item.actor,
+    'ac55eHillRune',
+  );
+  const activatableRunes = [frostRune, hillRune].filter(Boolean);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const options: [string, any][] = activatableRunes.map((rune: any) => [
+    rune.name,
+    rune.identifier,
+  ]);
+  if (options.length) {
+    const selection = await dialogUtils.buttonDialog(
+      item.name,
+      'Activate a rune?',
+      options,
+    );
+    const selectedRune = () => {
+      if (selection === 'frost-rune') return frostRune;
+      if (selection === 'hill-rune') return hillRune;
+      return null;
+    };
+    const selected = selectedRune();
+    if (selected) {
+      const invokeActivity = activityUtils.getActivityByIdentifier(
+        selected,
+        'invoke',
+        { strict: true },
+      );
+      await workflowUtils.syntheticActivityRoll(invokeActivity, [token]);
+    }
+  }
   const formula = `1d${exploitDie.faces}`;
   const newSize = legendaryRuneLord ? 'huge' : 'lg';
   const runicMightEffectData = {
@@ -28,6 +67,7 @@ async function runicMight(
       'dae': {
         enableCondition:
           '!effects.some(e => e.name.toLowerCase() === \'incapacitated\')',
+        stackable: 'noneName',
       },
       'chris-premades': {
         info: {
@@ -95,11 +135,11 @@ async function runicMight(
   return true;
 }
 
-async function workflow({ trigger: { entity: item } }) {
+async function workflow({ trigger: { entity: item, token } }) {
   const altClassesModule = game.modules
     ?.get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
-  await runicMight(item, altClassesModule);
+  await runicMight(item, token, altClassesModule);
 }
 
 export const ac55eRunicMight = {

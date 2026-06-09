@@ -18,6 +18,7 @@ async function pre(
       'You must have inscribed the Frost Rune into an item to use it',
       'error',
     );
+    return false;
   }
   if (!workflow.targets.size) return false;
   const actorFlags = item.actor.flags['alternate-classes-55e'];
@@ -76,6 +77,9 @@ async function during(
     icon: item.img,
     duration: { seconds: 600 },
     flags: {
+      'dae': {
+        stackable: 'noneName',
+      },
       'chris-premades': {
         info: {
           identifier: 'ac55eFrostRuneEffect',

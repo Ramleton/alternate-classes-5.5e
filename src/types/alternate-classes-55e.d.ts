@@ -155,6 +155,8 @@ export interface AlternateClasses55e {
     spendAlternateMartialExploitUses(uses: number, actor: Actor): Promise<void>;
 
     getAlternateMartialExploitDie(item: Item): Die;
+
+    getAlternateMartialExploitDieWithActor(actor: Actor): Die;
   };
 }
 

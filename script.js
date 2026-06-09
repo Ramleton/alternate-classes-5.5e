@@ -374,6 +374,36 @@ Hooks.once('init', () => {
         return multiclassingDie;
       return maxSingleClassDie;
     },
+
+    getAlternateMartialExploitDieWithActor: function (actor) {
+      const moduleAPI = game.modules.get('alternate-classes-55e').api;
+      const multiclassingLevel = moduleAPI.getAltMartialMCTotalLevel(actor);
+      const multiclassingDie = moduleAPI.getAltMartialExploitDieForMulticlassLevel(multiclassingLevel);
+      let fighterDie = actor.system.scale?.
+        ['alternate-fighter']?.['exploit-die'];
+      const masterAtArms = actor
+        .classes['alternate-fighter']
+        ?.subclass
+        ?.identifier === 'master-at-arms';
+      if (masterAtArms) {
+        fighterDie = actor.system.scale
+          ?.['master-at-arms']?.['exploit-die'];
+      }
+      const barbarianDie = actor.system.scale?.
+        ['alternate-barbarian']?.['exploit-die'];
+      const rogueDie = actor.system.scale?.
+        ['alternate-rogue']?.['exploit-die'];
+      const maxSingleClassDie = [
+        fighterDie,
+        barbarianDie,
+        rogueDie,
+      ]
+        .filter(maxDie => maxDie)
+        .sort((die1, die2) => die2.faces - die1.faces)[0];
+      if (maxSingleClassDie?.faces < multiclassingDie.faces)
+        return multiclassingDie;
+      return maxSingleClassDie;
+    },
   };
   console.log('Alternate Classes 5e | Initialized API');
 });

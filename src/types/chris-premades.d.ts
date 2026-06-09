@@ -403,13 +403,13 @@ declare module 'chrisPremades' {
       content: string,
       buttons: [
         string,
-        string,
+        any,
         options?: { image?: string; displayAsRows?: boolean },
       ][],
       options?: {
         userId?: string;
       }
-    ): Promise<string>;
+    ): Promise<any>;
 
     numberDialog(
       title: string,
