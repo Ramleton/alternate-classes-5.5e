@@ -275,13 +275,13 @@ Hooks.once('init', () => {
         - martialExploits?.system?.uses?.spent || 0
         - savageExploits?.system?.uses?.spent || 0
         - deviousExploits?.system?.uses?.spent || 0;
-      if (
-        item?.system?.type?.subtype === 'martialExploit'
-        && moduleAPI.altMartialExploitsToDegrees[item.identifier] <= 2
-      ) {
-        remainingMulticlassUses += martialSuperiority?.system?.uses?.value || 0;
-      }
-      return remainingMulticlassUses > 0
+      // if (
+      //   item?.system?.type?.subtype === 'martialExploit'
+      //   && moduleAPI.altMartialExploitsToDegrees[item.identifier] <= 2
+      // ) {
+      //   return martialSuperiority.system?.uses?.value || 0;
+      // }
+      return remainingMulticlassUses < 0
         ? singleClassMax
         : remainingMulticlassUses;
     },
@@ -309,7 +309,8 @@ Hooks.once('init', () => {
       const moduleAPI = game.modules.get('alternate-classes-55e').api;
       // Alternate Fighter Martial Superiority
       if (
-        item?.system?.type?.subtype === 'martialExploit'
+        uses === 1
+        && item?.system?.type?.subtype === 'martialExploit'
         && await moduleAPI._spendAltFighterMartialSuperiority(item)
       )
         return;
