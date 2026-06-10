@@ -5,6 +5,7 @@ Hooks.once('init', () => {
   CONFIG.DND5E.featureTypes.class.subtypes.savageExploit = 'Savage Exploit';
   CONFIG.DND5E.featureTypes.class.subtypes.martialExploit = 'Martial Exploit';
   CONFIG.DND5E.featureTypes.class.subtypes.mysticTechnique = 'Mystic Technique';
+  CONFIG.DND5E.featureTypes.class.subtypes.enchantedShot = 'Enchanted Shot';
   console.log('Alternate Classes 5e | Initialized class feature types');
 
   class WuJenSpellcasting extends dnd5e
