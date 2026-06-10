@@ -46,7 +46,8 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src"
+    "src",
+    "src/types/chris-premades.d.ts"
   ],
   "exclude": [
     "node_modules",

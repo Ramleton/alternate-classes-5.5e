@@ -34,6 +34,7 @@ export default [
         tabWidth: 2,
         ignoreUrls: true,
         ignoreRegExpLiterals: true,
+        ignorePattern: '^import\\s.+\\sfrom\\s.+;$',
         // ADD THESE THREE EXCLUSIONS TO BREAK THE CIRCULAR LOOP:
         ignoreTrailingComments: true,
         ignoreComments: true,
