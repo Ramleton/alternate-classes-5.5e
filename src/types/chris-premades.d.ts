@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module 'chrisPremades' {
   import type { Workflow } from '@midi-qol/types/module/Workflow';
   export interface DamageFormulaObject {
@@ -454,7 +455,7 @@ declare module 'chrisPremades' {
         minAmount?: number;
         userId?: string;
         buttons?: string;
-        maxes?: {};
+        maxes?: any;
       }
     ): Promise<false | [any, boolean] | any>;
 
@@ -506,8 +507,8 @@ declare module 'chrisPremades' {
         showSpellLevel?: boolean;
         showUses?: boolean;
         checkbox?: boolean;
-        weights?: {};
-        maxes?: {};
+        weights?: any;
+        maxes?: any;
       }
     ): Promise<object[]>;
 
