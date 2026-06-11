@@ -1,4 +1,5 @@
 import stylistic from '@stylistic/eslint-plugin';
+import nodePlugin from 'eslint-plugin-n';
 import globals from 'globals';
 import ts from 'typescript-eslint';
 
@@ -17,8 +18,11 @@ export default [
     semi: true, // Set to false if you prefer no semicolons
   }),
   {
-    files: ['./src/**/*.{js,mjs,cjs,ts,.d.ts}'],
-    plugins: { ts, '@stylistic': stylistic },
+    files: [
+      './src/**/*.{js,mjs,cjs,ts,.d.ts}',
+      './dist/**/*.{js}',
+    ],
+    plugins: { ts, '@stylistic': stylistic, 'n': nodePlugin },
     languageOptions: {
       globals: globals.browser,
       parserOptions: {
@@ -27,6 +31,7 @@ export default [
       },
     },
     rules: {
+      'n/file-extension-in-import': ['error', 'always'],
       '@stylistic/eol-last': ['error', 'always'],
       '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1, maxBOF: 0 }],
       '@stylistic/max-len': ['error', {
@@ -50,6 +55,7 @@ export default [
           ignoreRestSiblings: true,
         },
       ],
+      '@typescript-eslint/no-floating-promises': 'error',
     },
   },
 ];

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "es2025",
+    "module": "es2022",
     "lib": [
       "DOM",
       "ESNext"
@@ -33,6 +33,18 @@
       ],
       "@midi-qol/types/module/*": [
         "./subrepos/midi-qol/types/module/*"
+      ],
+      "fvtt-types/*": [
+        "./src/types/fvtt-types/*"
+      ],
+      "chris-premades/*": [
+        "./src/types/chris-premades/*"
+      ],
+      "exploits/*": [
+        "./src/scripts/exploits/*"
+      ],
+      "martialArts/*": [
+        "./src/scripts/martialArts/*"
       ]
     },
     "types": [

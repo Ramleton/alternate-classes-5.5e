@@ -1,6 +1,6 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import AlternateClasses55e from '../../../../../types/alternate-classes-55e.js';
-import CPRMacro, { MacroFunction } from '../../../../../types/chris-premades/macro.js';
+import CPRMacro, { MidiMacroFunction } from '../../../../../types/chris-premades/macro.js';
 import handleEnchantedShot from './handle.js';
 
 const pre = async (item) => {
@@ -67,7 +67,7 @@ const post = async (
   );
 };
 
-const workflow: MacroFunction = async ({
+const workflow: MidiMacroFunction = async ({
   trigger: { entity: item },
   workflow,
 }) => {

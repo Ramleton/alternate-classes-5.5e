@@ -1,6 +1,21 @@
-import CPRMacro from './macro';
-import Summons from './summons';
-import Teleport from './teleport';
+import CPRMacro from './macro.js';
+import Summons from './summons.js';
+import Teleport from './teleport.js';
+
+type DAMAGE_TYPE
+  = 'bludgeoning'
+    | 'piercing'
+    | 'slashing'
+    | 'acid'
+    | 'fire'
+    | 'cold'
+    | 'lightning'
+    | 'poison'
+    | 'radiant'
+    | 'necrotic'
+    | 'psychic'
+    | 'thunder'
+    | 'force';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default interface CauldronOfPlentifulResources {
@@ -272,14 +287,14 @@ export default interface CauldronOfPlentifulResources {
         formula: string,
         options?: {
           ignoreCrit?: boolean;
-          damageType?: string;
+          damageType?: DAMAGE_TYPE;
         }
       ): Promise<void>;
 
       applyDamage(
         tokens: Token[],
         value: number,
-        damageType: string
+        damageType: DAMAGE_TYPE
       ): Promise<void>;
 
       completeActivityUse(
@@ -1063,7 +1078,7 @@ export default interface CauldronOfPlentifulResources {
         formula: string,
         options?: {
           entity?: any;
-          chatMessage?: any;
+          chatMessage?: boolean;
           flavor?: any;
           mode?: 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll';
           options?: any;

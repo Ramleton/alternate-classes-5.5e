@@ -1,4 +1,4 @@
-import CauldronOfPlentifulResources from './chris-premades/cauldronOfPlentifulResources';
+import CauldronOfPlentifulResources from './chris-premades/cauldronOfPlentifulResources.js';
 
 export { };
 

@@ -64,7 +64,7 @@ async function use({ workflow }): Promise<void> {
     }
   }
   else if (effect) {
-    genericUtils.remove(effect);
+    await genericUtils.remove(effect);
   }
   let name = itemUtils.getConfig(workflow.item, 'name');
   if (!name?.length) name = `${workflow.actor.name}'s Shade`;

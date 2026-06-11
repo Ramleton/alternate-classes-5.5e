@@ -1,0 +1,52 @@
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { HandleEnchantedShot } from '../handle.js';
+
+const handleGraspingShot: HandleEnchantedShot = async ({
+  item,
+  saveWorkflow,
+}) => {
+  const { utils: { effectUtils } } = chrisPremades;
+  const targetEffectData = {
+    name: `${item.name}: Grasped`,
+    icon: item.img,
+    origin: item.uuid,
+    duration: { seconds: 60 },
+    flags: {
+      'dae': {
+        stackable: 'noneName',
+      },
+      'alternate-classes-55e': {
+        graspingShot: {
+          moved: false,
+          exploitDie: getAlternateMartialExploitDie(item),
+          originActor: item.actor,
+        },
+      },
+      'chris-premades': {
+        info: {
+          identifier: 'ac55eGraspingShotEffect',
+        },
+        macros: {
+          movement: ['ac55eGraspingShotEffectMoved'],
+          combat: ['ac55eGraspingShotEffectReset'],
+        },
+      },
+    },
+    changes: [{
+      key: 'flags.midi-qol.OverTime',
+      mode: 0,
+      value: `turn=start, label=Grasping Shot, rollType=check, saveAbility=str,\
+        saveDC=${saveWorkflow.saveDC}, saveCount=1-, actionSave=roll,\
+        allowIncapacitated=true`,
+    }],
+  };
+  for (const target of saveWorkflow.failedSaves) {
+    if (!target.actor) continue;
+    await effectUtils.createEffect(target.actor, targetEffectData, {
+      rules: 'modern',
+    });
+  }
+  return true;
+};
+
+export default handleGraspingShot;

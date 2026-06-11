@@ -16,7 +16,7 @@
   "main": "eslint.config.js",
   "scripts": {
     "gen-types:chris": "tsc -p tsconfig.chrisPremades.json",
-    "build": "tsc && npm run format-dist",
+    "build": "tsc && tsc-alias && npm run format-dist",
     "format-dist": "eslint dist/**/*.js --fix"
   },
   "devDependencies": {
@@ -25,10 +25,12 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^8.60.0",
     "dnd5e": "github:adriangaro/dnd5e-types",
+    "eslint-plugin-n": "^18.1.0",
     "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
     "globals": "^17.6.0",
     "jiti": "^2.7.0",
     "sequencer": "github:fantasycalendar/FoundryVTT-Sequencer#master",
+    "tsc-alias": "^1.8.17",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.0"
   },

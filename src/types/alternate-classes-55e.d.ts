@@ -1,12 +1,5 @@
 import { Workflow } from '@midi-qol/types/module/Workflow';
 
-export interface EnchantedShotData {
-  item;
-  workflow: Workflow;
-  saveWorkflow: Workflow;
-  altClassesModule: AlternateClasses55e;
-}
-
 interface Die {
   faces: number;
   formula: string;

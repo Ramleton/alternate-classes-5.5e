@@ -1,5 +1,5 @@
 import { Workflow } from '@midi-qol/types/module/Workflow';
-import CPRMacro from '../../../../../../types/chris-premades/macro';
+import CPRMacro from '../../../../../../types/chris-premades/macro.js';
 
 async function pre(workflow: Workflow): Promise<boolean> {
   const { utils: { constants } } = chrisPremades;

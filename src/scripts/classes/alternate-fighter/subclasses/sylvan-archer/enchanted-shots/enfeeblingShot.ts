@@ -1,4 +1,4 @@
-import { HandleEnchantedShot } from '../handle';
+import { HandleEnchantedShot } from '../handle.js';
 
 const handleBeguilingShot: HandleEnchantedShot = async ({
   item,

@@ -1,9 +1,10 @@
-import Activity from './Activity';
-import ItemUses from './ItemUses';
+import Activity from './Activity.js';
+import ItemUses from './ItemUses.js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface FeatSystemData extends foundry.abstract.DataModel<any, any> {
   activities?: Record<string, Activity>;
   uses?: ItemUses;
+  actor?: Actor;
   advancement: Record<string, unknown>;
   description: {
     value: string;

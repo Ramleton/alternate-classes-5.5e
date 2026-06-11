@@ -1,4 +1,4 @@
-import { HandleEnchantedShot } from '../handle';
+import { HandleEnchantedShot } from '../handle.js';
 
 const handleBurstingShot: HandleEnchantedShot = async (_data) => {
   return true; // The saving throw handles it fully
