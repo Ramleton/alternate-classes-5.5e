@@ -22,7 +22,7 @@ try {
   // 4. Copy dist/script.js if it exists
   if (fs.existsSync(srcScriptFile)) {
     fs.copyFileSync(srcScriptFile, path.join(destModuleDir, 'script.js'));
-    console.log('✓ Successfully copied dist/script.js');
+    console.log('✓ Successfully copied dist/src/script.js');
   }
   else {
     console.warn('⚠ Warning: dist/src/script.js not found.');
@@ -32,7 +32,7 @@ try {
   if (fs.existsSync(srcScriptsDir)) {
     // cpSync copies folders recursively (requires Node.js v16.7.0+)
     fs.cpSync(srcScriptsDir, destScriptsDir, { recursive: true, force: true });
-    console.log('✓ Successfully copied dist/scripts/ folder contents');
+    console.log('✓ Successfully copied dist/src/scripts/ folder contents');
   }
   else {
     console.warn('⚠ Warning: dist/src/scripts folder not found.');
