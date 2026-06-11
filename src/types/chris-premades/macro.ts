@@ -99,7 +99,7 @@ export interface CastData {
 export interface Trigger {
   castData?: CastData;
   distance?: number;
-  entity: MidiActiveEffect;
+  entity: MidiActiveEffect | Item;
   macro: MacroFunction;
   macroName: string;
   name: string;

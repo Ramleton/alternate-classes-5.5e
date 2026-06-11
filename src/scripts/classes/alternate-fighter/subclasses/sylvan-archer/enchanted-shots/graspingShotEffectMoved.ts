@@ -36,8 +36,9 @@ async function post(effect: MidiActiveEffect, token: Token): Promise<void> {
 }
 
 const workflow: MacroFunction = async ({
-  trigger: { entity: effect, token },
+  trigger: { entity, token },
 }) => {
+  const effect = entity as MidiActiveEffect;
   const res1 = await pre(effect);
   if (!res1) return;
   await post(effect, token);

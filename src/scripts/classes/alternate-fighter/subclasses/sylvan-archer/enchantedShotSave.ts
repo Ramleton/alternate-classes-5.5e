@@ -3,17 +3,22 @@ import { getAlternateMartialExploitDie, spendAlternateMartialExploitUses } from 
 import CPRMacro, { MidiMacroFunction } from '../../../../../types/chris-premades/macro.js';
 import handleEnchantedShot from './handle.js';
 
-const pre = async (item) => {
+export const pre = async (
+  item: Item<'feat'>,
+  workflow: Workflow,
+) => {
+  if (!workflow.hitTargets.size)
+    return false;
   return item
-    .actor
+    .actor!
     .flags['alternate-classes-55e']
     ?.macros
     ?.enchantedShot
-    ?.[item.identifier];
+    ?.[item.system.identifier];
 };
 
 const during = async (
-  item,
+  item: Item<'feat'>,
   workflow: Workflow,
 ) => {
   const { utils: { activityUtils, genericUtils, itemUtils, workflowUtils } }
@@ -32,7 +37,7 @@ const during = async (
   saveActivityData.damage.parts[0].custom.formula = `2d${exploitDie.faces}`;
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
-    item.actor,
+    item.actor!,
     'ac55eSylvanShot',
   );
   if (sylvanShot)
@@ -40,7 +45,7 @@ const during = async (
   const saveWorkflow = await workflowUtils.syntheticActivityDataRoll(
     saveActivityData,
     item,
-    item.actor,
+    item.actor!,
     [workflow.hitTargets.first() as Token],
     { consumeResources: true },
   );
@@ -49,17 +54,17 @@ const during = async (
   return 1;
 };
 
-const post = async (
-  item,
+export const post = async (
+  item: Item<'feat'>,
   uses: number,
 ) => {
   const { utils: { genericUtils } }
     = chrisPremades;
   await spendAlternateMartialExploitUses(uses, item);
   await genericUtils.unsetFlag(
-    item.actor,
+    item.actor!,
     'alternate-classes-55e',
-    `macros.enchantedShot.${item.identifier}`,
+    `macros.enchantedShot.${item.system.identifier}`,
   );
 };
 
@@ -67,10 +72,12 @@ const workflow: MidiMacroFunction = async ({
   trigger: { entity: item },
   workflow,
 }) => {
-  const res1 = await pre(item);
+  const feat = item as Item.OfType<'feat'>;
+  if (!feat.actor) return;
+  const res1 = await pre(feat, workflow);
   if (!res1) return;
-  const res2 = await during(item, workflow);
-  await post(item, res2);
+  const res2 = await during(feat, workflow);
+  await post(feat, res2);
 };
 
 const macro: CPRMacro = {
