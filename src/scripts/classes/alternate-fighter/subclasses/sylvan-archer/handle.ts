@@ -1,5 +1,4 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
-import AlternateClasses55e from '../../../../../types/alternate-classes-55e.js';
 import handleBeguilingShot from './enchanted-shots/beguilingShot.js';
 import handleBurstingShot from './enchanted-shots/burstingShot.js';
 import handleEnfeeblingShot from './enchanted-shots/enfeeblingShot.js';
@@ -9,7 +8,6 @@ export interface EnchantedShotData {
   item;
   workflow: Workflow;
   saveWorkflow: Workflow;
-  altClassesModule: AlternateClasses55e;
 }
 
 export type HandleEnchantedShot = (data: EnchantedShotData) => Promise<boolean>;
