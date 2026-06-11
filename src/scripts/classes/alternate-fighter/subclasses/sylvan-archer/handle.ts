@@ -3,6 +3,7 @@ import handleBeguilingShot from './enchanted-shots/beguilingShot.js';
 import handleBurstingShot from './enchanted-shots/burstingShot.js';
 import handleEnfeeblingShot from './enchanted-shots/enfeeblingShot.js';
 import handleGraspingShot from './enchanted-shots/graspingShot.js';
+import handleUmbralShot from './enchanted-shots/umbralShot.js';
 
 export interface EnchantedShotData {
   item;
@@ -25,6 +26,8 @@ const handleEnchantedShot = async (
       return await handleEnfeeblingShot(data);
     case 'grasping-shot':
       return await handleGraspingShot(data);
+    case 'umbral-shot':
+      return await handleUmbralShot(data);
   }
   return false;
 };
