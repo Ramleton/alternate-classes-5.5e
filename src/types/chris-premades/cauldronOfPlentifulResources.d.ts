@@ -19,8 +19,8 @@ type DAMAGE_TYPE
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default interface CauldronOfPlentifulResources {
-  Summons: Summons;
-  Teleport: Teleport;
+  Summons: typeof Summons;
+  Teleport: typeof Teleport;
   utils: {
     activityUtils: {
       /**

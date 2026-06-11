@@ -1,12 +1,12 @@
 import { HandleEnchantedShot } from '../handle.js';
 
-const handleEnfeeblingShot: HandleEnchantedShot = async ({
+const handleSeveringShot: HandleEnchantedShot = async ({
   item,
   saveWorkflow,
 }) => {
   const { utils: { effectUtils } } = chrisPremades;
   const targetEffectData = {
-    name: `${item.name}: Enfeebled`,
+    name: `${item.name}: Cannot cast spells`,
     icon: item.img,
     origin: item.uuid,
     duration: { seconds: 60 },
@@ -16,11 +16,11 @@ const handleEnfeeblingShot: HandleEnchantedShot = async ({
       },
       'chris-premades': {
         info: {
-          identifier: 'ac55eEnfeeblingShotEffect',
+          identifier: 'ac55eSeveringShotEffect',
         },
         macros: {
           midi: {
-            actor: ['ac55eEnfeeblingShotEffect'],
+            actor: ['ac55eSeveringShotEffect'],
           },
         },
       },
@@ -42,4 +42,4 @@ const handleEnfeeblingShot: HandleEnchantedShot = async ({
   return true;
 };
 
-export default handleEnfeeblingShot;
+export default handleSeveringShot;

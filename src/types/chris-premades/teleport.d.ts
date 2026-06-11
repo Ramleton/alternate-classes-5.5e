@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default class Teleport {
   constructor(tokens: Token[], controllingToken: Token, options: object);
+  template: { direction: number; x: number; y: number };
   static group(
     tokens: Token[],
     controllingToken: Token,
@@ -38,4 +39,8 @@ export default class Teleport {
     y: number;
     rotation: number;
   };
+  _move(): Promise<void>;
+  _moveGroup(): Promise<void>;
+  _nonSync(): Promise<void>;
+  _sync(): Promise<void>;
 };
