@@ -1356,5 +1356,43 @@ export default interface CauldronOfPlentifulResources {
     macroUtils: {
       registerMacros(macros: CPRMacro[]): void;
     };
+
+    templateUtils: {
+      getTokensInShape(
+        shape: any,
+        scene: any,
+        { x: offsetX, y: offsetY }: { x: number; y: number }
+      ): Token[];
+      getTokensInTemplate(template): Token[];
+      getTemplatesInToken(token): Template[];
+      getTokenPoints(token): { x: number; y: number }[];
+      findGrids(A: any, B: any, template: Template): Set<any>;
+      getCastData(template): any;
+      getCastLevel(template): number;
+      getBaseLevel(template): number;
+      setCastData(template: Template, data: any): Promise<void>;
+      setCastLevel(template: Template, level: number): Promise<void>;
+      setBaseLevel(template: Template, level: number): Promise<void>;
+      getSaveDC(template: Template): number | undefined;
+      setSaveDC(template: Template, dc: number): Promise<void>;
+      getName(template: Template): string;
+      setName(template: Template, name: string): Promise<void>;
+      placeTemplate(templateData: any, returnTokens?: boolean):
+        | Template
+        | { template: Template; tokens: Token[] };
+      rayIntersectsTemplate(templateDoc: any, ray: any): boolean;
+      getIntersections(
+        templateObj: any,
+        A: any,
+        B: any,
+        boolOnly?: boolean
+      ): any;
+      getSourceActor(template: Template): Promise<Actor | undefined>;
+      overlap(template1: Template, template2: Template): boolean;
+      attachToTemplate(
+        template: Template,
+        uuidsToAttach: string[]
+      ): Promise<void>;
+    };
   };
 }
