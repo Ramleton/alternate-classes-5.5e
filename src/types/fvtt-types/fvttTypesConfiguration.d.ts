@@ -1,3 +1,4 @@
+import WeaponSystemData from './WeaponSystemData.js';
 export { };
 
 declare module 'fvtt-types/configuration' {

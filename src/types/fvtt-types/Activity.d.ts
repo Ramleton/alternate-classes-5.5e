@@ -29,12 +29,27 @@ interface IgnoreTraits {
   idm: boolean;
 }
 
+type DamageType
+  = | 'bludgeoning'
+    | 'piercing'
+    | 'slashing'
+    | 'acid'
+    | 'fire'
+    | 'cold'
+    | 'force'
+    | 'lightning'
+    | 'poison'
+    | 'thunder'
+    | 'necrotic'
+    | 'psychic'
+    | 'radiant';
+
 interface DamagePart {
   custom: { enabled: boolean; formula: string };
   number: number | null;
   denomination: number | null;
   bonus: string;
-  types: string[];
+  types: DamageType[];
   scaling: { number: number; [key: string]: unknown };
 }
 
@@ -111,7 +126,7 @@ interface BaseActivity {
   [key: string]: unknown;
 }
 
-interface HealActivity extends BaseActivity {
+export interface HealActivity extends BaseActivity {
   type: 'heal';
   healing: {
     types: string[];
@@ -123,7 +138,7 @@ interface HealActivity extends BaseActivity {
   };
 }
 
-interface UtilityActivity extends BaseActivity {
+export interface UtilityActivity extends BaseActivity {
   type: 'utility';
   roll: {
     prompt: boolean;
@@ -133,10 +148,10 @@ interface UtilityActivity extends BaseActivity {
   };
 }
 
-interface SaveActivity extends BaseActivity {
+export interface SaveActivity extends BaseActivity {
   type: 'save';
   damage: {
-    onSave: string;
+    onSave: 'none' | 'half' | 'full';
     critical: { allow: boolean; [key: string]: unknown };
     parts: DamagePart[];
   };
