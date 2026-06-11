@@ -25,7 +25,7 @@ async function post(effect: MidiActiveEffect, token: Token): Promise<void> {
     `2d${exploitDie.faces}`,
     { chatMessage: true },
   );
-  await workflowUtils.applyDamage([token], rolled.total, 'piercing');
+  await workflowUtils.applyDamage([token], rolled.roll.total, 'piercing');
   await genericUtils.setFlag(
     effect,
     'alternate-classes-55e',
