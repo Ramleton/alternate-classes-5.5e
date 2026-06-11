@@ -1,12 +1,12 @@
 import { Workflow } from '@midi-qol/types/module/Workflow';
 import {
-    dialogUtils,
-    effectUtils,
-    socketUtils,
-    workflowUtils,
+  dialogUtils,
+  effectUtils,
+  socketUtils,
+  workflowUtils,
 } from 'chrisPremades';
 import {
-    AlternateClasses55e,
+  AlternateClasses55e,
 } from '../../../../types/alternate-classes-55e';
 
 async function pre(
@@ -82,8 +82,9 @@ async function workflow({
   trigger: { entity: item, token, sourceToken, targetToken },
   workflow,
 }) {
-  const altClassesModule = game
-    .modules
+  const altClassesModule = (game
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .modules as any)
     .get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
   const res1 = await pre(

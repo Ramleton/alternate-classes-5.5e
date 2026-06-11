@@ -1,15 +1,15 @@
 import { Workflow } from '@midi-qol/types/module/Workflow';
 import {
-    actorUtils,
-    dialogUtils,
-    effectUtils,
-    itemUtils,
-    socketUtils,
-    tokenUtils,
-    workflowUtils,
+  actorUtils,
+  dialogUtils,
+  effectUtils,
+  itemUtils,
+  socketUtils,
+  tokenUtils,
+  workflowUtils,
 } from 'chrisPremades';
 import {
-    AlternateClasses55e,
+  AlternateClasses55e,
 } from '../../../../types/alternate-classes-55e';
 
 async function pre(
@@ -104,8 +104,9 @@ async function workflow({
   workflow,
 }) {
   const reactionSpent = actorUtils.hasUsedReaction(token.actor);
-  const altClassesModule = game
-    .modules
+  const altClassesModule = (game
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .modules as any)
     .get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
   const targetToken = workflow.targets.first();

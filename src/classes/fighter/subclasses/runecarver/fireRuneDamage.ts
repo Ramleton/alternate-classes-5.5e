@@ -29,7 +29,7 @@ async function during(
   );
 }
 
-async function post(actor: Actor5e): Promise<void> {
+async function post(actor: Actor): Promise<void> {
   await genericUtils.unsetFlag(
     actor,
     'alternate-classes-55e',

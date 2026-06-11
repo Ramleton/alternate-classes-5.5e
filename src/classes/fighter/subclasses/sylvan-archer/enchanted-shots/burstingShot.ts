@@ -1,5 +1,5 @@
 import { Workflow } from '@midi-qol/types/module/Workflow';
-import { activityUtils, effectUtils, genericUtils, itemUtils, workflowUtils } from 'chrisPremades';
+import { activityUtils, genericUtils, itemUtils, workflowUtils } from 'chrisPremades';
 import {
   AlternateClasses55e,
 } from '../../../../../types/alternate-classes-55e';
@@ -32,7 +32,6 @@ async function during(
   const saveActivityData = genericUtils.duplicate(activity);
   saveActivityData.damage.parts[0].custom.enabled = true;
   saveActivityData.damage.parts[0].custom.formula = `2d${exploitDie.faces}`;
-  saveActivityData.damage.parts[0].type = 'psychic';
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
     item.actor,
@@ -40,34 +39,13 @@ async function during(
   );
   if (sylvanShot)
     saveActivityData.damage.onSave = 'half';
-  const saveWorkflow = await workflowUtils.syntheticActivityDataRoll(
+  await workflowUtils.syntheticActivityDataRoll(
     saveActivityData,
     item,
     item.actor,
     [workflow.hitTargets.first() as Token],
     { consumeResources: true },
   );
-  if (saveWorkflow.failedSaves.size) {
-    const target = saveWorkflow.failedSaves.first() as Token;
-    const targetEffectData = {
-      name: `${item.name}: Charmed`,
-      icon: item.img,
-      origin: item.uuid,
-      duration: { seconds: 60 },
-      flags: {
-        'dae': {
-          stackable: 'noneName',
-        },
-        'chris-premades': {
-          info: {
-            identifier: 'ac55eBeguilingShotEffect',
-          },
-        },
-      },
-      statuses: ['charmed'],
-    };
-    await effectUtils.createEffect(target.actor!, targetEffectData);
-  }
   return 1;
 }
 
@@ -97,8 +75,8 @@ async function workflow({
   await post(item, res2, altClassesModule);
 }
 
-export const ac55eBeguilingShot = {
-  name: 'Beguiling Shot',
+export const ac55eBurstingShot = {
+  name: 'Bursting Shot',
   version: '1.3.141',
   rules: 'modern',
   midi: {

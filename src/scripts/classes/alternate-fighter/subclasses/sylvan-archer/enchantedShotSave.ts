@@ -1,23 +1,24 @@
-import { Workflow } from '@midi-qol/types/module/Workflow';
-import { activityUtils, effectUtils, genericUtils, itemUtils, workflowUtils } from 'chrisPremades';
-import {
-  AlternateClasses55e,
-} from '../../../../../types/alternate-classes-55e';
+import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import AlternateClasses55e from '../../../../../types/alternate-classes-55e.js';
+import CPRMacro, { MacroFunction } from '../../../../../types/chris-premades/macro.js';
+import handleEnchantedShot from './handle.js';
 
-async function pre(item): Promise<boolean> {
+const pre = async (item) => {
   return item
     .actor
     .flags['alternate-classes-55e']
     ?.macros
     ?.enchantedShot
     ?.[item.identifier];
-}
+};
 
-async function during(
+const during = async (
   item,
   workflow: Workflow,
   altClassesModule: AlternateClasses55e,
-): Promise<number> {
+) => {
+  const { utils: { activityUtils, genericUtils, itemUtils, workflowUtils } }
+    = chrisPremades;
   if (!workflow.token) return 0;
   const exploitDie = altClassesModule
     ?.api
@@ -32,7 +33,6 @@ async function during(
   const saveActivityData = genericUtils.duplicate(activity);
   saveActivityData.damage.parts[0].custom.enabled = true;
   saveActivityData.damage.parts[0].custom.formula = `2d${exploitDie.faces}`;
-  saveActivityData.damage.parts[0].type = 'psychic';
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
     item.actor,
@@ -47,47 +47,30 @@ async function during(
     [workflow.hitTargets.first() as Token],
     { consumeResources: true },
   );
-  if (saveWorkflow.failedSaves.size) {
-    const target = saveWorkflow.failedSaves.first() as Token;
-    const targetEffectData = {
-      name: `${item.name}: Charmed`,
-      icon: item.img,
-      origin: item.uuid,
-      duration: { seconds: 60 },
-      flags: {
-        'dae': {
-          stackable: 'noneName',
-        },
-        'chris-premades': {
-          info: {
-            identifier: 'ac55eBeguilingShotEffect',
-          },
-        },
-      },
-      statuses: ['charmed'],
-    };
-    await effectUtils.createEffect(target.actor!, targetEffectData);
-  }
+  const data = { item, workflow, saveWorkflow, altClassesModule };
+  await handleEnchantedShot(data);
   return 1;
-}
+};
 
-async function post(
+const post = async (
   item,
   uses: number,
   altClassesModule: AlternateClasses55e,
-): Promise<void> {
+) => {
+  const { utils: { genericUtils } }
+    = chrisPremades;
   altClassesModule.api.spendAlternateMartialExploitUses(uses, item);
   await genericUtils.unsetFlag(
     item.actor,
     'alternate-classes-55e',
     `macros.enchantedShot.${item.identifier}`,
   );
-}
+};
 
-async function workflow({
+const workflow: MacroFunction = async ({
   trigger: { entity: item },
   workflow,
-}) {
+}) => {
   const altClassesModule = game.modules
     ?.get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
@@ -95,11 +78,13 @@ async function workflow({
   if (!res1) return;
   const res2 = await during(item, workflow, altClassesModule);
   await post(item, res2, altClassesModule);
-}
+};
 
-export const ac55eBeguilingShot = {
-  name: 'Beguiling Shot',
-  version: '1.3.141',
+const macro: CPRMacro = {
+  identifier: 'ac55eEnchantedShotSave',
+  name: 'Enchanted Shot: Save',
+  source: 'Alternate Classes 5.5e',
+  version: '1.0.0',
   rules: 'modern',
   midi: {
     actor: [
@@ -111,3 +96,5 @@ export const ac55eBeguilingShot = {
     ],
   },
 };
+
+export default macro;

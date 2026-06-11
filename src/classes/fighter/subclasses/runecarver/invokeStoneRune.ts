@@ -33,7 +33,7 @@ async function pre(
   }
   return await dialogUtils.confirm(
     item.name,
-    `${target.actor.name} ended their turn within 30 feet of you, \
+    `${target.actor!.name} ended their turn within 30 feet of you, \
     invoke Stone Rune?`,
     { userId: socketUtils.firstOwner(item.actor, true) },
   );

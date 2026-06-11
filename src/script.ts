@@ -1,3 +1,6 @@
+import handleEnchantedShot from './scripts/classes/alternate-fighter/subclasses/sylvan-archer/handle.js';
+import macros from './scripts/macros.js';
+
 Hooks.once('init', () => {
   // Adds the class feature types from LaserLlama's Alternate Classes
   CONFIG.DND5E.featureTypes.class.subtypes.knack = 'Knack';
@@ -61,10 +64,12 @@ Hooks.once('init', () => {
   console.log('Alternate Classes 5e | \
     Initialized rest recovery for Alternate Classes spellcasting types');
 
+  if (!game.modules) return;
   /**
    * API for Alternate Classes 5e
    */
-  game.modules.get('alternate-classes-55e').api = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (game.modules.get('alternate-classes-55e') as any).api = {
     isMartialArtsAttack: function ({ workflow }) {
       const { utils: { itemUtils, workflowUtils } } = chrisPremades;
       if (!workflowUtils.isAttackType(workflow, 'attack')) return false;
@@ -92,9 +97,10 @@ Hooks.once('init', () => {
         ?.identifier === 'ac55eRadiantBolt';
       if (radiantBolt) return true;
       if (workflowUtils.getActionType(workflow) !== 'mwak') return false;
-      return game
+      return (game
         .modules
-        .get('alternate-classes-55e')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .get('alternate-classes-55e') as any)
         .api
         .isMartialArtsAttack({ workflow });
     },
@@ -226,12 +232,14 @@ Hooks.once('init', () => {
     },
 
     alternateMartialExploitMulticlassingValues: function (totalLevel) {
-      return game.modules.get('alternate-classes-55e')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (game.modules.get('alternate-classes-55e') as any)
         .api.alternateMartialExploitMulticlassingTable[totalLevel - 1];
     },
 
     getAltMartialExploitDieForMulticlassLevel: function (totalLevel) {
-      const formula = game.modules.get('alternate-classes-55e')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const formula = (game.modules.get('alternate-classes-55e') as any)
         .api
         .alternateMartialExploitMulticlassingTable[totalLevel - 1].exploitDie;
       return { faces: Number.fromString(formula.replace('d', '')), formula };
@@ -252,34 +260,48 @@ Hooks.once('init', () => {
     },
 
     getAltMartialMCExploitsRemaining: function (totalLevel) {
-      return game.modules.get('alternate-classes-55e')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (game.modules.get('alternate-classes-55e') as any)
         .api
         .alternateMartialExploitMulticlassingTable[totalLevel - 1].exploitDice;
     },
 
-    getAltMartialExploitsRemaining: function (item) {
+    getAltMartialExploitsRemaining: function (
+      item: Item,
+    ): number {
+      if (!item.actor)
+        return 0;
       const { utils: { itemUtils } } = chrisPremades;
-      const moduleAPI = game.modules.get('alternate-classes-55e').api;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
       const totalLevel = moduleAPI.getAltMartialMCTotalLevel(item.actor);
       const multiclassUses = moduleAPI
         .getAltMartialMCExploitsRemaining(totalLevel);
-      const martialExploits = itemUtils
-        .getItemByIdentifier(item.actor, 'martialExploits');
+      const martialExploits = itemUtils.getItemByIdentifier<'feat'>(
+        item.actor,
+        'martialExploits',
+      );
       let martialExploitsUsesRemaining = martialExploits
         ?.system?.uses?.value || 0;
       // ? Check Alternate Fighter's Martial Superiority feature
-      const martialSuperiority = itemUtils
-        .getItemByIdentifier(item.actor, 'ac55eMartialSuperiority');
+      const martialSuperiority = itemUtils.getItemByIdentifier<'feat'>(
+        item.actor,
+        'ac55eMartialSuperiority',
+      );
       const martialSuperiorityUsesRemaining = martialSuperiority
         ?.system?.uses?.value || 0;
       martialExploitsUsesRemaining = Math
         .max(martialExploitsUsesRemaining, martialSuperiorityUsesRemaining);
-      const savageExploits = itemUtils
-        .getItemByIdentifier(item.actor, 'savageExploits');
+      const savageExploits = itemUtils.getItemByIdentifier<'feat'>(
+        item.actor,
+        'savageExploits',
+      );
       const savageExploitsUsesRemaining = savageExploits
         ?.system?.uses?.value || 0;
-      const deviousExploits = itemUtils
-        .getItemByIdentifier(item.actor, 'deviousExploits');
+      const deviousExploits = itemUtils.getItemByIdentifier<'feat'>(
+        item.actor,
+        'deviousExploits',
+      );
       const deviousExploitsUsesRemaining = deviousExploits
         ?.system?.uses?.value || 0;
       const singleClassMax = Math.max(
@@ -287,7 +309,7 @@ Hooks.once('init', () => {
         savageExploitsUsesRemaining,
         deviousExploitsUsesRemaining,
       );
-      let remainingMulticlassUses = multiclassUses
+      const remainingMulticlassUses = multiclassUses
         - martialExploits?.system?.uses?.spent || 0
         - savageExploits?.system?.uses?.spent || 0
         - deviousExploits?.system?.uses?.spent || 0;
@@ -296,7 +318,8 @@ Hooks.once('init', () => {
 
     _spendAltFighterMartialSuperiority: async function (item) {
       const { utils: { itemUtils, genericUtils } } = chrisPremades;
-      const moduleAPI = game.modules.get('alternate-classes-55e').api;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
       // Only use Martial Superiority for 1st and 2nd degree exploits
       if (moduleAPI.altMartialExploitsToDegrees[item.identifier] > 2)
         return false;
@@ -314,7 +337,8 @@ Hooks.once('init', () => {
 
     spendAlternateMartialExploitUses: async function (uses, item) {
       const { utils: { genericUtils } } = chrisPremades;
-      const moduleAPI = game.modules.get('alternate-classes-55e').api;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
       // Alternate Fighter Martial Superiority
       if (
         uses === 1
@@ -343,7 +367,6 @@ Hooks.once('init', () => {
           'system.uses.spent': savageExploits.system.uses.spent
             + Math.min(uses, remainingUses),
         });
-        uses -= Math.min(uses, remainingUses);
       }
       if (martialExploits && uses) {
         const remainingUses
@@ -352,7 +375,6 @@ Hooks.once('init', () => {
           'system.uses.spent':
             martialExploits.system.uses.spent + Math.min(uses, remainingUses),
         });
-        uses -= Math.min(uses, remainingUses);
       }
       if (uses) {
         genericUtils.notify('Unknown class', 'error');
@@ -360,7 +382,8 @@ Hooks.once('init', () => {
     },
 
     getAlternateMartialExploitDie: function (item) {
-      const moduleAPI = game.modules.get('alternate-classes-55e').api;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
       const multiclassingLevel
         = moduleAPI.getAltMartialMCTotalLevel(item.actor);
       const multiclassingDie = moduleAPI
@@ -393,7 +416,8 @@ Hooks.once('init', () => {
     },
 
     getAlternateMartialExploitDieWithActor: function (actor) {
-      const moduleAPI = game.modules.get('alternate-classes-55e').api;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
       const multiclassingLevel = moduleAPI.getAltMartialMCTotalLevel(actor);
       const multiclassingDie = moduleAPI
         .getAltMartialExploitDieForMulticlassLevel(multiclassingLevel);
@@ -424,4 +448,24 @@ Hooks.once('init', () => {
     },
   };
   console.log('Alternate Classes 5e | Initialized API');
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (game.modules.get('alternate-classes-55e') as any).functions = {
+    classes: {
+      'alternate-fighter': {
+        subclasses: {
+          'sylvan-archer': {
+            handleEnchantedShot,
+          },
+        },
+      },
+    },
+  };
+});
+
+// Register CPR Macros
+Hooks.on('ready', () => {
+  const { utils: { macroUtils } } = chrisPremades;
+  macroUtils.registerMacros(macros);
+  console.log('Alternate Classes 5e | Registered CPR Macros');
 });

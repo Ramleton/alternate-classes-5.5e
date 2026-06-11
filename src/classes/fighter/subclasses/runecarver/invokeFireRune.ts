@@ -100,7 +100,7 @@ async function during(
       },
     ],
   };
-  await effectUtils.createEffect(target.actor, fireRuneEffect);
+  await effectUtils.createEffect(target.actor!, fireRuneEffect);
   return true;
 }
 

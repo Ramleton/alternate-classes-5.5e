@@ -64,8 +64,10 @@ async function targetApplyDamage({ trigger, ditem }) {
     'ac55eRestorativeShadows',
   );
   if (!originItem) return;
-  const altClassesModule = game
-    .modules.get('alternate-classes-55e') as AlternateClasses55e | undefined;
+  const altClassesModule = (game
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .modules as any)
+    .get('alternate-classes-55e') as AlternateClasses55e | undefined;
   if (!altClassesModule) return;
   const exploitDie = altClassesModule.api
     .getAlternateMartialExploitDie(originItem);

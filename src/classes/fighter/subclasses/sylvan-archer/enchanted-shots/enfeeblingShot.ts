@@ -32,7 +32,6 @@ async function during(
   const saveActivityData = genericUtils.duplicate(activity);
   saveActivityData.damage.parts[0].custom.enabled = true;
   saveActivityData.damage.parts[0].custom.formula = `2d${exploitDie.faces}`;
-  saveActivityData.damage.parts[0].type = 'psychic';
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
     item.actor,
@@ -50,7 +49,7 @@ async function during(
   if (saveWorkflow.failedSaves.size) {
     const target = saveWorkflow.failedSaves.first() as Token;
     const targetEffectData = {
-      name: `${item.name}: Charmed`,
+      name: `${item.name}: Enfeebled`,
       icon: item.img,
       origin: item.uuid,
       duration: { seconds: 60 },
@@ -60,13 +59,26 @@ async function during(
         },
         'chris-premades': {
           info: {
-            identifier: 'ac55eBeguilingShotEffect',
+            identifier: 'ac55eEnfeeblingShotEffect',
+          },
+          macros: {
+            midi: {
+              actor: ['ac55eEnfeeblingShotDamage'],
+            },
           },
         },
       },
-      statuses: ['charmed'],
+      changes: [{
+        key: 'flags.midi-qol.OverTime',
+        mode: 0,
+        value: `turn=end,allowIncapacitated=true,saveAbility=con,\
+          saveDC=${saveWorkflow.saveDC},saveDamage=nodamage,saveRemove=true,\
+          saveMagic=true,rollMode=publicroll,`,
+      }],
     };
-    await effectUtils.createEffect(target.actor!, targetEffectData);
+    await effectUtils.createEffect(target.actor!, targetEffectData, {
+      rules: 'modern',
+    });
   }
   return 1;
 }
@@ -97,8 +109,8 @@ async function workflow({
   await post(item, res2, altClassesModule);
 }
 
-export const ac55eBeguilingShot = {
-  name: 'Beguiling Shot',
+export const ac55eEnfeeblingShot = {
+  name: 'Enfeebling Shot',
   version: '1.3.141',
   rules: 'modern',
   midi: {

@@ -173,7 +173,8 @@ async function use({ workflow }): Promise<void> {
     { 'flags.chris-premades.macros.combat': ['ac55eConjureShadeActive'] },
   );
   const applyFilter = (itemUtils.getConfig(workflow.item, 'filter') ?? true)
-    && game.modules.get('tokenmagic')?.active;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    && (game.modules as any).get('tokenmagic')?.active;
   const filter = [
     {
       filterType: 'oldfilm',
@@ -237,7 +238,7 @@ async function use({ workflow }): Promise<void> {
     if (applyFilter) await TokenMagic.addFilters((i as any).object, filter);
     if (!restorativeShadows) continue;
     const targetEffect = effectUtils.getEffectByIdentifier(
-      i.actor,
+      i.actor!,
       'summonedEffect',
     );
     await genericUtils.update(

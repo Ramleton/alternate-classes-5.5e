@@ -135,7 +135,7 @@ async function workflow({
     attackReach,
     'any',
     { includeIncapacitated: true, includeToken: false },
-  ).filter(t => t.actor.id !== target.actor.id);
+  ).filter(t => t.actor!.id !== target.actor!.id);
   const res1 = await pre(item, workflow, nearbyTokens, altClassesModule);
   if (!res1) return;
   const res2 = await during(item, workflow, nearbyTokens);
