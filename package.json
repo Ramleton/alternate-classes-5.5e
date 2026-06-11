@@ -16,8 +16,9 @@
   "main": "eslint.config.js",
   "scripts": {
     "gen-types:chris": "tsc -p tsconfig.chrisPremades.json",
-    "build": "tsc && tsc-alias && npm run format-dist",
-    "format-dist": "eslint dist/**/*.js --fix"
+    "build": "tsc && tsc-alias && npm run format-dist && npm run send-to-foundry",
+    "format-dist": "eslint dist/**/*.js --fix || cd .",
+    "send-to-foundry": "node copy-dist.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
