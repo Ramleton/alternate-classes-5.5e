@@ -1,4 +1,5 @@
 import CPRMacro from '../../../../../types/chris-premades/macro.js';
+import banishingShotMacro from './enchanted-shots/banishingShot.js';
 import enfeeblingShotMacro from './enchanted-shots/enfeeblingShotEffect.js';
 import graspingShotEffectMovedMacro from './enchanted-shots/graspingShotEffectMoved.js';
 import graspingShotEffectResetMacro from './enchanted-shots/graspingShotEffectReset.js';
@@ -11,6 +12,7 @@ const sylvanArcherMacros: CPRMacro[] = [
   graspingShotEffectMovedMacro,
   graspingShotEffectResetMacro,
   piercingShotMacro,
+  banishingShotMacro,
 ];
 
 export default sylvanArcherMacros;
