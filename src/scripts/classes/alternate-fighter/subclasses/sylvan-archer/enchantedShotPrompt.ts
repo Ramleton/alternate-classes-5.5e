@@ -18,8 +18,8 @@ const ENCHANTED_SHOTS = [
 async function pre(
   item: Item<'feat'>,
   workflow: Workflow,
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<any[]> {
+
+): Promise<[string, string][]> {
   const { utils: { itemUtils } } = chrisPremades;
   const usableShots: [string, string][] = [];
   // ? Only one Enchanted Shot per D20 Test
