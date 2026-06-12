@@ -4,7 +4,7 @@ import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { SaveActivity } from 'fvtt-types/Activity.js';
 import { pre as enchantedShotPre, getTokensInCircularTemplate, post } from '../enchantedShotSave.js';
 
-const preBurstingShot = async (
+const pre = async (
   item: Item<'feat'>,
   workflow: Workflow,
 ): Promise<Token[]> => {
@@ -79,7 +79,7 @@ const workflow: MidiMacroFunction = async ({
 }) => {
   const feat = item as Item.OfType<'feat'>;
   if (!feat.actor) return;
-  const res1 = await preBurstingShot(feat, workflow);
+  const res1 = await pre(feat, workflow);
   if (!res1.length) return;
   const res2 = await during(feat, res1);
   await post(feat, res2);
