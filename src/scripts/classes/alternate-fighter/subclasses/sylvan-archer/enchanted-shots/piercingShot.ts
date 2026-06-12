@@ -6,6 +6,7 @@ import { post, pre } from '../enchantedShotSave.js';
 
 const during = async (
   token: Token,
+  targets: Token[],
   item: Item<'feat'>,
   workflow: Workflow,
 ): Promise<number> => {
@@ -67,8 +68,16 @@ const during = async (
   await genericUtils.sleep(100);
   const tokens = templateUtils.getTokensInTemplate(template);
   saveActivityData.range.value = '' + range;
+  const usedLegendarySylvanArchery = item
+    .actor!
+    .flags['alternate-classes-55e']
+    ?.macros
+    ?.enchantedShots
+    ?.legendarySylvanArcher;
+  const exploitDice = usedLegendarySylvanArchery ? 3 : 2;
   saveActivityData.damage.parts[0].custom.enabled = true;
-  saveActivityData.damage.parts[0].custom.formula = `2d${exploitDie.faces}`;
+  saveActivityData.damage.parts[0].custom.formula
+    = `${exploitDice}d${exploitDie.faces}`;
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
     item.actor!,
@@ -77,9 +86,10 @@ const during = async (
   const effect = await effectUtils.createEffect(workflow.actor, effectData);
   await effectUtils.addDependent(effect, [template]);
   await workflowUtils.addEntityRemoval(workflow, [effect]);
-  const targets = Array.from(new Set([target, ...Array.from(tokens)])).filter(
-    i => i.document.uuid !== token.document.uuid,
-  );
+  const piercedTargets = Array.from(new Set([
+    ...targets,
+    ...Array.from(tokens)],
+  ));
   if (!targets.length) return 1;
   if (sylvanShot)
     saveActivityData.damage.onSave = 'half';
@@ -87,7 +97,7 @@ const during = async (
     saveActivityData,
     item,
     item.actor!,
-    targets,
+    piercedTargets,
     { consumeResources: true },
   );
   return 1;
@@ -100,8 +110,8 @@ const workflow: MidiMacroFunction = async ({
   const feat = entity as Item.OfType<'feat'>;
   if (!feat.actor) return;
   const res1 = await pre(feat, workflow);
-  if (!res1) return;
-  const res2 = await during(token, feat, workflow);
+  if (!res1.length) return;
+  const res2 = await during(token, res1, feat, workflow);
   await post(feat, res2);
 };
 

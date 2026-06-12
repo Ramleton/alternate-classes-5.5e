@@ -23,6 +23,16 @@ export default [
       './dist/**/*.{js}',
     ],
     plugins: { ts, '@stylistic': stylistic, 'n': nodePlugin },
+    settings: {
+      n: {
+        resolvePaths: ['src/scripts/'], // Adjust if your aliases map to a different base directory
+        typescriptExtensionsMap: [
+          ['.ts', '.js'],
+          ['.cts', '.cjs'],
+          ['.mts', '.mjs'],
+        ],
+      },
+    },
     languageOptions: {
       globals: globals.browser,
       parserOptions: {

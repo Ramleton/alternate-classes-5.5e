@@ -1,4 +1,3 @@
-import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { SaveActivity } from 'fvtt-types/Activity.js';
@@ -6,7 +5,7 @@ import { post, pre } from '../enchantedShotSave.js';
 
 const during = async (
   item: Item<'feat'>,
-  workflow: Workflow,
+  targets: Token[],
 ): Promise<number> => {
   const { utils: {
     activityUtils,
@@ -24,7 +23,6 @@ const during = async (
     { strict: true },
   );
   if (!activity) return 0;
-  const target = workflow.hitTargets.first() as Token;
   const saveActivityData: SaveActivity = genericUtils.duplicate(activity);
   saveActivityData.damage.parts = [];
   // If the actor has Sylvan Shot, on save the target takes half damage
@@ -38,7 +36,7 @@ const during = async (
     saveActivityData,
     item,
     item.actor!,
-    [target],
+    targets,
     { consumeResources: true },
   );
   const targetEffectData = {
@@ -118,8 +116,8 @@ const workflow: MidiMacroFunction = async ({
   const feat = entity as Item.OfType<'feat'>;
   if (!feat.actor) return;
   const res1 = await pre(feat, workflow);
-  if (!res1) return;
-  const res2 = await during(feat, workflow);
+  if (!res1.length) return;
+  const res2 = await during(feat, res1);
   await post(feat, res2);
 };
 

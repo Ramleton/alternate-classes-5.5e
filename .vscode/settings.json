@@ -22,5 +22,6 @@
         "premades",
         "subrepos"
     ],
-    "files.insertFinalNewline": false
+    "files.insertFinalNewline": false,
+    "js/ts.preferences.importModuleSpecifierEnding": "js"
 }

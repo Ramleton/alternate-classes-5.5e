@@ -661,7 +661,7 @@ export default interface CauldronOfPlentifulResources {
         content: string,
         targets: Token[],
         options?: {
-          type?: string;
+          type?: 'multiple';
           selectOptions?: never[];
           skipDeadAndUnconscious?: boolean;
           coverToken?: undefined;
@@ -1363,7 +1363,7 @@ export default interface CauldronOfPlentifulResources {
         scene: any,
         { x: offsetX, y: offsetY }: { x: number; y: number }
       ): Token[];
-      getTokensInTemplate(template): Token[];
+      getTokensInTemplate(template): Set<Token>;
       getTemplatesInToken(token): Template[];
       getTokenPoints(token): { x: number; y: number }[];
       findGrids(A: any, B: any, template: Template): Set<any>;

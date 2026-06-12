@@ -32,13 +32,22 @@ const handleGraspingShot: HandleEnchantedShot = async ({
         },
       },
     },
-    changes: [{
-      key: 'flags.midi-qol.OverTime',
-      mode: 0,
-      value: `turn=start, label=Grasping Shot, rollType=check, saveAbility=str,\
+    changes: [
+      {
+        key: 'flags.midi-qol.OverTime',
+        mode: 0,
+        value: `turn=start,label=Grasping Shot,rollType=check,saveAbility=str,\
         saveDC=${saveWorkflow.saveDC}, saveCount=1-, actionSave=roll,\
         allowIncapacitated=true`,
-    }],
+        priority: 20,
+      },
+      {
+        key: 'system.attributes.movement.all',
+        mode: 0,
+        value: '*0.5',
+        priority: 20,
+      },
+    ],
   };
   for (const target of saveWorkflow.failedSaves) {
     if (!target.actor) continue;

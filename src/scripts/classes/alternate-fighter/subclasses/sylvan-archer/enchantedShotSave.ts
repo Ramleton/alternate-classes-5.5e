@@ -1,25 +1,116 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import { getAlternateMartialExploitDie, spendAlternateMartialExploitUses } from 'exploits/utils.js';
+import { SaveActivity } from 'fvtt-types/Activity.js';
 import CPRMacro, { MidiMacroFunction } from '../../../../../types/chris-premades/macro.js';
 import handleEnchantedShot from './handle.js';
 
-export const pre = async (
+export const getTokensInCircularTemplate = async (
   item: Item<'feat'>,
   workflow: Workflow,
-) => {
-  if (!workflow.hitTargets.size)
-    return false;
-  return item
+  target: Token,
+  distance: number,
+): Promise<Token[]> => {
+  const { utils: {
+    genericUtils,
+    templateUtils,
+    workflowUtils,
+    effectUtils,
+  } } = chrisPremades;
+  const templateData = {
+    angle: 0,
+    direction: 0,
+    distance: canvas!.scene!.grid.distance * distance,
+    x: target.center.x,
+    y: target.center.y,
+    t: 'circle' as const,
+    user: game.user,
+    fillColor: game.user!.color.css,
+    width: 5,
+  };
+  const effectData = {
+    name: genericUtils.format(
+      'CHRISPREMADES.GenericEffects.TemplateEffect',
+      { itemName: 'Legendary Sylvan Archer' },
+    ),
+    img: item.img,
+    origin: item.uuid,
+    duration: {
+      seconds: 1,
+      turns: 1,
+    },
+  };
+  const [template] = await canvas!.scene!.createEmbeddedDocuments(
+    'MeasuredTemplate',
+    [templateData],
+  );
+  await genericUtils.sleep(100);
+  const effect = await effectUtils.createEffect(item.actor!, effectData);
+  await effectUtils.addDependent(effect, [template]);
+  await workflowUtils.addEntityRemoval(workflow, [effect]);
+  return Array.from(templateUtils.getTokensInTemplate(template));
+};
+
+const getLegendarySylvanArcherTokens = async (
+  item: Item<'feat'>,
+  workflow: Workflow,
+  target: Token,
+): Promise<Token[]> => {
+  if (!item
     .actor!
     .flags['alternate-classes-55e']
     ?.macros
     ?.enchantedShot
-    ?.[item.system.identifier];
+    ?.legendarySylvanArcher
+  ) return [target];
+  console.log('Ran Legendary Sylvan Archer');
+  const { utils: { dialogUtils } } = chrisPremades;
+  /**
+   * Legendary Sylvan Archer adds tokens in a 20 ft radius of the target
+   * to the save activity
+   */
+  const tokens = await getTokensInCircularTemplate(item, workflow, target, 4);
+  const selectedTokens = await dialogUtils.selectTargetDialog(
+    'Legendary Sylvan Archer',
+    `Select up to ${tokens.length} targets for saving throw`,
+    tokens,
+    {
+      type: 'multiple',
+      maxAmount: tokens.length,
+      skipDeadAndUnconscious: false,
+    },
+  ) as [Token[], boolean];
+  if (!selectedTokens[0].length)
+    return tokens;
+  return selectedTokens[0];
+};
+
+export const pre = async (
+  item: Item<'feat'>,
+  workflow: Workflow,
+): Promise<Token[]> => {
+  if (!item
+    .actor!
+    .flags['alternate-classes-55e']
+    ?.macros
+    ?.enchantedShot
+    ?.[item.system.identifier]
+  )
+    return [];
+  const target = workflow.hitTargets.first() as Token;
+  return Array.from(new Set<Token>([
+    target, // The target always makes the saving throw
+    ...(await getLegendarySylvanArcherTokens(
+      item,
+      workflow,
+      target,
+    )),
+  ]));
 };
 
 const during = async (
   item: Item<'feat'>,
   workflow: Workflow,
+  tokens: Token[],
 ) => {
   const { utils: { activityUtils, genericUtils, itemUtils, workflowUtils } }
     = chrisPremades;
@@ -32,9 +123,19 @@ const during = async (
     { strict: true },
   );
   if (!activity) return 0;
-  const saveActivityData = genericUtils.duplicate(activity);
-  saveActivityData.damage.parts[0].custom.enabled = true;
-  saveActivityData.damage.parts[0].custom.formula = `2d${exploitDie.faces}`;
+  const saveActivityData: SaveActivity = genericUtils.duplicate(activity);
+  const usedLegendarySylvanArchery = item
+    .actor!
+    .flags['alternate-classes-55e']
+    ?.macros
+    ?.enchantedShots
+    ?.legendarySylvanArcher;
+  const exploitDice = usedLegendarySylvanArchery ? 3 : 2;
+  if (saveActivityData.damage.parts.length) {
+    saveActivityData.damage.parts[0].custom.enabled = true;
+    saveActivityData.damage.parts[0].custom.formula
+      = `${exploitDice}d${exploitDie.faces}`;
+  }
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
     item.actor!,
@@ -46,7 +147,7 @@ const during = async (
     saveActivityData,
     item,
     item.actor!,
-    [workflow.hitTargets.first() as Token],
+    tokens,
     { consumeResources: true },
   );
   const data = { item, workflow, saveWorkflow };
@@ -75,8 +176,8 @@ const workflow: MidiMacroFunction = async ({
   const feat = item as Item.OfType<'feat'>;
   if (!feat.actor) return;
   const res1 = await pre(feat, workflow);
-  if (!res1) return;
-  const res2 = await during(feat, workflow);
+  if (!res1.length) return;
+  const res2 = await during(feat, workflow, res1);
   await post(feat, res2);
 };
 
