@@ -2,12 +2,19 @@ import CPRMacro, { MacroFunction, MidiActiveEffect } from 'chris-premades/macro'
 import { ScaleValueTypeDice } from 'fvtt-types/CharacterSystemData.js';
 
 async function pre(effect: MidiActiveEffect): Promise<boolean> {
-  return !effect.flags['alternate-classes-55e']?.graspingShot?.moved;
+  return !effect
+    .flags['alternate-classes-55e']
+    ?.macros
+    ?.enchantedShot
+    ?.graspingShot
+    ?.moved;
 }
 
 async function post(effect: MidiActiveEffect, token: Token): Promise<void> {
   const exploitDie = effect
     .flags['alternate-classes-55e']
+    ?.macros
+    ?.enchantedShot
     ?.graspingShot
     ?.exploitDie as ScaleValueTypeDice | undefined;
   if (!exploitDie) return;
@@ -18,6 +25,8 @@ async function post(effect: MidiActiveEffect, token: Token): Promise<void> {
   } } = chrisPremades;
   const originActor = effect
     .flags['alternate-classes-55e']
+    ?.macros
+    ?.enchantedShot
     ?.graspingShot
     ?.originActor;
   if (!originActor) return;
@@ -29,7 +38,7 @@ async function post(effect: MidiActiveEffect, token: Token): Promise<void> {
   await genericUtils.setFlag(
     effect,
     'alternate-classes-55e',
-    'graspingShot.moved',
+    'macros.enchantedShot.graspingShot.moved',
     true,
   );
   return;

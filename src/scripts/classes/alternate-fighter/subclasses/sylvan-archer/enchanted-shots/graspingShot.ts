@@ -16,10 +16,14 @@ const handleGraspingShot: HandleEnchantedShot = async ({
         stackable: 'noneName',
       },
       'alternate-classes-55e': {
-        graspingShot: {
-          moved: false,
-          exploitDie: getAlternateMartialExploitDie(item),
-          originActor: item.actor,
+        macros: {
+          enchantedShot: {
+            graspingShot: {
+              moved: false,
+              exploitDie: getAlternateMartialExploitDie(item),
+              originActor: item.actor,
+            },
+          },
         },
       },
       'chris-premades': {

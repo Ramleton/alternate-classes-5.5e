@@ -1,21 +1,7 @@
+import DamageType from '../damage.js';
 import CPRMacro from './macro.js';
 import Summons from './summons.js';
 import Teleport from './teleport.js';
-
-type DAMAGE_TYPE
-  = 'bludgeoning'
-    | 'piercing'
-    | 'slashing'
-    | 'acid'
-    | 'fire'
-    | 'cold'
-    | 'lightning'
-    | 'poison'
-    | 'radiant'
-    | 'necrotic'
-    | 'psychic'
-    | 'thunder'
-    | 'force';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default interface CauldronOfPlentifulResources {
@@ -276,7 +262,7 @@ export default interface CauldronOfPlentifulResources {
         formula: string,
         options?: {
           ignoreCrit?: boolean;
-          damageType?: string;
+          damageType?: DamageType;
         }
       ): Promise<void>;
 
@@ -287,7 +273,7 @@ export default interface CauldronOfPlentifulResources {
         formula: string,
         options?: {
           ignoreCrit?: boolean;
-          damageType?: DAMAGE_TYPE;
+          damageType?: DamageType;
         }
       ): Promise<void>;
 

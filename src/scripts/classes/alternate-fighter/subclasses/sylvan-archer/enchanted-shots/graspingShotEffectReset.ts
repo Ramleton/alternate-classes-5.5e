@@ -7,7 +7,7 @@ const workflow: MacroFunction = async ({
   await genericUtils.setFlag(
     effect,
     'alternate-classes-55e',
-    'graspingShot.moved',
+    'macros.enchantedShot.graspingShot.moved',
     false,
   );
 };

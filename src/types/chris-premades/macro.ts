@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import { EffectFlags } from '../effects.js';
 import { AuraEvent, CombatEvent, D20Event, EffectEvent, MidiQOLEvent, MovementEvent, RestEvent } from './macroEvents.js';
 
 export interface ActiveEffectChange {
@@ -24,11 +25,10 @@ export interface ActiveEffectDuration {
   remaining: number;
 }
 
-export interface ActiveEffectFlags {
+export interface ActiveEffectFlags extends EffectFlags {
   'core': {
     overlay: boolean;
   };
-  'alternate-classes-55e'?: Record<string, any>;
   'chris-premades'?: {
     conditions: string[];
     info?: {
@@ -54,21 +54,6 @@ export interface ActiveEffectFlags {
     rules: 'legacy' | 'modern';
     specialDuration: string[];
     templateEffectActivities: any[];
-  };
-  'dae'?: {
-    disableCondition?: string;
-    disableIncapacitated: boolean;
-    durationExpression?: string;
-    enableCondition: string;
-    macroRepeat?: 'none' | string;
-    showIcon: boolean;
-    specialDuration: string[];
-    stackable: 'noneName' | string;
-  };
-  'dnd5e': {
-    riders: {
-      statuses: string[];
-    };
   };
   'times-up': {
     durationSeconds?: number;
