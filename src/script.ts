@@ -266,55 +266,55 @@ Hooks.once('init', () => {
         .alternateMartialExploitMulticlassingTable[totalLevel - 1].exploitDice;
     },
 
-    getAltMartialExploitsRemaining: function (
-      item: Item,
-    ): number {
-      if (!item.actor)
-        return 0;
-      const { utils: { itemUtils } } = chrisPremades;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
-      const totalLevel = moduleAPI.getAltMartialMCTotalLevel(item.actor);
-      const multiclassUses = moduleAPI
-        .getAltMartialMCExploitsRemaining(totalLevel);
-      const martialExploits = itemUtils.getItemByIdentifier<'feat'>(
-        item.actor,
-        'martialExploits',
-      );
-      let martialExploitsUsesRemaining = martialExploits
-        ?.system?.uses?.value || 0;
-      // ? Check Alternate Fighter's Martial Superiority feature
-      const martialSuperiority = itemUtils.getItemByIdentifier<'feat'>(
-        item.actor,
-        'ac55eMartialSuperiority',
-      );
-      const martialSuperiorityUsesRemaining = martialSuperiority
-        ?.system?.uses?.value || 0;
-      martialExploitsUsesRemaining = Math
-        .max(martialExploitsUsesRemaining, martialSuperiorityUsesRemaining);
-      const savageExploits = itemUtils.getItemByIdentifier<'feat'>(
-        item.actor,
-        'savageExploits',
-      );
-      const savageExploitsUsesRemaining = savageExploits
-        ?.system?.uses?.value || 0;
-      const deviousExploits = itemUtils.getItemByIdentifier<'feat'>(
-        item.actor,
-        'deviousExploits',
-      );
-      const deviousExploitsUsesRemaining = deviousExploits
-        ?.system?.uses?.value || 0;
-      const singleClassMax = Math.max(
-        martialExploitsUsesRemaining,
-        savageExploitsUsesRemaining,
-        deviousExploitsUsesRemaining,
-      );
-      const remainingMulticlassUses = multiclassUses
-        - martialExploits?.system?.uses?.spent || 0
-        - savageExploits?.system?.uses?.spent || 0
-        - deviousExploits?.system?.uses?.spent || 0;
-      return Math.max(remainingMulticlassUses, singleClassMax);
-    },
+    // getAltMartialExploitsRemaining: function (
+    //   item: Item,
+    // ): number {
+    //   if (!item.actor)
+    //     return 0;
+    //   const { utils: { itemUtils } } = chrisPremades;
+    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //   const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
+    //   const totalLevel = moduleAPI.getAltMartialMCTotalLevel(item.actor);
+    //   const multiclassUses = moduleAPI
+    //     .getAltMartialMCExploitsRemaining(totalLevel);
+    //   const martialExploits = itemUtils.getItemByIdentifier<'feat'>(
+    //     item.actor,
+    //     'martialExploits',
+    //   );
+    //   let martialExploitsUsesRemaining = martialExploits
+    //     ?.system?.uses?.value || 0;
+    //   // ? Check Alternate Fighter's Martial Superiority feature
+    //   const martialSuperiority = itemUtils.getItemByIdentifier<'feat'>(
+    //     item.actor,
+    //     'ac55eMartialSuperiority',
+    //   );
+    //   const martialSuperiorityUsesRemaining = martialSuperiority
+    //     ?.system?.uses?.value || 0;
+    //   martialExploitsUsesRemaining = Math
+    //     .max(martialExploitsUsesRemaining, martialSuperiorityUsesRemaining);
+    //   const savageExploits = itemUtils.getItemByIdentifier<'feat'>(
+    //     item.actor,
+    //     'savageExploits',
+    //   );
+    //   const savageExploitsUsesRemaining = savageExploits
+    //     ?.system?.uses?.value || 0;
+    //   const deviousExploits = itemUtils.getItemByIdentifier<'feat'>(
+    //     item.actor,
+    //     'deviousExploits',
+    //   );
+    //   const deviousExploitsUsesRemaining = deviousExploits
+    //     ?.system?.uses?.value || 0;
+    //   const singleClassMax = Math.max(
+    //     martialExploitsUsesRemaining,
+    //     savageExploitsUsesRemaining,
+    //     deviousExploitsUsesRemaining,
+    //   );
+    //   const remainingMulticlassUses = multiclassUses
+    //     - martialExploits?.system?.uses?.spent || 0
+    //     - savageExploits?.system?.uses?.spent || 0
+    //     - deviousExploits?.system?.uses?.spent || 0;
+    //   return Math.max(remainingMulticlassUses, singleClassMax);
+    // },
 
     _spendAltFighterMartialSuperiority: async function (item) {
       const { utils: { itemUtils, genericUtils } } = chrisPremades;
