@@ -615,18 +615,18 @@ export default interface CauldronOfPlentifulResources {
     };
 
     dialogUtils: {
-      buttonDialog(
+      buttonDialog<T>(
         title: string,
         content: string,
         buttons: [
           string,
-          any,
+          T,
             options?: { image?: string; displayAsRows?: boolean },
         ][],
         options?: {
           userId?: string;
         }
-      ): Promise<any>;
+      ): Promise<T>;
 
       numberDialog(
         title: string,
