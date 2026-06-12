@@ -106,6 +106,8 @@ interface ExploitsToDegrees {
   'storm-of-arrows': 5;
 }
 
+export type ExploitActivityIdentifier = 'save' | 'use' | 'damage';
+
 interface MacroPassToExploit {
   attackRollComplete: string[];
   postAttackRoll: string[];
