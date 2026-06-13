@@ -81,6 +81,241 @@ export interface CastData {
   saveDC: number;
 }
 
+interface Proficiency {
+  deterministic: boolean;
+  multiplier: number;
+  rounding: 'up' | 'down';
+  _baseProficiency: number;
+  dice: string;
+  flat: number;
+  hasProficiency: boolean;
+  term: string;
+}
+
+interface D20RollAbility {
+  attack: number;
+  value: number;
+  proficient: 0 | 0.5 | 1 | 2;
+  bonuses: { check: string; save: string };
+  check: {
+    roll: {
+      max: number | null;
+      min: number | null;
+      mode: number;
+      modeCounts: {
+        advantages: {
+          count: number;
+          suppressed: false;
+        };
+        disadvantages: {
+          count: number;
+          suppressed: false;
+        };
+      };
+    };
+  };
+  checkBonus: number;
+  checkProf: Proficiency;
+  dc: number;
+  max: number;
+  mod: number;
+  save: {
+    roll: {
+      max: number | null;
+      min: number | null;
+      mode: number;
+    };
+    value: number;
+  };
+  saveBonus: number;
+  saveProf: Proficiency;
+}
+
+interface ArmorClass {
+  armor: number;
+  base: number;
+  bonus: number;
+  calc: 'default' | 'flat' | 'custom' | unknown;
+  cover: number;
+  dex: number;
+  flat: number | null;
+  formula: string | undefined;
+  label: string | null;
+  min: number;
+  shield: number;
+  value: number;
+}
+
+interface HitDice {
+  actor: Actor5e;
+  classes: Set<Item<'class'>>;
+  sizes: Set<number>;
+  bySize: {
+    d6?: number;
+    d8?: number;
+    d10?: number;
+    d12?: number;
+  };
+  largest: 'd6' | 'd8' | 'd10' | 'd12';
+  largestAvailable: 'd6' | 'd8' | 'd10' | 'd12';
+  largestFace: 6 | 8 | 10 | 12;
+  max: number;
+  pct: number;
+  smallest: 'd6' | 'd8' | 'd10' | 'd12';
+  smallestAvailable: 'd6' | 'd8' | 'd10' | 'd12';
+  smallestFace: 6 | 8 | 10 | 12;
+  value: number;
+}
+
+interface RollMode {
+  min: number | null;
+  max: number | null;
+  mode: number;
+}
+
+export interface D20Roll {
+  data: {
+    Embed: string;
+    abilities: {
+      cha: D20RollAbility;
+      con: D20RollAbility;
+      dex: D20RollAbility;
+      int: D20RollAbility;
+      str: D20RollAbility;
+      wis: D20RollAbility;
+    };
+    abilityId: 'cha' | 'con' | 'dex' | 'int' | 'str' | 'wis';
+    actorId: string;
+    actorType: 'character' | unknown;
+    actorUuid: string;
+    attributes: {
+      ac: ArmorClass;
+      attunement: { max: number; value: number };
+      concentration: {
+        ability: string;
+        bonuses: { save: string };
+        limit: number;
+        roll: {
+          min: number | null;
+          max: number | null;
+          mode: number;
+        };
+        save: number;
+      };
+      death: {
+        bonuses: { save: string };
+        failure: number;
+        roll: {
+          min: number | null;
+          max: number | null;
+          mode: number;
+        };
+        success: number;
+      };
+      encumbrance: {
+        bonuses: {
+          encumbered: string;
+          heavilyEncumbered: string;
+          maximum: string;
+          overall: string;
+        };
+        encumbered: boolean;
+        max: number;
+        mod: number;
+        multipliers: {
+          encumbered: string;
+          heavilyEncumbered: string;
+          maximum: string;
+          overall: string;
+        };
+        pct: number;
+        stops: {
+          encumbered: number;
+          heavilyEncumbered: number;
+        };
+        thresholds: {
+          encumbered: number;
+          heavilyEncumbered: number;
+          maximum: number;
+        };
+      };
+      hd: HitDice;
+      hp: {
+        bonuses: {
+          level: string;
+          overall: undefined;
+        };
+        damage: number;
+        dt: undefined;
+        effectiveMax: number;
+        max: number;
+        pct: number;
+        temp: number;
+        tempmax: number;
+        value: number;
+      };
+      init: {
+        ability: string;
+        bonus: string;
+        mod: number;
+        prof: Proficiency;
+        roll: RollMode;
+        score: number;
+        total: number;
+      };
+      inspiration: boolean;
+      loyalty: {
+        value: undefined;
+      };
+      movement: {
+        bonus: undefined;
+        burrow: number;
+        climb: number;
+        fly: number;
+        fromSpecies: { walk: string };
+        hover: boolean;
+        ignoredDifficultTerrain: Set<string>;
+        jump: number;
+        max: number;
+        slowed: boolean;
+        special: undefined;
+        speed: number;
+        swim: number;
+        units: 'ft';
+        walk: number;
+      };
+      prof: number;
+      senses: {
+        blindsight: number;
+        darkvision: number;
+        ranges: {
+          blindsight: number;
+          darkvision: number;
+          tremorsense: number;
+          truesight: number;
+        };
+        special: string;
+        tremorsense: number;
+        truesight: number;
+        units: 'ft';
+      };
+      spell: {
+        abilityLabel:
+          | 'Strength'
+          | 'Dexterity'
+          | 'Constitution'
+          | 'Intelligence'
+          | 'Wisdom'
+          | 'Charisma';
+        attack: number;
+        dc: number;
+        mod: number;
+      };
+      spellcasting: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+    };
+  };
+}
+
 export interface Trigger {
   castData?: CastData;
   distance?: number;
@@ -91,6 +326,7 @@ export interface Trigger {
   priority: number;
   target?: Token;
   token: Token;
+  roll: any;
 }
 
 export type MacroFunction = (__0: {

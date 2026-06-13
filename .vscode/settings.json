@@ -16,11 +16,17 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "cSpell.words": [
+        "blindsight",
+        "darkvision",
         "ditem",
         "multiclass",
         "Multiclassing",
         "premades",
-        "subrepos"
+        "spellcasting",
+        "subrepos",
+        "tempmax",
+        "tremorsense",
+        "truesight"
     ],
     "files.insertFinalNewline": false,
     "js/ts.preferences.importModuleSpecifierEnding": "js"
