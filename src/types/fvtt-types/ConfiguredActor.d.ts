@@ -5,5 +5,6 @@ declare global {
     SubType extends Actor.SubType = Actor.SubType,
   > extends Actor<SubType> {
     classes: Record<string, Item5e<'class'>>;
+    items: Item[];
   }
 }

@@ -75,44 +75,44 @@ export default interface CauldronOfPlentifulResources {
       getCRFromProf(prof: number): number;
       getSidebarActor(actor: Actor, options?: { autoImport?: boolean }): Actor;
       getSize<B extends boolean>(
-        actor: Actor,
+        actor: Actor5e,
         returnString: B
       ): B extends true ? string : number;
-      hasUsedReaction(actor: Actor): boolean;
-      setReactionUsed(actor: Actor): Promise<void>;
-      removeReactionUsed(actor: Actor, force?: boolean): Promise<void>;
-      hasUsedBonusAction(actor: Actor): boolean;
-      setBonusActionUsed(actor: Actor): Promise<void>;
-      removeBonusActionUsed(actor: Actor, force?: boolean): Promise<void>;
-      hasSpellSlots(actor: Actor, atLeast?: number): boolean;
-      getCastableSpells(actor: Actor): Item[];
-      isShapeChanger(actor: Actor): boolean;
-      doConcentrationCheck(actor: Actor, saveDC: number): Promise<void>;
+      hasUsedReaction(actor: Actor5e): boolean;
+      setReactionUsed(actor: Actor5e): Promise<void>;
+      removeReactionUsed(actor: Actor5e, force?: boolean): Promise<void>;
+      hasUsedBonusAction(actor: Actor5e): boolean;
+      setBonusActionUsed(actor: Actor5e): Promise<void>;
+      removeBonusActionUsed(actor: Actor5e, force?: boolean): Promise<void>;
+      hasSpellSlots(actor: Actor5e, atLeast?: number): boolean;
+      getCastableSpells(actor: Actor5e): Item[];
+      isShapeChanger(actor: Actor5e): boolean;
+      doConcentrationCheck(actor: Actor5e, saveDC: number): Promise<void>;
       polymorph(
-        origActor: Actor,
-        newActor: Actor,
+        origActor: Actor5e,
+        newActor: Actor5e,
         options: object,
         renderSheet?: boolean
       ): Promise<void>;
-      updateAll(actor: Actor): Promise<string>;
+      updateAll(actor: Actor5e): Promise<string>;
       getEquivalentSpellSlotName(
-        actor: Actor,
+        actor: Actor5e,
         level: number,
         options?: {
           canCast?: boolean;
         }
       );
-      getEquippedArmor(actor: Actor, types?: string[]): Item?;
-      getEquippedShield(actor: Actor): Item?;
-      getAllEquippedArmor(actor: Actor): Item[];
+      getEquippedArmor(actor: Actor5e, types?: string[]): Item?;
+      getEquippedShield(actor: Actor5e): Item?;
+      getAllEquippedArmor(actor: Actor5e): Item[];
       hasConditionBy(
-        sourceActor: Actor,
-        targetActor: Actor,
+        sourceActor: Actor5e,
+        targetActor: Actor5e,
         statusId: string
       ): Promise<boolean>;
       compareSize(
-        source: Actor | Token,
-        target: Actor | Token,
+        source: Actor5e | Token,
+        target: Actor5e | Token,
         goal:
           | 'equal'
           | '='
