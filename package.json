@@ -15,11 +15,8 @@
   "type": "commonjs",
   "main": "eslint.config.js",
   "scripts": {
-    "gen-types:chris": "tsc -p tsconfig.chrisPremades.json",
-    "build": "tsc && tsc-alias && npm run format-dist",
-    "test": "npm run build && npm run send-to-foundry",
-    "format-dist": "eslint dist/**/*.js --fix || cd .",
-    "send-to-foundry": "node copy-dist.mjs"
+    "dev": "vite",
+    "build": "vite build"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -34,7 +31,8 @@
     "sequencer": "github:fantasycalendar/FoundryVTT-Sequencer#master",
     "tsc-alias": "^1.8.17",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.0"
+    "typescript-eslint": "^8.60.0",
+    "vite": "^8.0.16"
   },
   "dependencies": {
     "@eslint/compat": "^2.1.0",
