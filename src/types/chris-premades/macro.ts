@@ -120,6 +120,7 @@ export default interface CPRMacro {
       pass: MidiQOLEvent;
       macro: MidiMacroFunction;
       priority: number;
+      activities?: string[];
     }[];
   };
   effect?: {
