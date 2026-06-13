@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import { EffectFlags } from '../effects.js';
+import { SkillIdentifier } from '../skills.js';
 import { AuraEvent, CombatEvent, D20Event, EffectEvent, MidiQOLEvent, MovementEvent, RestEvent } from './macroEvents.js';
 
 export interface ActiveEffectChange {
@@ -624,6 +625,8 @@ export interface Trigger {
   target?: Token;
   token: Token;
   roll: D20Roll;
+  saveId: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+  skillId: SkillIdentifier;
 }
 
 export type MacroFunction = (__0: {
