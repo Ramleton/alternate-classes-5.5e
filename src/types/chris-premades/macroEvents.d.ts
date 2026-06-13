@@ -70,7 +70,8 @@ export type D20Event
     | 'sceneSituational' // Runs right before an Ability Check or Saving Throw is rolled. The macros are pulled from all tokens on the scene. (Useful for 3rd Party Reactions)
     | 'context' // Runs right before an Ability Check or Saving Throw is rolled. Must return specifically formatted data, which is used in a dialog.
     | 'bonus' // Runs after an Ability Check or Saving Throw is rolled. Used to modify the roll before being rendered.
-    | 'sceneBonus'; // Runs after an Ability Check or Saving Throw is rolled. Used to modify the roll b efore being rendered. The macros are pulled from all tokens on the scene. (Useful for 3rd party reactions).
+    | 'sceneBonus' // Runs after an Ability Check or Saving Throw is rolled. Used to modify the roll before being rendered. The macros are pulled from all tokens on the scene. (Useful for 3rd party reactions).
+    | 'post';
 
 export type AuraEvent
   = | 'create'; // Run when the aura handler thinks a token should be getting an aura. It expects effect data to be returned (or undefined).

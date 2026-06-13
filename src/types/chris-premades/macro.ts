@@ -173,6 +173,46 @@ interface RollMode {
   mode: number;
 }
 
+interface D20Die {
+  isIntermediate: boolean;
+  modifiers: unknown[];
+  options: {
+    advantageMode: number;
+    criticalFailure: number;
+    criticalSuccess: number;
+    elvenAccuracy: boolean;
+    flavor: null;
+    halflingLucky: boolean;
+    maximum: undefined;
+    minimum: undefined;
+  };
+  results: {
+    active: boolean;
+    hidden: boolean;
+    result: number;
+  }[];
+  _evaluated: boolean;
+  _faces: 20;
+  _id: string;
+  _number: number;
+  _root: D20Roll;
+  denomination: 'd20';
+  dice: unknown[];
+  expression: '1d20';
+  faces: 20;
+  flavor: string;
+  formula: '1d20';
+  isCriticalFailure: boolean;
+  isCriticalSuccess: boolean;
+  isDeterministic: boolean;
+  isValid: boolean;
+  method: string;
+  number: 1;
+  resolver: unknown;
+  total: number;
+  values: number[];
+}
+
 export interface D20Roll {
   data: {
     Embed: string;
@@ -313,7 +353,264 @@ export interface D20Roll {
       };
       spellcasting: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
     };
+    bastion: {
+      name: string;
+      description: string;
+    };
+    bonuses: {
+      abilities: {
+        check: string;
+        save: string;
+        skill: string;
+      };
+      msak: {
+        attack: string;
+        damage: string;
+      };
+      mwak: {
+        attack: string;
+        damage: string;
+      };
+      rsak: {
+        attack: string;
+        damage: string;
+      };
+      rwak: {
+        attack: string;
+        damage: string;
+      };
+      spell: { dc: string };
+    };
+    cfg: {
+      actorSizes: {
+        grg: {
+          abbreviation: 'Gt';
+          capacityMultiplier: number;
+          hitDie: number;
+          label: 'Gargantuan';
+          numerical: number;
+          token: number;
+        };
+        huge: {
+          abbreviation: 'Hg';
+          capacityMultiplier: number;
+          hitDie: number;
+          label: 'Huge';
+          numerical: number;
+          token: number;
+        };
+        lg: {
+          abbreviation: 'Lg';
+          capacityMultiplier: number;
+          hitDie: number;
+          label: 'Large';
+          numerical: number;
+          token: number;
+        };
+        med: {
+          abbreviation: 'Md';
+          capacityMultiplier: number;
+          hitDie: number;
+          label: 'Medium';
+          numerical: number;
+          token: number;
+        };
+        sm: {
+          abbreviation: 'Sm';
+          capacityMultiplier: number;
+          hitDie: number;
+          label: 'Small';
+          numerical: number;
+          token: number;
+        };
+        tiny: {
+          abbreviation: 'Tn';
+          capacityMultiplier: number;
+          hitDie: number;
+          label: 'Tiny';
+          numerical: number;
+          token: number;
+        };
+      };
+      armorClasses: {
+        custom: {
+          label: 'Custom Formula';
+        };
+        [key: string]: {
+          label: string;
+          formula?: string;
+        };
+      };
+      skills: Record<string, {
+        ability: string;
+        fullKey: string;
+        icon: string;
+        label: string;
+        reference: string;
+      }>;
+    };
+    classes: Record<string, Item<'class'>>;
+    currency: {
+      cp: number;
+      ep: number;
+      gp: number;
+      pp: number;
+      sp: number;
+    };
+    details: {
+      age: string;
+      alignment: string;
+      appearance: string;
+      biography: {
+        value: string;
+        public: string;
+      };
+      bond: string;
+      eyes: string;
+      faith: string;
+      flaw: string;
+      gender: string;
+      hair: string;
+      height: string;
+      ideal: string;
+      level: number;
+      originalClass: string;
+      skin: string;
+      tier: number;
+      trait: string;
+      type: {
+        custom: string;
+        value: string;
+        subtype: string;
+        config: {
+          icon: string;
+          label: string;
+          plural: string;
+          reference: string;
+        };
+        label: string;
+      };
+      weight: string;
+      xp: {
+        max: number;
+        min: number;
+        pct: number;
+        value: number;
+      };
+      background: Item;
+      race: Item;
+    };
+    effects: MidiActiveEffect[];
+    favorites: {
+      type: 'activity';
+      id: string;
+      sort: number;
+    }[];
+    flags: Record<string, unknown>;
+    midiFlags: Record<string, unknown>;
+    mod: number;
+    name: string;
+    prof: Proficiency;
+    resources: {
+      primary: {
+        label: string;
+        lr: boolean;
+        max: number;
+        sr: boolean;
+        value: number;
+      };
+      secondary: {
+        label: string;
+        lr: boolean;
+        max: number;
+        sr: boolean;
+        value: number;
+      };
+      tertiary: {
+        label: string;
+        lr: boolean;
+        max: number;
+        sr: boolean;
+        value: number;
+      };
+    };
+    scale: Record<string, Record<string, unknown>>;
+    skills: Record<string, {
+      ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+      bonus: number;
+      bonuses: { check: string; passive: string };
+      effectValue: number;
+      mod: number;
+      passive: number;
+      prof: Proficiency;
+      proficient: 0 | 0.5 | 1 | 2;
+      roll: {
+        min: number | null;
+        max: number | null;
+        mode: number;
+      };
+      total: number;
+      value: number;
+    }>;
+    spells: Record<string, {
+      label: string;
+      override: undefined;
+      type: string;
+      value: number;
+    }>;
+    statuses: Record<string, unknown>;
+    statusesSet: Set<string>;
+    subclasses: Record<string, Item>;
+    tools: Record<string, {
+      ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+      bonus: number;
+      bonuses: { check: string };
+      effectValue: number;
+      mod: number;
+      prof: Proficiency;
+      roll: {
+        min: number | null;
+        max: number | null;
+        mode: number;
+      };
+      total: number;
+      value: number;
+    }>;
+    traits: Record<string, unknown>;
   };
+  options: {
+    advantage: boolean;
+    advantageMode: number;
+    configured: true;
+    criticalFailure: number;
+    criticalSuccess: number;
+    defaultButton: 'normal';
+    disadvantage: boolean;
+    elvenAccuracy: undefined;
+    halflingLucky: undefined;
+    reliableTalent: boolean;
+    rollMode: 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll';
+    rollType: 'skill' | 'check' | 'damage' | 'heal';
+    target: unknown | undefined;
+  };
+  terms: unknown[];
+  _dice: unknown[];
+  _evaluated: boolean;
+  _formula: string;
+  _resolver: unknown;
+  d20: D20Die;
+  dice: unknown[];
+  formula: string;
+  hasAdvantage: boolean;
+  hasDisadvantage: boolean;
+  isCritical: boolean;
+  isDeterministic: boolean;
+  isFailure: boolean;
+  isSuccess: boolean;
+  product: number;
+  result: string;
+  total: number;
+  validD20Roll: boolean;
 }
 
 export interface Trigger {
@@ -326,19 +623,19 @@ export interface Trigger {
   priority: number;
   target?: Token;
   token: Token;
-  roll: any;
+  roll: D20Roll;
 }
 
 export type MacroFunction = (__0: {
   trigger: Trigger;
   ditem?: any;
-}) => Promise<void>;
+}) => Promise<unknown>;
 
 export type MidiMacroFunction = (__0: {
   trigger: Trigger;
   workflow: Workflow;
   ditem?: any;
-}) => Promise<void>;
+}) => Promise<unknown>;
 
 export default interface CPRMacro {
   identifier: string;

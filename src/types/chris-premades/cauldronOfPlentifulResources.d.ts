@@ -1,5 +1,5 @@
 import DamageType from '../damage.js';
-import CPRMacro from './macro.js';
+import { CPRMacro, D20Roll } from './macro.js';
 import Summons from './summons.js';
 import Teleport from './teleport.js';
 
@@ -1087,7 +1087,11 @@ export default interface CauldronOfPlentifulResources {
         options?: any,
         evaluateOptions?: any
       ): Promise<any>;
-      addToRoll(roll: any, formula: string, options?: any): Promise<any>;
+      addToRoll(
+        roll: D20Roll,
+        formula: string,
+        options?: any
+      ): Promise<D20Roll>;
       remoteRoll(roll: any, userId: any): Promise<any>;
       remoteDamageRolls(rolls: any, userId: any): Promise<any>;
       hasDuplicateDie(rolls: any[]): boolean;
