@@ -339,7 +339,7 @@ export default interface CauldronOfPlentifulResources {
       syntheticActivityDataRoll(
         activityData: object,
         item: Item,
-        actor: Actor,
+        actor: Actor5e,
         targets: Token[],
         options?: {
           options?: object;
@@ -479,7 +479,7 @@ export default interface CauldronOfPlentifulResources {
       setSaveDC(effect: ActiveEffect, level: number): Promise<void>;
 
       createEffect(
-        actor: Actor,
+        actor: Actor5e,
         effectData: object,
         options?: {
           concentrationItem?: Item;
