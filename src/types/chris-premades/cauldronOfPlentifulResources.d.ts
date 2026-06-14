@@ -327,7 +327,7 @@ export default interface CauldronOfPlentifulResources {
 
       syntheticItemDataRoll(
         itemData: Item,
-        actor: Actor,
+        actor: Actor5e,
         targets: Token[],
         options?: {
           options?: object;
@@ -681,7 +681,7 @@ export default interface CauldronOfPlentifulResources {
       selectDocumentDialog(
         title: string,
         content: string,
-        documentType: string,
+        documents: any,
         options?: {
           displayTooltops?: boolean;
           sortAlphabetical?: boolean;
