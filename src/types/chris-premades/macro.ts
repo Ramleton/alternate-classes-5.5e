@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import { DamageType } from '../damage.js';
 import { EffectFlags } from '../effects.js';
 import { SkillIdentifier } from '../skills.js';
 import { AuraEvent, CombatEvent, D20Event, EffectEvent, MidiQOLEvent, MovementEvent, RestEvent } from './macroEvents.js';
@@ -629,15 +630,101 @@ export interface Trigger {
   skillId: SkillIdentifier;
 }
 
+export interface CalcDamageOptions {
+  ignore: {
+    absorption: Set<DamageType>;
+    immunity: Set<DamageType>;
+    modification: Set<DamageType>;
+    resistance: Set<DamageType>;
+    vulnerability: Set<DamageType>;
+  };
+  invertHealing: boolean;
+  midi: {
+    applyDamage: boolean;
+    challengeModeAR: number;
+    criticalSave: boolean;
+    fumbleSave: boolean;
+    isCritical: boolean;
+    isFumble: boolean;
+    isHit: boolean;
+    itemType: 'item' | unknown;
+    save: boolean;
+    saveMultiplier: number;
+    saved: boolean;
+    semiSuperSaver: boolean;
+    sourceActorUuid: string;
+    superSaver: boolean;
+    targetUuid: string;
+    totalDamage: number;
+    uncannyDodge: undefined;
+  };
+  midiIgnoreComputed: boolean;
+  multiplier: number;
+}
+
+export interface DamageDetail {
+  active: { multiplier: number };
+  damage: number;
+  formula: string;
+  properties: Set<string>;
+  type: DamageType;
+  value: number;
+}
+
+export interface DItem {
+  actorId: string;
+  actorUuid: string;
+  calcDamageOptions: CalcDamageOptions;
+  challengeModeAR: number;
+  challengeModeScale: number;
+  critical: boolean;
+  damageDetail: DamageDetail[];
+  damageDetails: {
+    bonusDamage: number[];
+    calcDamageOptions: CalcDamageOptions;
+    combinedDamage: DamageDetail[];
+    defaultDamage: DamageDetail[];
+    otherDamage: {
+      amount: number;
+      temp: number;
+      tempMax: number;
+    };
+    rawBonusDamage: unknown[];
+    rawcombinedDamage: DamageDetail[];
+    rawdefaultDamage: DamageDetail[];
+    rawotherDamage: unknown[];
+  };
+  damageSelection: string;
+  details: unknown[];
+  healingAdjustedTotalDamage: number;
+  hpDamage: number;
+  isHit: boolean;
+  newHP: number;
+  newTempHP: number;
+  oldHP: number;
+  oldTempHP: number;
+  rawDamageDetail: DamageDetail[];
+  saved: boolean;
+  sceneId: string;
+  semiSuperSaver: boolean;
+  superSaver: boolean;
+  targetUuid: string;
+  tempDamage: number;
+  totalDamage: number;
+  updateOptions: object;
+  useDamageDetail: boolean;
+  wasHit: boolean;
+}
+
 export type MacroFunction = (__0: {
   trigger: Trigger;
-  ditem?: any;
+  ditem?: DItem;
 }) => Promise<unknown>;
 
 export type MidiMacroFunction = (__0: {
   trigger: Trigger;
   workflow: Workflow;
-  ditem?: any;
+  ditem?: DItem;
 }) => Promise<unknown>;
 
 export default interface CPRMacro {

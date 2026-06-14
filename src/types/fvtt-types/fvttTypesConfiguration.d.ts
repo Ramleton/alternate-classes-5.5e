@@ -1,3 +1,4 @@
+import EquipmentSystemData from './EquipmentSystemData.js';
 import FeatSystemData from './FeatSystemData.js';
 import WeaponSystemData from './WeaponSystemData.js';
 export { };
@@ -14,6 +15,7 @@ declare module 'fvtt-types/configuration' {
       feat: typeof FeatSystemData;
       weapon: typeof WeaponSystemData;
       class: typeof ClassSystemData;
+      equipment: typeof EquipmentSystemData;
     };
   }
 }
