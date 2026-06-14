@@ -1,4 +1,5 @@
 import DamageType from '../damage.js';
+import MidiActiveEffect from '../macro.js';
 import { CPRMacro, D20Roll } from './macro.js';
 import Summons from './summons.js';
 import Teleport from './teleport.js';
@@ -593,7 +594,7 @@ export default interface CauldronOfPlentifulResources {
         entity: object
       ): Promise<ActiveEffect>;
 
-      getOriginItem(effect: ActiveEffect): Promise<Item>;
+      getOriginItem(effect: MidiActiveEffect): Promise<Item>;
 
       getOriginItemSync(effect: ActiveEffect): Item;
 

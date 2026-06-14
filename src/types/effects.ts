@@ -49,6 +49,10 @@ export interface EffectFlags {
           type?: DamageType;
         };
       };
+      honorDuel?: {
+        sourceUuid?: string;
+        targetUuid?: string;
+      };
     };
   };
   'chris-premades'?: {
@@ -166,7 +170,7 @@ export interface OverTimeEffectData {
   rollType?: 'damage' | 'skill' | 'check';
   saveAbility?: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
   saveCount?: `${number}${Consecutive}${RemovePermanent}${OverTimeStatus}`;
-  saveDamage?: 'halfdamage' | 'fulldamage';
+  saveDamage?: 'nodamage' | 'halfdamage' | 'fulldamage';
   saveDC?: number;
   turn: 'start' | 'end';
 }

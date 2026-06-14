@@ -6,6 +6,8 @@ export type MidiQOLEvent
     | 'preambleComplete' // Run after targeting is complete.
     | 'targetPreambleComplete' // Run after targeting is complete, but macros are pulled from the targets instead of attacker.
     | 'scenePreambleComplete' // Run after targeting is complete, but checks all tokens on the scene for macros. (Useful for 3rd party reactions).
+    | 'preAttackRollConfig' // Runs before the attack roll configuration popup
+    | 'postAttackRollConfig' // Runs after the attack roll configuration popup
     | 'postAttackRoll' // Runs after the Attack Roll is complete, but before checking for hits.
     | 'targetPostAttackRoll' // Runs after the attack roll is complete, but before checking for hits. Macros are pulled from the targets instead of attacker.
     | 'scenePostAttackRoll' // Runs after the attack roll is complete, but before checking for hits. Macros are pulled from all tokens on the scene. (Useful for 3rd party reactions).
