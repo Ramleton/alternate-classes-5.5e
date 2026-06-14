@@ -69,7 +69,7 @@ export default class WeaponSystemData extends foundry.abstract.TypeDataModel<
 
   declare properties: string[];
   declare proficient: boolean | null;
-  declare activities: Record<string, Activity>;
+  declare activities: Activity[];
   declare ammunition: Record<string, unknown>;
   declare mastery: string;
   declare identifier: string;

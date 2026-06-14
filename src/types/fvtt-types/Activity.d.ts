@@ -50,7 +50,7 @@ interface DamagePart {
   denomination: number | null;
   bonus: string;
   types: DamageType[];
-  scaling: { number: number; [key: string]: unknown };
+  scaling: { number?: number; [key: string]: unknown };
 }
 
 interface BaseActivity {
@@ -165,7 +165,7 @@ export interface SaveActivity extends BaseActivity {
   friendlySave: string;
 }
 
-interface AttackActivity extends BaseActivity {
+export interface AttackActivity extends BaseActivity {
   type: 'attack';
   attack: {
     ability: string;
