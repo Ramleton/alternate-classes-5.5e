@@ -2,6 +2,7 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import { DamageType } from '../damage.js';
 import { EffectFlags } from '../effects.js';
+import CharacterData from '../fvtt-types/ConfiguredActor.js';
 import { SkillIdentifier } from '../skills.js';
 import { AuraEvent, CombatEvent, D20Event, EffectEvent, MidiQOLEvent, MovementEvent, RestEvent } from './macroEvents.js';
 
@@ -83,7 +84,7 @@ export interface CastData {
   saveDC: number;
 }
 
-interface Proficiency {
+export interface Proficiency {
   deterministic: boolean;
   multiplier: number;
   rounding: 'up' | 'down';
@@ -92,45 +93,6 @@ interface Proficiency {
   flat: number;
   hasProficiency: boolean;
   term: string;
-}
-
-interface D20RollAbility {
-  attack: number;
-  value: number;
-  proficient: 0 | 0.5 | 1 | 2;
-  bonuses: { check: string; save: string };
-  check: {
-    roll: {
-      max: number | null;
-      min: number | null;
-      mode: number;
-      modeCounts: {
-        advantages: {
-          count: number;
-          suppressed: false;
-        };
-        disadvantages: {
-          count: number;
-          suppressed: false;
-        };
-      };
-    };
-  };
-  checkBonus: number;
-  checkProf: Proficiency;
-  dc: number;
-  max: number;
-  mod: number;
-  save: {
-    roll: {
-      max: number | null;
-      min: number | null;
-      mode: number;
-    };
-    value: number;
-  };
-  saveBonus: number;
-  saveProf: Proficiency;
 }
 
 interface ArmorClass {
@@ -215,371 +177,220 @@ interface D20Die {
   values: number[];
 }
 
-export interface D20Roll {
-  data: {
-    Embed: string;
-    abilities: {
-      cha: D20RollAbility;
-      con: D20RollAbility;
-      dex: D20RollAbility;
-      int: D20RollAbility;
-      str: D20RollAbility;
-      wis: D20RollAbility;
+export interface CharacterAttributes {
+  ac: ArmorClass;
+  attunement: { max: number; value: number };
+  concentration: {
+    ability: string;
+    bonuses: { save: string };
+    limit: number;
+    roll: {
+      min: number | null;
+      max: number | null;
+      mode: number;
     };
-    abilityId: 'cha' | 'con' | 'dex' | 'int' | 'str' | 'wis';
-    actorId: string;
-    actorType: 'character' | unknown;
-    actorUuid: string;
-    attributes: {
-      ac: ArmorClass;
-      attunement: { max: number; value: number };
-      concentration: {
-        ability: string;
-        bonuses: { save: string };
-        limit: number;
-        roll: {
-          min: number | null;
-          max: number | null;
-          mode: number;
-        };
-        save: number;
-      };
-      death: {
-        bonuses: { save: string };
-        failure: number;
-        roll: {
-          min: number | null;
-          max: number | null;
-          mode: number;
-        };
-        success: number;
-      };
-      encumbrance: {
-        bonuses: {
-          encumbered: string;
-          heavilyEncumbered: string;
-          maximum: string;
-          overall: string;
-        };
-        encumbered: boolean;
-        max: number;
-        mod: number;
-        multipliers: {
-          encumbered: string;
-          heavilyEncumbered: string;
-          maximum: string;
-          overall: string;
-        };
-        pct: number;
-        stops: {
-          encumbered: number;
-          heavilyEncumbered: number;
-        };
-        thresholds: {
-          encumbered: number;
-          heavilyEncumbered: number;
-          maximum: number;
-        };
-      };
-      hd: HitDice;
-      hp: {
-        bonuses: {
-          level: string;
-          overall: undefined;
-        };
-        damage: number;
-        dt: undefined;
-        effectiveMax: number;
-        max: number;
-        pct: number;
-        temp: number;
-        tempmax: number;
-        value: number;
-      };
-      init: {
-        ability: string;
-        bonus: string;
-        mod: number;
-        prof: Proficiency;
-        roll: RollMode;
-        score: number;
-        total: number;
-      };
-      inspiration: boolean;
-      loyalty: {
-        value: undefined;
-      };
-      movement: {
-        bonus: undefined;
-        burrow: number;
-        climb: number;
-        fly: number;
-        fromSpecies: { walk: string };
-        hover: boolean;
-        ignoredDifficultTerrain: Set<string>;
-        jump: number;
-        max: number;
-        slowed: boolean;
-        special: undefined;
-        speed: number;
-        swim: number;
-        units: 'ft';
-        walk: number;
-      };
-      prof: number;
-      senses: {
-        blindsight: number;
-        darkvision: number;
-        ranges: {
-          blindsight: number;
-          darkvision: number;
-          tremorsense: number;
-          truesight: number;
-        };
-        special: string;
-        tremorsense: number;
-        truesight: number;
-        units: 'ft';
-      };
-      spell: {
-        abilityLabel:
-          | 'Strength'
-          | 'Dexterity'
-          | 'Constitution'
-          | 'Intelligence'
-          | 'Wisdom'
-          | 'Charisma';
-        attack: number;
-        dc: number;
-        mod: number;
-      };
-      spellcasting: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
-    };
-    bastion: {
-      name: string;
-      description: string;
-    };
-    bonuses: {
-      abilities: {
-        check: string;
-        save: string;
-        skill: string;
-      };
-      msak: {
-        attack: string;
-        damage: string;
-      };
-      mwak: {
-        attack: string;
-        damage: string;
-      };
-      rsak: {
-        attack: string;
-        damage: string;
-      };
-      rwak: {
-        attack: string;
-        damage: string;
-      };
-      spell: { dc: string };
-    };
-    cfg: {
-      actorSizes: {
-        grg: {
-          abbreviation: 'Gt';
-          capacityMultiplier: number;
-          hitDie: number;
-          label: 'Gargantuan';
-          numerical: number;
-          token: number;
-        };
-        huge: {
-          abbreviation: 'Hg';
-          capacityMultiplier: number;
-          hitDie: number;
-          label: 'Huge';
-          numerical: number;
-          token: number;
-        };
-        lg: {
-          abbreviation: 'Lg';
-          capacityMultiplier: number;
-          hitDie: number;
-          label: 'Large';
-          numerical: number;
-          token: number;
-        };
-        med: {
-          abbreviation: 'Md';
-          capacityMultiplier: number;
-          hitDie: number;
-          label: 'Medium';
-          numerical: number;
-          token: number;
-        };
-        sm: {
-          abbreviation: 'Sm';
-          capacityMultiplier: number;
-          hitDie: number;
-          label: 'Small';
-          numerical: number;
-          token: number;
-        };
-        tiny: {
-          abbreviation: 'Tn';
-          capacityMultiplier: number;
-          hitDie: number;
-          label: 'Tiny';
-          numerical: number;
-          token: number;
-        };
-      };
-      armorClasses: {
-        custom: {
-          label: 'Custom Formula';
-        };
-        [key: string]: {
-          label: string;
-          formula?: string;
-        };
-      };
-      skills: Record<string, {
-        ability: string;
-        fullKey: string;
-        icon: string;
-        label: string;
-        reference: string;
-      }>;
-    };
-    classes: Record<string, Item<'class'>>;
-    currency: {
-      cp: number;
-      ep: number;
-      gp: number;
-      pp: number;
-      sp: number;
-    };
-    details: {
-      age: string;
-      alignment: string;
-      appearance: string;
-      biography: {
-        value: string;
-        public: string;
-      };
-      bond: string;
-      eyes: string;
-      faith: string;
-      flaw: string;
-      gender: string;
-      hair: string;
-      height: string;
-      ideal: string;
-      level: number;
-      originalClass: string;
-      skin: string;
-      tier: number;
-      trait: string;
-      type: {
-        custom: string;
-        value: string;
-        subtype: string;
-        config: {
-          icon: string;
-          label: string;
-          plural: string;
-          reference: string;
-        };
-        label: string;
-      };
-      weight: string;
-      xp: {
-        max: number;
-        min: number;
-        pct: number;
-        value: number;
-      };
-      background: Item;
-      race: Item;
-    };
-    effects: MidiActiveEffect[];
-    favorites: {
-      type: 'activity';
-      id: string;
-      sort: number;
-    }[];
-    flags: Record<string, unknown>;
-    midiFlags: Record<string, unknown>;
-    mod: number;
-    name: string;
-    prof: Proficiency;
-    resources: {
-      primary: {
-        label: string;
-        lr: boolean;
-        max: number;
-        sr: boolean;
-        value: number;
-      };
-      secondary: {
-        label: string;
-        lr: boolean;
-        max: number;
-        sr: boolean;
-        value: number;
-      };
-      tertiary: {
-        label: string;
-        lr: boolean;
-        max: number;
-        sr: boolean;
-        value: number;
-      };
-    };
-    scale: Record<string, Record<string, unknown>>;
-    skills: Record<string, {
-      ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
-      bonus: number;
-      bonuses: { check: string; passive: string };
-      effectValue: number;
-      mod: number;
-      passive: number;
-      prof: Proficiency;
-      proficient: 0 | 0.5 | 1 | 2;
-      roll: {
-        min: number | null;
-        max: number | null;
-        mode: number;
-      };
-      total: number;
-      value: number;
-    }>;
-    spells: Record<string, {
-      label: string;
-      override: undefined;
-      type: string;
-      value: number;
-    }>;
-    statuses: Record<string, unknown>;
-    statusesSet: Set<string>;
-    subclasses: Record<string, Item>;
-    tools: Record<string, {
-      ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
-      bonus: number;
-      bonuses: { check: string };
-      effectValue: number;
-      mod: number;
-      prof: Proficiency;
-      roll: {
-        min: number | null;
-        max: number | null;
-        mode: number;
-      };
-      total: number;
-      value: number;
-    }>;
-    traits: Record<string, unknown>;
+    save: number;
   };
+  death: {
+    bonuses: { save: string };
+    failure: number;
+    roll: {
+      min: number | null;
+      max: number | null;
+      mode: number;
+    };
+    success: number;
+  };
+  encumbrance: {
+    bonuses: {
+      encumbered: string;
+      heavilyEncumbered: string;
+      maximum: string;
+      overall: string;
+    };
+    encumbered: boolean;
+    max: number;
+    mod: number;
+    multipliers: {
+      encumbered: string;
+      heavilyEncumbered: string;
+      maximum: string;
+      overall: string;
+    };
+    pct: number;
+    stops: {
+      encumbered: number;
+      heavilyEncumbered: number;
+    };
+    thresholds: {
+      encumbered: number;
+      heavilyEncumbered: number;
+      maximum: number;
+    };
+  };
+  hd: HitDice;
+  hp: {
+    bonuses: {
+      level: string;
+      overall: undefined;
+    };
+    damage: number;
+    dt: undefined;
+    effectiveMax: number;
+    max: number;
+    pct: number;
+    temp: number;
+    tempmax: number;
+    value: number;
+  };
+  init: {
+    ability: string;
+    bonus: string;
+    mod: number;
+    prof: Proficiency;
+    roll: RollMode;
+    score: number;
+    total: number;
+  };
+  inspiration: boolean;
+  loyalty: {
+    value: undefined;
+  };
+  movement: {
+    bonus: undefined;
+    burrow: number;
+    climb: number;
+    fly: number;
+    fromSpecies: { walk: string };
+    hover: boolean;
+    ignoredDifficultTerrain: Set<string>;
+    jump: number;
+    max: number;
+    slowed: boolean;
+    special: undefined;
+    speed: number;
+    swim: number;
+    units: 'ft';
+    walk: number;
+  };
+  prof: number;
+  senses: {
+    blindsight: number;
+    darkvision: number;
+    ranges: {
+      blindsight: number;
+      darkvision: number;
+      tremorsense: number;
+      truesight: number;
+    };
+    special: string;
+    tremorsense: number;
+    truesight: number;
+    units: 'ft';
+  };
+  spell: {
+    abilityLabel:
+      | 'Strength'
+      | 'Dexterity'
+      | 'Constitution'
+      | 'Intelligence'
+      | 'Wisdom'
+      | 'Charisma';
+    attack: number;
+    dc: number;
+    mod: number;
+  };
+  spellcasting: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+}
+
+interface D20RollCharacterData extends CharacterData {
+  Embed: string;
+  abilityId: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+  actorId: string;
+  actorType: 'character' | unknown;
+  actorUuid: string;
+  cfg: {
+    actorSizes: {
+      grg: {
+        abbreviation: 'Gt';
+        capacityMultiplier: number;
+        hitDie: number;
+        label: 'Gargantuan';
+        numerical: number;
+        token: number;
+      };
+      huge: {
+        abbreviation: 'Hg';
+        capacityMultiplier: number;
+        hitDie: number;
+        label: 'Huge';
+        numerical: number;
+        token: number;
+      };
+      lg: {
+        abbreviation: 'Lg';
+        capacityMultiplier: number;
+        hitDie: number;
+        label: 'Large';
+        numerical: number;
+        token: number;
+      };
+      med: {
+        abbreviation: 'Md';
+        capacityMultiplier: number;
+        hitDie: number;
+        label: 'Medium';
+        numerical: number;
+        token: number;
+      };
+      sm: {
+        abbreviation: 'Sm';
+        capacityMultiplier: number;
+        hitDie: number;
+        label: 'Small';
+        numerical: number;
+        token: number;
+      };
+      tiny: {
+        abbreviation: 'Tn';
+        capacityMultiplier: number;
+        hitDie: number;
+        label: 'Tiny';
+        numerical: number;
+        token: number;
+      };
+    };
+    armorClasses: {
+      custom: {
+        label: 'Custom Formula';
+      };
+      [key: string]: {
+        label: string;
+        formula?: string;
+      };
+    };
+    skills: Record<string, {
+      ability: string;
+      fullKey: string;
+      icon: string;
+      label: string;
+      reference: string;
+    }>;
+  };
+  classes: Record<string, Item<'class'>>;
+  effects: MidiActiveEffect[];
+  flags: Record<string, unknown>;
+  midiFlags: Record<string, unknown>;
+  mod: number;
+  name: string;
+  prof: Proficiency;
+  statuses: Record<string, unknown>;
+  statusesSet: Set<string>;
+  subclasses: Record<string, Item>;
+}
+
+export interface D20Roll {
+  data: D20RollCharacterData;
   options: {
     advantage: boolean;
     advantageMode: number;
