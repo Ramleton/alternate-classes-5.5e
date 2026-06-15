@@ -730,7 +730,7 @@ export type MidiMacroFunction = (__0: {
 export default interface CPRMacro {
   identifier: string;
   name: string;
-  source: string;
+  source: 'Alternate Classes 5.5e' | string;
   version: `${number}.${number}.${number}`;
   rules: 'modern' | 'legacy';
   midi?: {

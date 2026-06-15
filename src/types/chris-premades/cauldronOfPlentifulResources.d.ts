@@ -533,7 +533,7 @@ export default interface CauldronOfPlentifulResources {
       ): ActiveEffect;
 
       getEffectByIdentifier(
-        actor: Actor,
+        actor: Actor5e,
         name: string
       ): ActiveEffect;
 
