@@ -17,7 +17,7 @@ export default class Teleport {
     }
   ): Promise<void>;
   static target(
-    target: Token,
+    target: Token | Token[],
     controllingToken: Token,
     options?: {
       animation?: string;
