@@ -28,7 +28,8 @@
         "subrepos",
         "tempmax",
         "tremorsense",
-        "truesight"
+        "truesight",
+        "warcry"
     ],
     "files.insertFinalNewline": false,
     "js/ts.preferences.importModuleSpecifierEnding": "js"
