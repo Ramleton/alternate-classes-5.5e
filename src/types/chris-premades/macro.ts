@@ -436,6 +436,8 @@ export interface Trigger {
   priority: number;
   target?: Token;
   token: Token;
+  sourceToken?: Token;
+  targetToken?: Token;
   roll: D20Roll;
   saveId: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
   skillId: SkillIdentifier;
