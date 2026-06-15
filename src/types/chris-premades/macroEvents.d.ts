@@ -18,7 +18,8 @@ export type MidiQOLEvent
     | 'applyDamage' // Runs after damage has been applied to the target.
     | 'targetApplyDamage' // Runs after damage has been applied to the target, but the macros are pulled from the target.
     | 'sceneApplyDamage' // Runs after damage has been applied to the target, but the macros are pulled from all tokens on the scene. (Useful for 3rd party reactions).
-    | 'rollFinished'; // Runs after all other events are complete. Useful for for macros that don't need to alter the Midi-Qol workflow.
+    | 'rollFinished' // Runs after all other events are complete. Useful for for macros that don't need to alter the Midi-Qol workflow.
+    | 'targetRollFinished'; // Runs after all other events are complete. Macros are pulled from the target instead of the attacker.
 
 export type EffectEvent
   = | 'created' // Run when an effect is created.
