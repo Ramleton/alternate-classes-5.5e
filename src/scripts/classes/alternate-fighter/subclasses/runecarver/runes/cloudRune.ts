@@ -19,11 +19,13 @@ const pre = async (
   if (!workflow.targets.size)
     return false;
   const target = workflow.targets.first()! as Token;
-  const distance = tokenUtils.getDistance(workflow.token!, target);
-  if (distance > 30)
-    return false;
-  if (!tokenUtils.canSee(workflow.token!, target))
-    return false;
+  if (target.actor!.uuid !== feat.actor!.uuid) {
+    const distance = tokenUtils.getDistance(workflow.token!, target);
+    if (distance > 30)
+      return false;
+    if (!tokenUtils.canSee(workflow.token!, target))
+      return false;
+  }
   if (!nearbyTokens.length)
     return false;
   if (!preRune(feat, 'cloud'))

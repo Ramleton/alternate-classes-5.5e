@@ -79,7 +79,7 @@ const attackWorkflow: MidiMacroFunction = async (
   await post(token.actor);
 };
 const macro: CPRMacro = {
-  identifier: 'ac55eStormRune',
+  identifier: 'ac55eStormRuneProphecy',
   name: 'Runecarver Runes: Storm Rune',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',

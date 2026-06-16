@@ -4,24 +4,45 @@ export const preRune = async (
   feat: Item<'feat'>,
   rune: 'fire' | 'frost' | 'hill' | 'stone' | 'storm' | 'cloud',
 ): Promise<boolean> => {
-  const { utils: { itemUtils } } = chrisPremades;
+  const { utils: { genericUtils, itemUtils } } = chrisPremades;
   const runeName = rune.charAt(0).toUpperCase() + rune.slice(1);
   const inscriptions = feat.actor!.items.filter(
     i => itemUtils.getEffectByIdentifier(i, `ac55e${runeName}RuneInscription`));
-  if (inscriptions.length < 2)
+  if (inscriptions.length < 2) {
+    genericUtils.notify(
+      'You must have inscribed the rune into an item to use it',
+      'error',
+    );
     return false;
+  }
   const actorFlags = feat.actor!.flags['alternate-classes-55e'];
   if (feat.system.uses?.spent) {
     const elderInsight = itemUtils.getItemByIdentifier(
       feat.actor!,
       'ac55eElderInsight',
     );
-    if (!elderInsight)
+    if (!elderInsight) {
+      genericUtils.notify(
+        // eslint-disable-next-line @stylistic/max-len
+        'You have invoked this rune already and must have Elder Insight to use it again.',
+        'error',
+      );
       return false;
-    if (actorFlags?.macros?.runeCarver?.elderInsight?.[rune])
+    }
+    if (actorFlags?.macros?.runeCarver?.elderInsight?.[rune]) {
+      genericUtils.notify(
+        'You have already invoked this rune using Elder Insight before',
+        'error',
+      );
       return false;
-    if (!getAltMartialExploitsRemaining(feat))
+    }
+    if (!getAltMartialExploitsRemaining(feat)) {
+      genericUtils.notify(
+        'You have already invoked this rune and are out of exploit dice',
+        'error',
+      );
       return false;
+    }
   }
   return true;
 };
