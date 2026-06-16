@@ -1,7 +1,7 @@
+import { runActivity } from 'automation/utils.js';
 import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
-import { generateOverTimeEffectChange } from 'exploits/handling/effectUtils.js';
-import { runActivity } from 'exploits/handling/exploitUtils.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { generateOverTimeEffectChange } from '../../../../../automation/effectUtils.js';
 import { isRuneInvokable, postRune } from './runeUtils.js';
 
 const pre = async (feat: Item<'feat'>, target: Token | undefined) => {

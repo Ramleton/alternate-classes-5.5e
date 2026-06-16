@@ -45,6 +45,9 @@
       ],
       "martialArts/*": [
         "./src/scripts/martialArts/*"
+      ],
+      "automation/*": [
+        "./src/scripts/automation/*"
       ]
     },
     "types": [

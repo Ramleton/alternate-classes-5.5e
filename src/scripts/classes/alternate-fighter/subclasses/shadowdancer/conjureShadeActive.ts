@@ -1,5 +1,5 @@
+import { getActivityData } from 'automation/utils.js';
 import CPRMacro, { MacroFunction, MidiMacroFunction } from 'chris-premades/macro.js';
-import { getActivityData } from 'exploits/handling/exploitUtils.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { HealActivity } from 'fvtt-types/Activity.js';
 

@@ -1,8 +1,8 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import { runActivity } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { generateOverTimeEffectChange } from 'exploits/handling/effectUtils.js';
-import { runActivity } from 'exploits/handling/exploitUtils.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { generateOverTimeEffectChange } from '../../../../../automation/effectUtils.js';
 import { isRuneInvokable, postRune as post } from './runeUtils.js';
 
 const pre = async (

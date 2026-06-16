@@ -1,0 +1,35 @@
+import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import Activity from 'fvtt-types/Activity.js';
+
+export const runActivity = async (
+  item: Item<'feat'>,
+  activityIdentifier: string,
+  targets: Token[],
+  options = { consumeResources: true },
+): Promise<Workflow | null> => {
+  const { utils: { activityUtils, workflowUtils } } = chrisPremades;
+  const activity = activityUtils.getActivityByIdentifier(
+    item,
+    activityIdentifier, {
+      strict: true,
+    });
+  if (!activity) return null;
+  return await workflowUtils.syntheticActivityRoll(
+    activity,
+    targets,
+    options,
+  );
+};
+
+export const getActivityData = async (
+  item: Item<'feat'>,
+  activityIdentifier: string,
+): Promise<Activity | undefined> => {
+  const { utils: { activityUtils, genericUtils } } = chrisPremades;
+  const activity = activityUtils.getActivityByIdentifier(
+    item,
+    activityIdentifier,
+    { strict: true });
+  if (!activity) return;
+  return genericUtils.duplicate(activity);
+};

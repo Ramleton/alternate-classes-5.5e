@@ -1,6 +1,6 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import { runActivity } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { runActivity } from 'exploits/handling/exploitUtils.js';
 import { isRuneInvokable, postRune } from './runeUtils.js';
 
 const pre = async (

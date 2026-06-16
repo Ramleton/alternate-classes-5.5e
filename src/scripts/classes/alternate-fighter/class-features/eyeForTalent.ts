@@ -89,8 +89,10 @@ const during = async ({
   const newCheckActivity = genericUtils.duplicate(checkActivity.toObject());
   if (!newCheckActivity)
     return;
-  const enemyCR = targetActor.system.details.cr;
-  const newDC = 8 + enemyCR;
+  const enemyLevel = 'cr' in targetActor.system.details
+    ? targetActor.system.details.cr
+    : targetActor.system.details.level;
+  const newDC = 8 + enemyLevel;
   newCheckActivity.check.dc.value = newDC;
   newCheckActivity.check.dc.formula = newDC;
   console.log('Check Activity', newCheckActivity);

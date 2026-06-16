@@ -1,4 +1,6 @@
 import { CharacterAttributes, D20RollAbility } from '../chris-premades/macro.js';
+import { DamageType } from '../damage.js';
+import { Status } from '../effects.js';
 export { };
 
 interface D20RollAbility {
@@ -40,7 +42,18 @@ interface D20RollAbility {
   saveProf: Proficiency;
 }
 
-export interface CharacterData {
+type TraitResistanceImmunityVulnerability = Record<string, unknown>; ;
+
+interface TraitDamageResistanceImmunityVulnerability extends
+  TraitResistanceImmunityVulnerability {
+  value: DamageType[];
+}
+
+interface TraitConditionImmunity extends TraitResistanceImmunityVulnerability {
+  value: Status[];
+}
+
+interface ActorData {
   abilities: {
     str: D20RollAbility;
     dex: D20RollAbility;
@@ -101,7 +114,6 @@ export interface CharacterData {
     hair: string;
     height: string;
     ideal: string;
-    level: number;
     originalClass: string;
     skin: string;
     tier: number;
@@ -195,7 +207,31 @@ export interface CharacterData {
     total: number;
     value: number;
   }>;
-  traits: Record<string, unknown>;
+  traits: {
+    dr: TraitDamageResistanceImmunityVulnerability;
+    ci: TraitConditionImmunity;
+    di: TraitDamageResistanceImmunityVulnerability;
+    dv: TraitDamageResistanceImmunityVulnerability;
+    [key: string]: unknown;
+  };
+}
+
+type ActorDataCommon = Omit<ActorData, 'details'>;
+
+interface CharacterDetails {
+  level: number;
+}
+
+interface NPCDetails {
+  cr: number;
+}
+
+export interface CharacterData extends ActorDataCommon {
+  details: ActorData['details'] & CharacterDetails;
+}
+
+export interface NPCData extends ActorDataCommon {
+  details: ActorData['details'] & NPCDetails;
 }
 
 declare global {
@@ -203,7 +239,7 @@ declare global {
     SubType extends Actor.SubType = Actor.SubType,
   > extends Actor<SubType> {
     classes: Record<string, Item5e<'class'>>;
-    system: CharacterData;
+    system: CharacterData | NPCData;
     items: Item[];
   }
 }

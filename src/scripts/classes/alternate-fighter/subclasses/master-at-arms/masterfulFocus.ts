@@ -1,5 +1,5 @@
+import { runActivity } from 'automation/utils.js';
 import CPRMacro from 'chris-premades/macro.js';
-import { runActivity } from 'exploits/handling/exploitUtils.js';
 
 const useMasterfulFocus = async ({
   trigger: { entity: item, token },

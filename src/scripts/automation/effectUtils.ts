@@ -1,4 +1,4 @@
-import { EffectChange, OverTimeEffectData } from '../../../types/effects.js';
+import { EffectChange, OverTimeEffectData } from '../../types/effects.js';
 
 const generateOverTimeEffectValue = ({
   actionSave,
