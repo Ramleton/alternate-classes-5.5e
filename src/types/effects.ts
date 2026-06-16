@@ -31,9 +31,19 @@ export interface EffectDuration {
   turns?: number;
 }
 
+type DAESpecialDuration
+  = | 'isDamaged'
+    | 'turnStartSource'
+    | 'turnEndSource'
+    | 'turnStartTarget'
+    | 'turnEndTarget';
+
 export interface EffectFlags {
   'alternate-classes-55e'?: {
     macros?: {
+      chivalricMark?: {
+        distance: number;
+      };
       enchantedShot?: {
         graspingShot?: {
           originActor?: Actor;
@@ -53,6 +63,7 @@ export interface EffectFlags {
         sourceUuid?: string;
         targetUuid?: string;
       };
+      origin?: string;
     };
   };
   'chris-premades'?: {
@@ -88,7 +99,7 @@ export interface EffectFlags {
     enableCondition?: string;
     macroRepeat?: 'none' | string;
     showIcon?: boolean;
-    specialDuration?: string[];
+    specialDuration?: DAESpecialDuration[];
     stackable?: 'noneName' | string;
     [key: string]: unknown;
   };

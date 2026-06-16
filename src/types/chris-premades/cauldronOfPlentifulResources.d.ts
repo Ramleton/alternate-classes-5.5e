@@ -535,12 +535,12 @@ export default interface CauldronOfPlentifulResources {
       getEffectByIdentifier(
         actor: Actor5e,
         name: string
-      ): ActiveEffect;
+      ): ActiveEffect | undefined;
 
       getAllEffectsByIdentifier(
         actor: Actor,
         name: string
-      ): ActiveEffect[];
+      ): (ActiveEffect | undefined)[];
 
       getEffectByStatusID(
         actor: Actor,
