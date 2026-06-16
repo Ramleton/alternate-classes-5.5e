@@ -10,7 +10,7 @@ const pre = async (
 ): Promise<boolean> => {
   if (!workflow.targets.size)
     return false;
-  return await preRune(feat, 'frost');
+  return await preRune(feat);
 };
 const during = async (
   feat: Item<'feat'>,
@@ -64,7 +64,7 @@ const during = async (
   return true;
 };
 const post = async (feat: Item<'feat'>) => {
-  await postRune(feat, 'frost');
+  await postRune(feat);
   const { utils: { genericUtils } } = chrisPremades;
   await genericUtils.unsetFlag(
     feat.actor!,

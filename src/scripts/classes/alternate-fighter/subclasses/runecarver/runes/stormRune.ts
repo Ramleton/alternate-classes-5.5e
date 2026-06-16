@@ -43,13 +43,13 @@ const workflow: MacroFunction = async (
   { trigger: { entity: item } },
 ) => {
   const feat = item as Item<'feat'>;
-  const res1 = await pre(feat, 'storm');
+  const res1 = await pre(feat);
   if (!res1)
     return;
   const res2 = await during(feat);
   if (!res2)
     return;
-  await post(feat, 'storm');
+  await post(feat);
 };
 const macro: CPRMacro = {
   identifier: 'ac55eStormRune',

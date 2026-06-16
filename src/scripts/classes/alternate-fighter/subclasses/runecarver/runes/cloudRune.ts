@@ -1,7 +1,7 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { runActivity } from 'exploits/handling/exploitUtils.js';
-import { postRune, preRune } from './runeUtils.js';
+import { isRuneInvokable, postRune } from './runeUtils.js';
 
 const pre = async (
   feat: Item<'feat'>,
@@ -28,7 +28,8 @@ const pre = async (
   }
   if (!nearbyTokens.length)
     return false;
-  if (!preRune(feat, 'cloud'))
+  const res = isRuneInvokable(feat);
+  if (!res.usable)
     return false;
   return await dialogUtils.confirm(
     feat.name,
@@ -91,7 +92,7 @@ const workflow: MidiMacroFunction = async (
   const res2 = await during(feat, workflow, nearbyTokens);
   if (!res2)
     return;
-  await postRune(feat, 'cloud');
+  await postRune(feat);
 };
 const macro: CPRMacro = {
   identifier: 'ac55eCloudRune',

@@ -13,6 +13,7 @@ export type MidiQOLEvent
     | 'scenePostAttackRoll' // Runs after the attack roll is complete, but before checking for hits. Macros are pulled from all tokens on the scene. (Useful for 3rd party reactions).
     | 'attackRollComplete' // Runs after the attack roll is complete and the hit is confirmed.
     | 'targetAttackRollComplete' // Runs after the attack roll is complete and the hit is confirmed. Macros are pulled from the target instead of the attacker.
+    | 'sceneAttackRollComplete' // Runs after the attack roll is complete and the hit is confirmed. Macros are pulled from all tokens on the scene. (Useful for 3rd party reactions).
     | 'damageRollComplete' // Runs after the damage roll is complete, but before checking resistances and immunities. (Useful for bonus damage automations).
     | 'damage' // Runs for every target token. Allows for modification of damage on a per-token basis.
     | 'applyDamage' // Runs after damage has been applied to the target.

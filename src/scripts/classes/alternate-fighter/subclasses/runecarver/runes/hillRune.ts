@@ -1,6 +1,6 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { EffectChange } from '../../../../../../types/effects.js';
+import { EffectChange, EffectData } from '../../../../../../types/effects.js';
 import { postRune, preRune } from './runeUtils.js';
 
 const pre = async (
@@ -9,7 +9,7 @@ const pre = async (
 ): Promise<boolean> => {
   if (!workflow.targets.size)
     return false;
-  return await preRune(feat, 'hill');
+  return await preRune(feat);
 };
 const during = async (
   feat: Item<'feat'>,
@@ -31,11 +31,16 @@ const during = async (
       priority: 20,
     });
   }
-  const hillRuneEffect = {
-    name: 'Frost Rune',
+  const hillRuneEffect: EffectData = {
+    name: 'Hill Rune',
     icon: feat.img,
     duration: { seconds: 600 },
     flags: {
+      'dae': {
+        stackable: 'noneName',
+        // eslint-disable-next-line @stylistic/max-len
+        enableCondition: '!effects.some(e => e.name.toLowerCase() === \'incapacitated\')',
+      },
       'chris-premades': {
         info: {
           identifier: 'ac55eHillRuneEffect',
@@ -43,12 +48,14 @@ const during = async (
       },
     },
     changes,
+    origin: '',
+    statuses: [],
   };
   await effectUtils.createEffect(workflow.actor, hillRuneEffect);
   return true;
 };
 const post = async (feat: Item<'feat'>) => {
-  await postRune(feat, 'hill');
+  await postRune(feat);
   const { utils: { genericUtils } } = chrisPremades;
   await genericUtils.unsetFlag(
     feat.actor!,

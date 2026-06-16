@@ -3,7 +3,7 @@ import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { generateOverTimeEffectChange } from 'exploits/handling/effectUtils.js';
 import { runActivity } from 'exploits/handling/exploitUtils.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
-import { postRune as post, preRune } from './runeUtils.js';
+import { isRuneInvokable, postRune as post } from './runeUtils.js';
 
 const pre = async (
   feat: Item<'feat'>,
@@ -14,7 +14,8 @@ const pre = async (
     return false;
   if (!workflow.hitTargets.size)
     return false;
-  if (!preRune(feat, 'fire'))
+  const res = isRuneInvokable(feat);
+  if (!res.usable)
     return false;
   return await dialogUtils.confirm(
     feat.name,
@@ -88,7 +89,7 @@ const workflow: MidiMacroFunction = async (
   const res2 = await during(feat, workflow);
   if (!res2)
     return;
-  await post(feat, 'fire');
+  await post(feat);
 };
 
 const fireRuneDamage: MidiMacroFunction = async (

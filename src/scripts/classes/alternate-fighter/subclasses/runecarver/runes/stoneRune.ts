@@ -2,12 +2,13 @@ import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
 import { generateOverTimeEffectChange } from 'exploits/handling/effectUtils.js';
 import { runActivity } from 'exploits/handling/exploitUtils.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
-import { postRune, preRune } from './runeUtils.js';
+import { isRuneInvokable, postRune } from './runeUtils.js';
 
 const pre = async (feat: Item<'feat'>, target: Token | undefined) => {
   if (!target)
     return false;
-  if (!preRune(feat, 'stone'))
+  const res = isRuneInvokable(feat);
+  if (!res.usable)
     return false;
   const { utils: { dialogUtils, socketUtils } } = chrisPremades;
   return await dialogUtils.confirm(
@@ -77,7 +78,7 @@ const workflow: MacroFunction = async (
   const res2 = await during(feat, target!);
   if (!res2)
     return;
-  await postRune(feat, 'stone');
+  await postRune(feat);
 };
 const macro: CPRMacro = {
   identifier: 'ac55eStoneRune',

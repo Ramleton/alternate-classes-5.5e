@@ -544,7 +544,7 @@ export type MidiMacroFunction = (__0: {
 
 interface SharedMacroEventDetails {
   distance?: number;
-  disposition?: 'enemy' | unknown;
+  disposition?: 'enemy' | 'ally';
   priority: number;
 }
 
