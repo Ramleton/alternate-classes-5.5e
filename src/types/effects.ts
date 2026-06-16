@@ -169,6 +169,7 @@ export interface OverTimeEffectData {
   rollMode?: 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll';
   rollType?: 'damage' | 'skill' | 'check';
   saveAbility?: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+  saveMagic?: boolean;
   saveCount?: `${number}${Consecutive}${RemovePermanent}${OverTimeStatus}`;
   saveDamage?: 'nodamage' | 'halfdamage' | 'fulldamage';
   saveDC?: number;

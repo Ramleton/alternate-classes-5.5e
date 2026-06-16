@@ -4,7 +4,7 @@ import { DamageType } from '../damage.js';
 import { EffectFlags } from '../effects.js';
 import CharacterData from '../fvtt-types/ConfiguredActor.js';
 import { SkillIdentifier } from '../skills.js';
-import { AuraEvent, CombatEvent, D20Event, EffectEvent, MidiQOLEvent, MovementEvent, RestEvent } from './macroEvents.js';
+import { AuraEvent, CombatEvent, D20Event, EffectEvent, MacroEvent, MidiQOLEvent, MovementEvent, RestEvent } from './macroEvents.js';
 
 export interface ActiveEffectChange {
   key: string;
@@ -436,6 +436,8 @@ export interface Trigger {
   priority: number;
   target?: Token;
   token: Token;
+  actor?: Actor5e;
+  sourceActor?: Actor5e;
   sourceToken?: Token;
   targetToken?: Token;
   roll: D20Roll;
@@ -540,6 +542,54 @@ export type MidiMacroFunction = (__0: {
   ditem?: DItem;
 }) => Promise<unknown>;
 
+interface SharedMacroEventDetails {
+  distance?: number;
+  disposition?: 'enemy' | unknown;
+  priority: number;
+}
+
+export interface MacroEventDetails extends SharedMacroEventDetails {
+  pass: MacroEvent;
+  macro: MacroFunction;
+}
+
+interface MidiMacroEventDetails extends SharedMacroEventDetails {
+  pass: MidiQOLEvent;
+  macro: MidiMacroFunction;
+}
+
+interface MidiItemMacroEventDetails extends MidiMacroEventDetails {
+  activities?: string[];
+}
+
+interface CPRMacroEventDetails extends SharedMacroEventDetails {
+  macro: MacroFunction;
+}
+
+interface EffectMacroEventDetails extends CPRMacroEventDetails {
+  pass: EffectEvent;
+}
+
+interface AuraMacroEventDetails extends CPRMacroEventDetails {
+  pass: AuraEvent;
+}
+
+interface CombatMacroEventDetails extends CPRMacroEventDetails {
+  pass: CombatEvent;
+}
+
+export interface MovementMacroEventDetails extends CPRMacroEventDetails {
+  pass: MovementEvent;
+}
+
+export interface RestMacroEventDetails extends CPRMacroEventDetails {
+  pass: RestEvent;
+}
+
+export interface D20MacroEventDetails extends CPRMacroEventDetails {
+  pass: D20Event;
+}
+
 export default interface CPRMacro {
   identifier: string;
   name: string;
@@ -547,66 +597,17 @@ export default interface CPRMacro {
   version: `${number}.${number}.${number}`;
   rules: 'modern' | 'legacy';
   midi?: {
-    actor?: {
-      pass: MidiQOLEvent;
-      macro: MidiMacroFunction;
-      priority: number;
-    }[];
-    item?: {
-      pass: MidiQOLEvent;
-      macro: MidiMacroFunction;
-      priority: number;
-      activities?: string[];
-    }[];
+    actor?: MidiMacroEventDetails[];
+    item?: MidiItemMacroEventDetails[];
   };
-  effect?: {
-    pass: EffectEvent;
-    macro: MacroFunction;
-    priority: number;
-  }[];
-  aura?: {
-    pass: AuraEvent;
-    macro: MacroFunction;
-    priority: number;
-  }[];
-  combat?: {
-    pass: CombatEvent;
-    macro: MacroFunction;
-    priority: number;
-  }[];
-  movement?: {
-    pass: MovementEvent;
-    macro: MacroFunction;
-    priority: number;
-  }[];
-  rest?: {
-    pass: RestEvent;
-    macro: MacroFunction;
-    priority: number;
-  }[];
-  save?: {
-    pass: D20Event;
-    macro: MacroFunction;
-    priority: number;
-  }[];
-  check?: {
-    pass: D20Event;
-    macro: MacroFunction;
-    priority: number;
-  }[];
-  skill?: {
-    pass: D20Event;
-    macro: MacroFunction;
-    priority: number;
-  }[];
-  death?: {
-    pass: D20Event;
-    macro: MacroFunction;
-    priority: number;
-  }[];
-  D20?: {
-    pass: D20Event;
-    macro: MacroFunction;
-    priority: number;
-  }[];
+  effect?: EffectMacroEventDetails[];
+  aura?: AuraMacroEventDetails[];
+  combat?: CombatMacroEventDetails[];
+  movement?: MovementMacroEventDetails[];
+  rest?: RestMacroEventDetails[];
+  save?: D20MacroEventDetails[];
+  check?: D20MacroEventDetails[];
+  skill?: D20MacroEventDetails[];
+  death?: D20MacroEventDetails[];
+  D20?: D20MacroEventDetails[];
 }

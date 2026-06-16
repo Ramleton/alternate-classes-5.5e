@@ -97,3 +97,15 @@ export type ItemEvent
     | 'itemMedkit' // Run after an item is medkit. This includes being actor medkit.
     | 'actorMedkit' // Run after an actor medkit is applied
     | 'actorMunch'; // Run after a character has been imported via the DDBI module.
+
+export type MacroEvent
+  = | MidiQOLEvent
+    | EffectEvent
+    | AuraEvent
+    | CombatEvent
+    | TemplateEvent
+    | MovementEvent
+    | RestEvent
+    | D20Event
+    | RegionEvent
+    | ItemEvent;
