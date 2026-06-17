@@ -1,6 +1,6 @@
 import { generateOverTimeEffectChange } from 'automation/effectUtils.js';
 import { runActivity } from 'automation/utils.js';
-import { EffectData, OverTimeEffectData } from '../../../../../types/effects.js';
+import { EffectData, OverTimeEffectData } from 'types/effects.js';
 import subclassSmiteMacroFactory, { DuringCallbackArgs, PreCallbackArgs } from '../utils/subclassSmiteFactory.js';
 
 const pre = async ({ feat }: PreCallbackArgs): Promise<boolean> => {

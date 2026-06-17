@@ -48,6 +48,9 @@
       ],
       "automation/*": [
         "./src/scripts/automation/*"
+      ],
+      "types/*": [
+        "./src/types/*"
       ]
     },
     "types": [
