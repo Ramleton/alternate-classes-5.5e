@@ -1,10 +1,9 @@
-import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import { generateOverTimeEffectChange } from 'automation/effectUtils.js';
 import { runActivity } from 'automation/utils.js';
-import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { EffectData, OverTimeEffectData } from '../../../../../types/effects.js';
+import subclassSmiteMacroFactory, { DuringCallbackArgs, PreCallbackArgs } from '../utils/subclassSmiteFactory.js';
 
-const pre = async (feat: Item<'feat'>): Promise<boolean> => {
+const pre = async ({ feat }: PreCallbackArgs): Promise<boolean> => {
   const flag = feat.actor!
     .flags['alternate-classes-55e']
     ?.macros
@@ -27,8 +26,7 @@ const pre = async (feat: Item<'feat'>): Promise<boolean> => {
 };
 
 const during = async (
-  feat: Item<'feat'>,
-  workflow: Workflow,
+  { feat, workflow }: DuringCallbackArgs,
 ): Promise<void> => {
   const targets = Array.from(workflow.hitTargets) as Token[];
   const saveWorkflow = await runActivity(feat, 'save', targets);
@@ -70,34 +68,9 @@ const during = async (
   }
 };
 
-const workflow: MidiMacroFunction = async ({
-  trigger: { entity },
-  workflow,
-}) => {
-  const feat = entity as Item<'feat'>;
-  if (!feat.actor)
-    return;
-  const res1 = await pre(feat);
-  if (!res1)
-    return;
-  await during(feat, workflow);
-};
-
-const macro: CPRMacro = {
-  identifier: 'ac55eVerdantSmite',
-  name: 'Oath of the Ancients: Verdant Smite',
-  source: 'Alternate Classes 5.5e',
-  version: '1.0.0',
-  rules: 'modern',
-  midi: {
-    actor: [
-      {
-        pass: 'attackRollComplete',
-        macro: workflow,
-        priority: 910,
-      },
-    ],
-  },
-};
-
-export default macro;
+export default await subclassSmiteMacroFactory({
+  name: 'Verdant Smite',
+  subclass: 'Oath of the Ancients',
+  preCallback: pre,
+  duringCallback: during,
+});
