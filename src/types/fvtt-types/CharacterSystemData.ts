@@ -20,11 +20,10 @@ export type ScaleValue
     | ScaleValueTypeNumber
     | ScaleValueTypeDice;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-interface CharacterSystemData extends foundry.abstract.DataModel<any, any> {
-  scale: Record<string, Record<string, ScaleValue>>;
-  classes: Record<string, Item<'class'>>;
+export default class CharacterSystemData
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  extends foundry.abstract.DataModel<any, any> {
+  declare scale: Record<string, Record<string, ScaleValue>>;
+  declare classes: Record<string, Item<'class'>>;
   [key: string]: unknown;
 }
-
-export default CharacterSystemData;

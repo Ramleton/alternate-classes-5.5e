@@ -478,12 +478,19 @@ export interface CalcDamageOptions {
 }
 
 export interface DamageDetail {
-  active: { multiplier: number };
+  active: {
+    multiplier: number;
+    immunity?: boolean;
+    type?: {
+      resistance?: boolean;
+    };
+  };
   damage: number;
   formula: string;
   properties: Set<string>;
   type: DamageType;
   value: number;
+  [key: string]: unknown;
 }
 
 export interface DItem {

@@ -3,7 +3,7 @@ export const spendDivineFervor = async (
   uses = 1,
 ): Promise<void> => {
   const { utils: { genericUtils, itemUtils } } = chrisPremades;
-  const divineFervor = await itemUtils.getItemByIdentifier(
+  const divineFervor = itemUtils.getItemByIdentifier(
     actor,
     'ac55eDivineFervor',
   );

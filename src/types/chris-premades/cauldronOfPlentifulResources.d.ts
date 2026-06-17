@@ -777,7 +777,7 @@ export default interface CauldronOfPlentifulResources {
       setProperty(object: object, key: string, value: any): void;
       getProperty(object: object, key: string): any;
       duplicate(object: any): any;
-      deepClone(object: object): object;
+      deepClone<T>(object: T): T;
       mergeObject(original: object, other: object, options: object): object;
       update(
         entity: object,
