@@ -55,3 +55,22 @@ export const isSpellObject = (
 ): item is DynamicSpells[CombinedKeys] => {
   return typeof item === 'object' && item !== null && 'level' in item;
 };
+
+export const spendSpellSlot = async (
+  actor: Actor5e,
+  spell: SpellType,
+  level: SpellLevel,
+) => {
+  const { utils: { genericUtils } } = chrisPremades;
+  switch (spell) {
+    case 'ac55eSpell':
+      await genericUtils.update(
+        actor,
+        {
+          ['system.spells.spell' + level + '.value']: actor
+            .system
+            .spells['spell' + level].value - 1,
+        },
+      );
+  }
+};

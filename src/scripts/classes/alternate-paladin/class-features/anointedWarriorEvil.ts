@@ -11,6 +11,7 @@ const pre = async (
   const { utils: {
     constants,
     dialogUtils,
+    itemUtils,
     socketUtils,
     workflowUtils,
   } } = chrisPremades;
@@ -20,6 +21,12 @@ const pre = async (
     return false;
   // Check if the attack actually did damage
   if (ditem.newHP === ditem.oldHP && ditem.newTempHP === ditem.oldTempHP)
+    return false;
+  const divineFervor = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eDivineFervor',
+  );
+  if (!divineFervor?.system?.uses?.value)
     return false;
   const selection = await dialogUtils.confirmUseItem(
     feat,

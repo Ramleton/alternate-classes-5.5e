@@ -9,5 +9,8 @@ export const spendDivineFervor = async (
   );
   if (!divineFervor)
     return;
-  await genericUtils.update(divineFervor, { 'system.uses.spent': uses });
+  await genericUtils.update(
+    divineFervor,
+    { 'system.uses.spent': divineFervor.system.uses.spent + uses },
+  );
 };

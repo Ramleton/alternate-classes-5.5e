@@ -2,7 +2,15 @@ import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import { MidiMacroFunction } from 'chris-premades/macro.js';
 import { DamageType } from '../../../../types/damage.js';
 
-const pre = async (actor: Actor5e, workflow: Workflow) => {
+interface DamageObject {
+  formula: string;
+  type: DamageType;
+}
+
+const pre = async (
+  actor: Actor5e,
+  workflow: Workflow,
+): Promise<DamageObject | undefined> => {
   if (!workflow.hitTargets.size)
     return;
   const flag = actor
@@ -13,15 +21,13 @@ const pre = async (actor: Actor5e, workflow: Workflow) => {
   return flag;
 };
 
-interface DamageObject {
-  formula: string;
-  type: DamageType;
-}
-
-const during = async (damage: DamageObject) => {
+const during = async (
+  workflow: Workflow,
+  damage: DamageObject,
+): Promise<void> => {
   const { utils: { workflowUtils } } = chrisPremades;
   const options = { damageType: damage.type };
-  await workflowUtils.bonusDamage(damageWorkflow, damage.formula, options);
+  await workflowUtils.bonusDamage(workflow, damage.formula, options);
 };
 
 const post = async (actor: Actor5e): Promise<void> => {
@@ -38,10 +44,12 @@ const damageWorkflow: MidiMacroFunction = async ({
   workflow,
 }) => {
   const feat = entity as Item<'feat'>;
-  if (!feat.actor) return;
+  if (!feat.actor)
+    return;
   const res1 = await pre(feat.actor, workflow);
-  if (!res1) return;
-  await during(res1);
+  if (!res1)
+    return;
+  await during(workflow, res1);
   await post(feat.actor);
 };
 

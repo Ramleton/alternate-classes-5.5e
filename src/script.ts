@@ -53,67 +53,81 @@ Hooks.once('init', () => {
   };
   console.log('Alternate Classes 5e | Initialized Wu Jen Spellcasting');
 
-  CONFIG.DND5E.spellcasting.ac55eSpell = {
-    label: 'Alternate Classes 5.5e Spellcasting',
-    type: 'multi',
-    order: 16,
-    cantrips: true,
-    prepares: true,
-    img: 'icons/magic/air/air-smoke-casting.webp',
-    progression: {
-      ac55eFull: {
-        label: 'Full Caster',
-        divisor: 1,
-        roundUp: true,
-      },
-      ac55eHalf: {
-        label: 'Half Caster',
-        divisor: 2,
-        roundUp: false,
-      },
-      ac55eThird: {
-        label: 'Third Caster',
-        divisor: 3,
-        roundUp: false,
-      },
+  CONFIG.DND5E.spellcasting.spell.progression = {
+    ...CONFIG.DND5E.spellcasting.spell.progression,
+    ac55eHalf: {
+      label: 'Half Caster (AC55e)',
+      divisor: 2,
+      roundUp: false,
     },
-    table: [
-      [2],
-      [3],
-      [4, 2],
-      [4, 3],
-      [4, 3, 2],
-      [4, 3, 3],
-      [4, 3, 3, 1],
-      [4, 3, 3, 2],
-      [4, 3, 3, 3, 1],
-      [4, 3, 3, 3, 2],
-      [4, 3, 3, 3, 2, 1],
-      [4, 3, 3, 3, 2, 1],
-      [4, 3, 3, 3, 2, 1, 1],
-      [4, 3, 3, 3, 2, 1, 1],
-      [4, 3, 3, 3, 2, 1, 1, 1],
-      [4, 3, 3, 3, 2, 1, 1, 1],
-      [4, 3, 3, 3, 2, 1, 1, 1, 1],
-      [4, 3, 3, 3, 3, 1, 1, 1, 1],
-      [4, 3, 3, 3, 3, 2, 1, 1, 1],
-      [4, 3, 3, 3, 3, 2, 2, 1, 1],
-    ],
+    ac55eThird: {
+      label: 'Third Caster (AC55e)',
+      divisor: 3,
+      roundUp: false,
+    },
   };
 
-  class AlternateClasses55eSpell extends dnd5e
-    .dataModels
-    .spellcasting
-    .MultiLevelSpellcasting {
-    /** @override */
-    // eslint-disable-next-line @typescript-eslint/class-literal-property-style
-    static get TYPE() {
-      return 'ac55eSpell';
-    }
-  }
+  // CONFIG.DND5E.spellcasting.ac55eSpell = {
+  //   label: 'Alternate Classes 5.5e Spellcasting',
+  //   type: 'multi',
+  //   order: 16,
+  //   cantrips: true,
+  //   prepares: true,
+  //   img: 'icons/magic/air/air-smoke-casting.webp',
+  //   progression: {
+  //     ac55eFull: {
+  //       label: 'Full Caster',
+  //       divisor: 1,
+  //       roundUp: true,
+  //     },
+  //     ac55eHalf: {
+  //       label: 'Half Caster',
+  //       divisor: 2,
+  //       roundUp: false,
+  //     },
+  //     ac55eThird: {
+  //       label: 'Third Caster',
+  //       divisor: 3,
+  //       roundUp: false,
+  //     },
+  //   },
+  //   table: [
+  //     [2],
+  //     [3],
+  //     [4, 2],
+  //     [4, 3],
+  //     [4, 3, 2],
+  //     [4, 3, 3],
+  //     [4, 3, 3, 1],
+  //     [4, 3, 3, 2],
+  //     [4, 3, 3, 3, 1],
+  //     [4, 3, 3, 3, 2],
+  //     [4, 3, 3, 3, 2, 1],
+  //     [4, 3, 3, 3, 2, 1],
+  //     [4, 3, 3, 3, 2, 1, 1],
+  //     [4, 3, 3, 3, 2, 1, 1],
+  //     [4, 3, 3, 3, 2, 1, 1, 1],
+  //     [4, 3, 3, 3, 2, 1, 1, 1],
+  //     [4, 3, 3, 3, 2, 1, 1, 1, 1],
+  //     [4, 3, 3, 3, 3, 1, 1, 1, 1],
+  //     [4, 3, 3, 3, 3, 2, 1, 1, 1],
+  //     [4, 3, 3, 3, 3, 2, 2, 1, 1],
+  //   ],
+  // };
 
-  dnd5e.dataModels.spellcasting.SpellcastingModel.TYPES.ac55eSpell
-    = AlternateClasses55eSpell;
+  // class AlternateClasses55eSpell extends dnd5e
+  //   .dataModels
+  //   .spellcasting
+  //   .MultiLevelSpellcasting {
+  //   /** @override */
+  //   // eslint-disable-next-line @typescript-eslint/class-literal-property-style
+  //   static get TYPE() {
+  //     return 'ac55eSpell';
+  //   }
+  // }
+
+  // dnd5e.dataModels.spellcasting.SpellcastingModel.TYPES.ac55eSpell
+  //   = AlternateClasses55eSpell;
   // eslint-disable-next-line @stylistic/max-len
   console.log('Alternate Classes 5e | Initialized Alternate Classes Spellcasting');
 
@@ -122,7 +136,7 @@ Hooks.once('init', () => {
    */
   CONFIG.DND5E.restTypes.short.recoverSpellSlotTypes.add('wuJen');
   CONFIG.DND5E.restTypes.long.recoverSpellSlotTypes.add('wuJen');
-  CONFIG.DND5E.restTypes.long.recoverSpellSlotTypes.add('ac55eSpell');
+  // CONFIG.DND5E.restTypes.long.recoverSpellSlotTypes.add('ac55eSpell');
   console.log('Alternate Classes 5e | \
     Initialized rest recovery for Alternate Classes spellcasting types');
 
