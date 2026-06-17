@@ -191,6 +191,7 @@ interface ActorData {
     override: undefined;
     type: string;
     value: number;
+    max: number;
   }>;
   tools: Record<string, {
     ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
