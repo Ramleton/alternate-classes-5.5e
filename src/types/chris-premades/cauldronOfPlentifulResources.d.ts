@@ -648,7 +648,7 @@ export default interface CauldronOfPlentifulResources {
         content: string,
         targets: Token[],
         options?: {
-          type?: 'multiple';
+          type?: 'multiple' | 'selectAmount';
           selectOptions?: never[];
           skipDeadAndUnconscious?: boolean;
           coverToken?: undefined;

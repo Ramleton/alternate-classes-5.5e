@@ -1,12 +1,15 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { MidiQOLEvent } from 'chris-premades/macroEvents.js';
 
 export interface PreCallbackArgs {
   feat: Item<'feat'>;
   workflow: Workflow;
 }
 
-const pre = async ({ feat }: PreCallbackArgs): Promise<boolean> => {
+export const preSmiteCallback = async (
+  { feat }: PreCallbackArgs,
+): Promise<boolean> => {
   const flag = feat.actor!
     .flags['alternate-classes-55e']
     ?.macros
@@ -37,6 +40,8 @@ export interface SmiteMacroFactoryArgs {
   subclass: string;
   name: string;
   version?: `${number}.${number}.${number}`;
+  macroPass?: MidiQOLEvent;
+  priority?: number;
   preCallback?: (data: PreCallbackArgs) => Promise<boolean>;
   duringCallback: (data: DuringCallbackArgs) => Promise<void>;
 }
@@ -48,7 +53,9 @@ const subclassSmiteMacroFactory = async (
     subclass,
     name,
     version = '1.0.0',
-    preCallback = pre,
+    macroPass = 'attackRollComplete',
+    priority = 910,
+    preCallback = preSmiteCallback,
     duringCallback,
   } = data;
 
@@ -72,9 +79,9 @@ const subclassSmiteMacroFactory = async (
     midi: {
       actor: [
         {
-          pass: 'attackRollComplete',
+          pass: macroPass,
           macro: workflow,
-          priority: 910,
+          priority,
         },
       ],
     },
