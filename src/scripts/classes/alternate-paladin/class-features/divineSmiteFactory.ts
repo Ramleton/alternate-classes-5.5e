@@ -56,39 +56,17 @@ const during = async (
   return;
 };
 
-interface DivineSmiteWorkflowArgs {
-  trigger: {
-    entity: Item<'feat'>;
-  };
-  workflow: Workflow;
-  damageType: DamageType;
-}
-
-type DivineSmiteWorkflow = (__0: DivineSmiteWorkflowArgs) => Promise<void>;
-
-const templateWorkflow: DivineSmiteWorkflow = async ({
-  trigger: { entity },
-  workflow,
-  damageType,
-}) => {
-  const feat = entity as Item<'feat'>;
-  if (!feat.actor)
-    return;
-  const res1 = await pre(feat, workflow);
-  if (!res1)
-    return;
-  await during(feat, res1, damageType);
-  await spendSpellSlot(feat.actor, res1.type, res1.level);
-};
-
 const divineSmiteMacroFactory = (damageType: DamageType): CPRMacro => {
   const workflow: MidiMacroFunction = async (data) => {
-    const feat = data.trigger.entity as Item<'feat'>;
-    await templateWorkflow({
-      ...data,
-      trigger: { ...data.trigger, entity: feat },
-      damageType,
-    });
+    const { trigger: { entity }, workflow } = data;
+    const feat = entity as Item<'feat'>;
+    if (!feat.actor)
+      return;
+    const res1 = await pre(feat, workflow);
+    if (!res1)
+      return;
+    await during(feat, res1, damageType);
+    await spendSpellSlot(feat.actor, res1.type, res1.level);
   };
 
   const damageName = damageType.charAt(0).toUpperCase()

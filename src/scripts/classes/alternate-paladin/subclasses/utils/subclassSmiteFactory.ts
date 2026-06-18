@@ -6,6 +6,28 @@ export interface PreCallbackArgs {
   workflow: Workflow;
 }
 
+const pre = async ({ feat }: PreCallbackArgs): Promise<boolean> => {
+  const flag = feat.actor!
+    .flags['alternate-classes-55e']
+    ?.macros
+    ?.divineSmite
+    ?.damage;
+  if (!flag)
+    return false;
+  const { utils: { dialogUtils, itemUtils, socketUtils } } = chrisPremades;
+  const divineFervor = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eDivineFervor',
+  ) as Item<'feat'> | undefined;
+  if (!divineFervor?.system?.uses?.value)
+    return false;
+  const selection = await dialogUtils.confirmUseItem(
+    feat,
+    { userId: socketUtils.firstOwner(feat.actor, true) },
+  );
+  return selection;
+};
+
 export interface DuringCallbackArgs {
   feat: Item<'feat'>;
   workflow: Workflow;
@@ -15,7 +37,7 @@ export interface SmiteMacroFactoryArgs {
   subclass: string;
   name: string;
   version?: `${number}.${number}.${number}`;
-  preCallback: (data: PreCallbackArgs) => Promise<boolean>;
+  preCallback?: (data: PreCallbackArgs) => Promise<boolean>;
   duringCallback: (data: DuringCallbackArgs) => Promise<void>;
 }
 
@@ -26,7 +48,7 @@ const subclassSmiteMacroFactory = async (
     subclass,
     name,
     version = '1.0.0',
-    preCallback,
+    preCallback = pre,
     duringCallback,
   } = data;
 

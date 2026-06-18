@@ -1,4 +1,4 @@
-import divineSmiteMacroFactory from './divineSmiteTemplate.js';
+import divineSmiteMacroFactory from './divineSmiteFactory.js';
 
 export const divineSmiteRadiant = divineSmiteMacroFactory('radiant');
 export const divineSmiteThunder = divineSmiteMacroFactory('thunder');

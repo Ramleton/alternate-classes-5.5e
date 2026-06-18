@@ -1,29 +1,7 @@
 import { generateOverTimeEffectChange } from 'automation/effectUtils.js';
 import { runActivity } from 'automation/utils.js';
 import { EffectData, OverTimeEffectData } from 'types/effects.js';
-import subclassSmiteMacroFactory, { DuringCallbackArgs, PreCallbackArgs } from '../utils/subclassSmiteFactory.js';
-
-const pre = async ({ feat }: PreCallbackArgs): Promise<boolean> => {
-  const flag = feat.actor!
-    .flags['alternate-classes-55e']
-    ?.macros
-    ?.divineSmite
-    ?.damage;
-  if (!flag)
-    return false;
-  const { utils: { dialogUtils, itemUtils, socketUtils } } = chrisPremades;
-  const divineFervor = itemUtils.getItemByIdentifier(
-    feat.actor!,
-    'ac55eDivineFervor',
-  ) as Item<'feat'> | undefined;
-  if (!divineFervor?.system?.uses?.value)
-    return false;
-  const selection = await dialogUtils.confirmUseItem(
-    feat,
-    { userId: socketUtils.firstOwner(feat.actor, true) },
-  );
-  return selection;
-};
+import subclassSmiteMacroFactory, { DuringCallbackArgs } from '../utils/subclassSmiteFactory.js';
 
 const during = async (
   { feat, workflow }: DuringCallbackArgs,
@@ -71,6 +49,5 @@ const during = async (
 export default await subclassSmiteMacroFactory({
   name: 'Verdant Smite',
   subclass: 'Oath of the Ancients',
-  preCallback: pre,
   duringCallback: during,
 });

@@ -4,7 +4,7 @@ import { DamageType } from '../../../../types/damage.js';
 
 interface DamageObject {
   formula: string;
-  type: DamageType;
+  damageType: DamageType;
 }
 
 const pre = async (
@@ -26,7 +26,7 @@ const during = async (
   damage: DamageObject,
 ): Promise<void> => {
   const { utils: { workflowUtils } } = chrisPremades;
-  const options = { damageType: damage.type };
+  const options = { damageType: damage.damageType };
   await workflowUtils.bonusDamage(workflow, damage.formula, options);
 };
 
@@ -35,7 +35,7 @@ const post = async (actor: Actor5e): Promise<void> => {
   await genericUtils.unsetFlag(
     actor,
     'alternate-classes-55e',
-    'macros.divineSmite.damage',
+    'macros.divineSmite',
   );
 };
 
