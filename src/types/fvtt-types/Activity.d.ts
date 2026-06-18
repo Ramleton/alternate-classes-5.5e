@@ -189,8 +189,17 @@ export interface AttackActivity extends BaseActivity {
   fumbleThreshold: number;
 }
 
+export interface DamageActivity extends BaseActivity {
+  type: 'damage';
+  damage: {
+    critical: { allow: boolean; bonus: unknown };
+    parts: DamagePart[];
+  };
+}
+
 type Activity
   = | AttackActivity
+    | DamageActivity
     | HealActivity
     | UtilityActivity
     | SaveActivity

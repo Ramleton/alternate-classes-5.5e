@@ -1,21 +1,18 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { DamageType } from 'types/damage.js';
+import { getDivineSmiteDamageType } from '../subclasses/utils/utils.js';
 
-const damageWorkflow: MidiMacroFunction = async ({
+const workflow: MidiMacroFunction = async ({
   trigger: { entity },
   workflow,
 }) => {
   const feat = entity as Item<'feat'>;
   if (!feat.actor)
     return;
-  const { utils: { itemUtils, workflowUtils } } = chrisPremades;
-  let damageType: DamageType = 'radiant';
-  if (itemUtils.getItemByIdentifier(feat.actor, 'ac55eDivineSmiteThunder')) {
-    damageType = 'thunder';
-  }
-  if (itemUtils.getItemByIdentifier(feat.actor, 'ac55eDivineSmiteNecrotic')) {
-    damageType = 'necrotic';
-  }
+  const { utils: { constants, workflowUtils } } = chrisPremades;
+  const actionType = workflowUtils.getActionType(workflow);
+  if (!constants.weaponAttacks.some(type => type === actionType))
+    return;
+  const damageType = getDivineSmiteDamageType(feat.actor);
   await workflowUtils.bonusDamage(workflow, '1d8', { damageType });
 };
 
@@ -29,7 +26,7 @@ const macro: CPRMacro = {
     actor: [
       {
         pass: 'damageRollComplete',
-        macro: damageWorkflow,
+        macro: workflow,
         priority: 100,
       },
     ],
