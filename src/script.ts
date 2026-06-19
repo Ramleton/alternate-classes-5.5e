@@ -66,68 +66,6 @@ Hooks.once('init', () => {
       roundUp: false,
     },
   };
-
-  // CONFIG.DND5E.spellcasting.ac55eSpell = {
-  //   label: 'Alternate Classes 5.5e Spellcasting',
-  //   type: 'multi',
-  //   order: 16,
-  //   cantrips: true,
-  //   prepares: true,
-  //   img: 'icons/magic/air/air-smoke-casting.webp',
-  //   progression: {
-  //     ac55eFull: {
-  //       label: 'Full Caster',
-  //       divisor: 1,
-  //       roundUp: true,
-  //     },
-  //     ac55eHalf: {
-  //       label: 'Half Caster',
-  //       divisor: 2,
-  //       roundUp: false,
-  //     },
-  //     ac55eThird: {
-  //       label: 'Third Caster',
-  //       divisor: 3,
-  //       roundUp: false,
-  //     },
-  //   },
-  //   table: [
-  //     [2],
-  //     [3],
-  //     [4, 2],
-  //     [4, 3],
-  //     [4, 3, 2],
-  //     [4, 3, 3],
-  //     [4, 3, 3, 1],
-  //     [4, 3, 3, 2],
-  //     [4, 3, 3, 3, 1],
-  //     [4, 3, 3, 3, 2],
-  //     [4, 3, 3, 3, 2, 1],
-  //     [4, 3, 3, 3, 2, 1],
-  //     [4, 3, 3, 3, 2, 1, 1],
-  //     [4, 3, 3, 3, 2, 1, 1],
-  //     [4, 3, 3, 3, 2, 1, 1, 1],
-  //     [4, 3, 3, 3, 2, 1, 1, 1],
-  //     [4, 3, 3, 3, 2, 1, 1, 1, 1],
-  //     [4, 3, 3, 3, 3, 1, 1, 1, 1],
-  //     [4, 3, 3, 3, 3, 2, 1, 1, 1],
-  //     [4, 3, 3, 3, 3, 2, 2, 1, 1],
-  //   ],
-  // };
-
-  // class AlternateClasses55eSpell extends dnd5e
-  //   .dataModels
-  //   .spellcasting
-  //   .MultiLevelSpellcasting {
-  //   /** @override */
-  //   // eslint-disable-next-line @typescript-eslint/class-literal-property-style
-  //   static get TYPE() {
-  //     return 'ac55eSpell';
-  //   }
-  // }
-
-  // dnd5e.dataModels.spellcasting.SpellcastingModel.TYPES.ac55eSpell
-  //   = AlternateClasses55eSpell;
   // eslint-disable-next-line @stylistic/max-len
   console.log('Alternate Classes 5e | Initialized Alternate Classes Spellcasting');
 
@@ -139,6 +77,16 @@ Hooks.once('init', () => {
   // CONFIG.DND5E.restTypes.long.recoverSpellSlotTypes.add('ac55eSpell');
   console.log('Alternate Classes 5e | \
     Initialized rest recovery for Alternate Classes spellcasting types');
+
+  CONFIG.DND5E.armorClasses.ac55eCharismaAC = {
+    label: 'Charisma AC',
+    formula: '@attributes.ac.armor + @abilities.cha.mod',
+  };
+
+  CONFIG.DND5E.armorClasses.ac55eCharismaMediumAC = {
+    label: 'Charisma Medium AC',
+    formula: '@attributes.ac.armor + max(2, @abilities.cha.mod)',
+  };
 
   if (!game.modules) return;
   /**
@@ -402,7 +350,7 @@ Hooks.once('init', () => {
       const martialSuperiority = itemUtils.getItemByIdentifier(
         item.actor,
         'ac55eMartialSuperiority',
-      );
+      ) as Item<'feat'> | undefined;
       if (!martialSuperiority) return false;
       if (!martialSuperiority.system?.uses?.value) return false;
       await genericUtils.update(martialSuperiority, {

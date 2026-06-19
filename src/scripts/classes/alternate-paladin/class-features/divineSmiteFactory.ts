@@ -36,22 +36,30 @@ const pre = async (
   return spellData;
 };
 
+export interface DivineSmiteData {
+  formula: `${number}d8`;
+  damageType: DamageType;
+  level: number;
+}
+
 const during = async (
   feat: Item<'feat'>,
   spellData: DynamicSpells[CombinedKeys],
   damageType: DamageType,
 ) => {
   const dmgSpellLevel = Math.min(spellData.level, 5);
-  const dmgFormula = `${1 + dmgSpellLevel}d8`;
+  const dmgFormula = `${1 + dmgSpellLevel}d8` as `${number}d8`;
   const { utils: { genericUtils } } = chrisPremades;
+  const smiteData: DivineSmiteData = {
+    formula: dmgFormula,
+    damageType,
+    level: dmgSpellLevel,
+  };
   await genericUtils.setFlag(
     feat.actor!,
     'alternate-classes-55e',
     'macros.divineSmite.damage',
-    {
-      formula: dmgFormula,
-      damageType,
-    },
+    smiteData,
   );
   return;
 };

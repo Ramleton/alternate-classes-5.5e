@@ -7,9 +7,11 @@ export interface PreCallbackArgs {
   workflow: Workflow;
 }
 
-export const preSmiteCallback = async (
-  { feat }: PreCallbackArgs,
-): Promise<boolean> => {
+export type PreSmiteCallback = (data: PreCallbackArgs) => Promise<boolean>;
+
+export const preSmiteCallback: PreSmiteCallback = async (
+  { feat },
+) => {
   const flag = feat.actor!
     .flags['alternate-classes-55e']
     ?.macros
@@ -36,6 +38,8 @@ export interface DuringCallbackArgs {
   workflow: Workflow;
 }
 
+export type DuringSmiteCallback = (data: DuringCallbackArgs) => Promise<void>;
+
 export interface SmiteMacroFactoryArgs {
   subclass: string;
   name: string;
@@ -43,7 +47,7 @@ export interface SmiteMacroFactoryArgs {
   macroPass?: MidiQOLEvent;
   priority?: number;
   preCallback?: (data: PreCallbackArgs) => Promise<boolean>;
-  duringCallback: (data: DuringCallbackArgs) => Promise<void>;
+  duringCallback: DuringSmiteCallback;
 }
 
 const subclassSmiteMacroFactory = async (
