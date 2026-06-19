@@ -60,6 +60,18 @@ const duringArmorClassBoost: DuringCallback = async ({
   return displayMessage === successMessage;
 };
 
+export interface PostCallbackArgs {
+  feat: Item<'feat'>;
+  workflow: Workflow;
+};
+
+export type PostCallback = (data: PostCallbackArgs) => Promise<void>;
+
+export const postArmorClassBoost: PostCallback = async ({ feat }) => {
+  const { utils: { actorUtils } } = chrisPremades;
+  await actorUtils.setReactionUsed(feat.actor!);
+};
+
 export type ACBonusCallback = ({
   feat,
   workflow,
@@ -69,30 +81,30 @@ export type ACBonusCallback = ({
 }) => Promise<number>;
 
 interface ACBoostMacroFactoryArgs {
+  identifier?: string;
   name: string;
   version?: `${number}.${number}.${number}`;
   macroPass?: MidiQOLEvent;
   priority?: number;
   acBonusCallback: ACBonusCallback;
-  spendReaction?: boolean;
   preCallback?: PreCallback;
   duringCallback?: DuringCallback;
+  postCallback?: PostCallback;
 }
 
 type ACBoostMacroFactory = (args: ACBoostMacroFactoryArgs) => CPRMacro;
 
 const acBoostMacroFactory: ACBoostMacroFactory = ({
   name,
+  identifier = 'ac55e' + name.replaceAll(' ', ''),
   version = '1.0.0',
   macroPass = 'sceneAttackRollComplete',
   priority = 910,
   acBonusCallback,
-  spendReaction = true,
   preCallback = preArmorClassBoost,
   duringCallback = duringArmorClassBoost,
+  postCallback = postArmorClassBoost,
 }) => {
-  const identifier = name.replaceAll(' ', '');
-
   const workflow: MidiMacroFunction = async ({
     trigger: { entity, token },
     workflow,
@@ -102,14 +114,11 @@ const acBoostMacroFactory: ACBoostMacroFactory = ({
     if (!res1)
       return;
     const res2 = await duringCallback({ feat, workflow, acBonusCallback });
-    if (spendReaction) {
-      const { utils: { actorUtils } } = chrisPremades;
-      await actorUtils.setReactionUsed(feat.actor!);
-    }
+    await postCallback({ feat, workflow });
     return res2;
   };
   return {
-    identifier: `ac55e${identifier}`,
+    identifier,
     name,
     source: 'Alternate Classes 5.5e',
     version,
