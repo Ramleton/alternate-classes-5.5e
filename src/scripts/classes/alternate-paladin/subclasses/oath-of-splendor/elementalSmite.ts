@@ -2,18 +2,7 @@ import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import { runActivity } from 'automation/utils.js';
 import { DivineSmiteData } from '../../class-features/divineSmiteFactory.js';
 import subclassSmiteMacroFactory, { DuringSmiteCallback } from '../utils/subclassSmiteFactory.js';
-
-const getChosenElement = (actor: Actor5e): Item<'feat'> | void => {
-  const { utils: { itemUtils } } = chrisPremades;
-  ['Air', 'Earth', 'Fire', 'Water'].forEach((element) => {
-    const feat = itemUtils.getItemByIdentifier(
-      actor,
-      `ac55eOathOfSplendor${element}`,
-    ) as Item<'feat'> | undefined;
-    if (feat)
-      return feat;
-  });
-};
+import { getChosenElement } from './utils.js';
 
 interface ElementHandlerArgs {
   feat: Item<'feat'>;
@@ -56,7 +45,7 @@ const during: DuringSmiteCallback = async ({ feat, workflow }) => {
     );
   }
   const target = workflow.hitTargets.first() as Token;
-  const saveWorkflow = await runActivity(feat, 'save', [target]);
+  const saveWorkflow = await runActivity(element, 'save', [target]);
   if (!saveWorkflow || elementID !== 'ac55eOathOfSplendorAir')
     return;
   for (const failedTarget of saveWorkflow.failedSaves) {

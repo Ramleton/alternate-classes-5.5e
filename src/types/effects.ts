@@ -186,3 +186,24 @@ export interface OverTimeEffectData {
   saveDC?: number;
   turn: 'start' | 'end';
 }
+
+export interface AuraActiveEffectData {
+  applyToSelf: boolean;
+  bestFormula: string;
+  canStack: boolean;
+  collisionTypes: Set<'move'>;
+  color?: string;
+  combatOnly: boolean;
+  disableOnHidden: boolean;
+  disposition: CONST.TOKEN_DISPOSITIONS;
+  distanceFormula: string;
+  evaluatePreApply: boolean;
+  opacity: number;
+  overrideName: string;
+  script: string;
+  showRadius: boolean;
+  stashedChanges: unknown[];
+  stashedStatuses: Set<unknown>;
+  validationFailures: object;
+  parent: EffectData;
+}
