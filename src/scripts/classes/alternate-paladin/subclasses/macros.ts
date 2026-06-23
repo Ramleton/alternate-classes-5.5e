@@ -4,6 +4,7 @@ import oathOfGlory from './oath-of-glory/macros.js';
 import oathOfSplendor from './oath-of-splendor/macros.js';
 import oathOfTheAncients from './oath-of-the-ancients/macros.js';
 import oathOfTheThrone from './oath-of-the-throne/macros.js';
+import oathOfVengeance from './oath-of-vengeance/macros.js';
 
 const macros: CPRMacro[] = [
   ...oathOfTheAncients,
@@ -11,6 +12,7 @@ const macros: CPRMacro[] = [
   ...oathOfGlory,
   ...oathOfSplendor,
   ...oathOfTheThrone,
+  ...oathOfVengeance,
 ];
 
 export default macros;
