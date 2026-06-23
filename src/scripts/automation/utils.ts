@@ -1,4 +1,5 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import { DamageDetail } from 'chris-premades/macro.js';
 import Activity from 'fvtt-types/Activity.js';
 
 export const runActivity = async (
@@ -32,4 +33,13 @@ export const getActivityData = async (
     { strict: true });
   if (!activity) return;
   return genericUtils.duplicate(activity);
+};
+
+export const getDamageDetailForToken = (
+  token: Token,
+  workflow: Workflow,
+) => {
+  return workflow.damageList.find(
+    i => i.targetUuid === token.document.uuid,
+  ) as DamageDetail | undefined;
 };

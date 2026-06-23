@@ -25,3 +25,8 @@ export const getDivineFervorUses = (actor: Actor5e): number => {
     return 0;
   return divineFervor.system.uses!.value;
 };
+
+export const getAuraRadius = (actor: Actor5e): number => {
+  return (actor.system.scale?.['alternate-paladin']?.['aura-radius'] as number)
+    ?? 0;
+};
