@@ -1,8 +1,8 @@
 import CPRMacro from 'chris-premades/macro.js';
-import vengeanceSmite from './vengeanceSmite.js';
+import vengefulSmite from './vengefulSmite.js';
 
 const macros: CPRMacro[] = [
-  vengeanceSmite,
+  vengefulSmite,
 ];
 
 export default macros;

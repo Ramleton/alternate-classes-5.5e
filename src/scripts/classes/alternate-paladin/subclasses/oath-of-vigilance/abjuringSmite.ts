@@ -9,7 +9,7 @@ const during = async (
 };
 
 export default await subclassSmiteMacroFactory({
-  name: 'Vengeance Smite',
-  subclass: 'Oath of Vengeance',
+  name: 'Abjuring Smite',
+  subclass: 'Oath of Vigilance',
   duringCallback: during,
 });

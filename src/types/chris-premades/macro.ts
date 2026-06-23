@@ -387,6 +387,7 @@ interface D20RollCharacterData extends CharacterData {
   statuses: Record<string, unknown>;
   statusesSet: Set<string>;
   subclasses: Record<string, Item>;
+  token?: Token;
 }
 
 export interface D20Roll {

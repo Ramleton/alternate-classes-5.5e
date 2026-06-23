@@ -67,7 +67,7 @@ export default interface CauldronOfPlentifulResources {
         entities: any[]
       ): Promise<void>;
       getTokens(actor: Actor): Token[];
-      getFirstToken(actor: Actor): Token;
+      getFirstToken(actor: Actor5e): Token;
       getLevelOrCR(actor: Actor): number;
       checkTrait(actor: Actor, type: string, trait: string): boolean;
       typeOrRace(actor: Actor): string;
