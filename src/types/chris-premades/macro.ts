@@ -541,6 +541,9 @@ export interface DItem {
 export type MacroFunction = (__0: {
   trigger: Trigger;
   ditem?: DItem;
+  options?: {
+    _movement?: Record<string, Record<string, unknown>>;
+  };
 }) => Promise<unknown>;
 
 export type MidiMacroFunction = (__0: {
