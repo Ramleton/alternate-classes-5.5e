@@ -1,10 +1,11 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
-import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import CPRMacro, { DItem, MidiMacroFunction } from 'chris-premades/macro.js';
 import { MidiQOLEvent } from 'chris-premades/macroEvents.js';
 
 export interface PreCallbackArgs {
   feat: Item<'feat'>;
   workflow: Workflow;
+  ditem?: DItem;
 }
 
 export type PreSmiteCallback = (data: PreCallbackArgs) => Promise<boolean>;
@@ -36,6 +37,7 @@ export const preSmiteCallback: PreSmiteCallback = async (
 export interface DuringCallbackArgs {
   feat: Item<'feat'>;
   workflow: Workflow;
+  ditem?: DItem;
 }
 
 export type DuringSmiteCallback = (data: DuringCallbackArgs) => Promise<void>;
@@ -64,13 +66,13 @@ const subclassSmiteMacroFactory = async (
   } = data;
 
   const workflow: MidiMacroFunction = async (
-    { trigger: { entity }, workflow },
+    { trigger: { entity }, workflow, ditem },
   ) => {
     const feat = entity as Item<'feat'>;
     if (!feat.actor) return;
-    const res1 = await preCallback({ feat, workflow });
+    const res1 = await preCallback({ feat, workflow, ditem });
     if (!res1) return;
-    await duringCallback({ feat, workflow });
+    await duringCallback({ feat, workflow, ditem });
   };
 
   const label = name.replaceAll(' ', '');

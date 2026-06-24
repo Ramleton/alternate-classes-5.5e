@@ -64,6 +64,16 @@ const during = async (
   return;
 };
 
+const postDivineSmite: MidiMacroFunction = async ({ trigger: { entity } }) => {
+  const { utils: { genericUtils } } = chrisPremades;
+  const feat = entity as Item<'feat'>;
+  await genericUtils.unsetFlag(
+    feat.actor!,
+    'alternate-classes-55e',
+    'macros.divineSmite',
+  );
+};
+
 const divineSmiteMacroFactory = (damageType: DamageType): CPRMacro => {
   const workflow: MidiMacroFunction = async (data) => {
     const { trigger: { entity }, workflow } = data;
@@ -96,6 +106,11 @@ const divineSmiteMacroFactory = (damageType: DamageType): CPRMacro => {
         {
           pass: 'damageRollComplete',
           macro: damageWorkflow,
+          priority: 100,
+        },
+        {
+          pass: 'rollFinished',
+          macro: postDivineSmite,
           priority: 100,
         },
       ],

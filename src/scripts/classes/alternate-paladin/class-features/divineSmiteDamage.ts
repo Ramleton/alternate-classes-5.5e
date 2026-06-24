@@ -30,15 +30,6 @@ const during = async (
   await workflowUtils.bonusDamage(workflow, damage.formula, options);
 };
 
-const post = async (actor: Actor5e): Promise<void> => {
-  const { utils: { genericUtils } } = chrisPremades;
-  await genericUtils.unsetFlag(
-    actor,
-    'alternate-classes-55e',
-    'macros.divineSmite',
-  );
-};
-
 const damageWorkflow: MidiMacroFunction = async ({
   trigger: { entity },
   workflow,
@@ -50,7 +41,6 @@ const damageWorkflow: MidiMacroFunction = async ({
   if (!res1)
     return;
   await during(workflow, res1);
-  await post(feat.actor);
 };
 
 export default damageWorkflow;

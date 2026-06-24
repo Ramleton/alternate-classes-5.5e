@@ -1,6 +1,6 @@
 import auraDamagedInsteadFactory from '../utils/auraDamagedInsteadFactory.js';
 
 export default auraDamagedInsteadFactory({
-  subclass: 'Oath of the Throne',
-  name: 'Divine Aegis',
+  subclass: 'Oath of Repentance',
+  name: 'Aura Of Penance',
 });
