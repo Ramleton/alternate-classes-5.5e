@@ -387,7 +387,7 @@ export default interface CauldronOfPlentifulResources {
 
       getTotalDamageOfType(
         damageDetail: object,
-        actor: Actor,
+        actor: Actor5e,
         type: string
       ): number;
 
