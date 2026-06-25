@@ -1,4 +1,6 @@
 {
 	"DND5E.SpellLevelWuJen": "{level} ({n} Wu Jen Slot(s))",
-	"DND5E.SpellSlotsWuJen": "Wu Jen Spell Slots"
+	"DND5E.SpellSlotsWuJen": "Wu Jen Spell Slots",
+	"DND5E.SpellLevelAc55eSpell": "{level} ({n} Spell Slots)",
+	"DND5E.SpellSlotsAc55eSpell": "Spell Slots"
 }
