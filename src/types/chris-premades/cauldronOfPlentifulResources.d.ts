@@ -378,6 +378,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           flavor?: string;
           itemCardId?: string;
+          sourceItem?: Item;
         }
       ): Workflow;
 

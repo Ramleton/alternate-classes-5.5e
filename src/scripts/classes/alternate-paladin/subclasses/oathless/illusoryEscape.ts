@@ -1,6 +1,7 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
-import { runActivity } from 'automation/utils.js';
+import { getActivityData, runActivity } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { DamageActivity } from 'fvtt-types/Activity.js';
 import { getAuraRadius, getDivineFervorUses } from '../../utils/utils.js';
 
 const pre = async (
@@ -39,6 +40,12 @@ const handleAuraOfDeception = async (
     tokenUtils,
     workflowUtils,
   } } = chrisPremades;
+  const damageActivityData = await getActivityData(
+    feat,
+    'damage',
+  ) as DamageActivity;
+  if (!damageActivityData)
+    return;
   const auraRadius = getAuraRadius(feat.actor!);
   const nearbyTokens = tokenUtils.findNearby(token, auraRadius, 'any', {
     includeIncapacitated: true,
@@ -57,11 +64,23 @@ const handleAuraOfDeception = async (
   );
   if (!target)
     return;
+  const saveWorkflow = await runActivity(feat, 'save', [target[0]]);
+  if (!saveWorkflow?.failedSaves?.size)
+    return;
   await workflowUtils.removeTargets(workflow, [token]);
-  const newTargets = Array.from(new Set([...workflow.targets, target[0]]));
-  await workflowUtils.updateTargets(
-    workflow,
-    newTargets,
+  const newTargets = Array.from(workflow.hitTargets.filter(t =>
+    (t as Token).document.uuid !== token.document.uuid,
+  )) as Token[];
+  await workflowUtils.updateTargets(workflow, newTargets);
+  workflowUtils.applyWorkflowDamage(
+    workflow.token!.document,
+    workflow.damageRoll as object,
+    workflow.defaultDamageType,
+    [target[0]],
+    {
+      flavor: 'Oathless: Aura of Deception',
+      sourceItem: workflow.item,
+    },
   );
 };
 

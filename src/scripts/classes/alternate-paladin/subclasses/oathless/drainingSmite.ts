@@ -47,16 +47,23 @@ const late: MidiMacroFunction = async ({
   const feat = entity as Item<'feat'>;
   if (!feat.actor)
     return;
-  if (!feat.actor.flags['alternate-classes-55e']?.macros?.drainingSmite)
-    return;
   if (!ditem)
     return;
-  const { utils: { workflowUtils } } = chrisPremades;
+  if (!feat.actor.flags['alternate-classes-55e']?.macros?.drainingSmite)
+    return;
+  const { utils: { genericUtils, workflowUtils } } = chrisPremades;
+  await genericUtils.unsetFlag(
+    feat.actor,
+    'alternate-classes-55e',
+    'macros.drainingSmite',
+  );
   const necroticDamage = workflowUtils.getTotalDamageOfType(
-    ditem?.damageDetail,
+    ditem.damageDetail,
     workflow.targets.first()!.actor!,
     'necrotic',
   );
+  if (!necroticDamage)
+    return;
   const healActivityData = await getActivityData(feat, 'heal') as HealActivity;
   healActivityData.healing.custom.formula = Math.floor(necroticDamage / 2) + '';
   await workflowUtils.syntheticActivityDataRoll(
