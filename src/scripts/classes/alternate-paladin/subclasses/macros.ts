@@ -1,4 +1,5 @@
 import CPRMacro from 'chris-premades/macro.js';
+import blackguard from './blackguard/macros.js';
 import oathOfConquest from './oath-of-conquest/macros.js';
 import oathOfGlory from './oath-of-glory/macros.js';
 import oathOfRepentance from './oath-of-repentance/macros.js';
@@ -19,6 +20,7 @@ const macros: CPRMacro[] = [
   ...oathOfVigilance,
   ...oathOfRepentance,
   ...oathless,
+  ...blackguard,
 ];
 
 export default macros;

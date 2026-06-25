@@ -13,6 +13,9 @@ const pre = async (
 ): Promise<DamageObject | undefined> => {
   if (!workflow.hitTargets.size)
     return;
+  const { utils: { workflowUtils } } = chrisPremades;
+  if (workflowUtils.getActionType(workflow) === 'heal')
+    return;
   const flag = actor
     .flags['alternate-classes-55e']
     ?.macros
