@@ -16,26 +16,29 @@
   "main": "eslint.config.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "lint": "eslint src/",
+    "format": "prettier --write \"src/**/*.{js,ts,mts,json,md}\"",
+    "check-format": "prettier --check \"src/**/*.{js,ts,mts,json,md}\""
   },
   "devDependencies": {
+    "@eslint/compat": "^2.1.0",
     "@eslint/js": "^10.0.1",
     "@ethaks/fvtt-quench": "^0.10.0",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^8.60.0",
     "dnd5e": "github:adriangaro/dnd5e-types",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-n": "^18.1.0",
     "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
     "globals": "^17.6.0",
     "jiti": "^2.7.0",
+    "prettier": "^3.9.0",
     "sequencer": "github:fantasycalendar/FoundryVTT-Sequencer#master",
     "tsc-alias": "^1.8.17",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.0",
     "vite": "^8.0.16"
-  },
-  "dependencies": {
-    "@eslint/compat": "^2.1.0",
-    "eslint": "^10.4.0"
   }
 }
