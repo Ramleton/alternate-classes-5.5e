@@ -134,7 +134,7 @@ Macros follow the chris-premades pattern with clear separation of concerns:
 All macros are fully typed using extended dnd5e item/actor types:
 
 ```typescript
-const healActivityData = (await getActivityData(feat, "heal")) as HealActivity;
+const healActivityData = (await getActivityData(feat, 'heal')) as HealActivity;
 ```
 
 TypeScript ensures activity properties match dnd5e 5.x schema.
