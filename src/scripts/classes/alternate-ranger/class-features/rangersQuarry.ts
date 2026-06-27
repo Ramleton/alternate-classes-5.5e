@@ -32,7 +32,7 @@ const preAutomatedApply: MidiMacroFunction = async ({
   }
   const selection = await dialogUtils.confirm(
     feat.name,
-    `Apply Ranger\'s Quarry to ${target.name}?`,
+    `Apply Ranger's Quarry to ${target.name}?`,
     { userId: socketUtils.firstOwner(feat.actor, true) },
   );
   if (!selection) return;
