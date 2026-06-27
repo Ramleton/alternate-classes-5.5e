@@ -7,7 +7,8 @@ import {
 import { runActivity } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { ScaleValueTypeDice } from 'fvtt-types/CharacterSystemData.js';
-import { EffectChange } from 'types/effects.js';
+import { EffectChange, EffectDuration } from 'types/effects.js';
+import { isQuarry } from '../utils/quarryUtils.js';
 
 const preAutomatedApply: MidiMacroFunction = async ({
   trigger: { entity },
@@ -17,28 +18,13 @@ const preAutomatedApply: MidiMacroFunction = async ({
   if (!feat.actor) return;
   if (!workflow.hitTargets.size) return;
   const {
-    utils: { dialogUtils, effectUtils, itemUtils, socketUtils },
+    utils: { dialogUtils, itemUtils, socketUtils },
   } = chrisPremades;
   const target = workflow.hitTargets.first() as Token;
   // Slayer I knack required for automatic application on attack
   const slayerI = itemUtils.getItemByIdentifier(feat.actor, 'ac55eSlayerI');
   if (!slayerI) return;
-  const rangersQuarrySource = effectUtils.getEffectByIdentifier(
-    feat.actor,
-    'ac55eRangersQuarrySource',
-  );
-  if (rangersQuarrySource) {
-    const rangersQuarryEffect = effectUtils.getEffectByIdentifier(
-      target.actor!,
-      'ac55eRangersQuarryTarget',
-    );
-    // Don't prompt if the target is already marked as the actor's quarry
-    if (
-      rangersQuarryEffect &&
-      rangersQuarryEffect.origin === rangersQuarrySource.uuid
-    )
-      return;
-  }
+  if (isQuarry(feat, target)) return;
   // If no item uses left, the actor can instead spend a spell slot
   if (!feat.system.uses?.value) {
     const spellDetails = getSpellData(feat.actor!);
@@ -90,10 +76,16 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
       priority: 20,
     },
   ];
+  const {
+    utils: { itemUtils },
+  } = chrisPremades;
+  // Slayer II knack extends duration indefinitely
+  const slayerII = itemUtils.getItemByIdentifier(feat.actor!, 'ac55eSlayerII');
+  const duration: EffectDuration = slayerII ? {} : { seconds: 3600 };
   await applySourceTargetInterdependentEffects({
     feat,
     target,
-    duration: { seconds: 3600 },
+    duration,
     targetChanges,
   });
 };
