@@ -12,8 +12,9 @@ interface SpellLevelData<L extends SpellLevel, T extends SpellType> {
 }
 
 export type DynamicSpells = {
-  // eslint-disable-next-line @stylistic/max-len
-  [K in CombinedKeys]: K extends `${infer T extends SpellType}${infer L extends SpellLevel}`
+  [
+    K in CombinedKeys
+  ]: K extends `${infer T extends SpellType}${infer L extends SpellLevel}`
     ? SpellLevelData<L, T>
     : never;
 };
@@ -43,7 +44,9 @@ export const getSpellData = (actor: Actor5e): SpellData => {
   const totalSlots = Object.values(spellDetails).reduce(
     (slots: number, sData: { value: number; max: number }) => {
       return slots + (sData?.value ?? 0);
-    }, 0);
+    },
+    0,
+  );
   return {
     ...(data as DynamicSpells),
     hasSpellSlots: totalSlots > 0,
@@ -61,16 +64,39 @@ export const spendSpellSlot = async (
   spell: SpellType,
   level: SpellLevel,
 ) => {
-  const { utils: { genericUtils } } = chrisPremades;
+  const {
+    utils: { genericUtils },
+  } = chrisPremades;
   switch (spell) {
     case 'ac55eSpell':
-      await genericUtils.update(
-        actor,
-        {
-          ['system.spells.spell' + level + '.value']: actor
-            .system
-            .spells['spell' + level].value - 1,
-        },
-      );
+      await genericUtils.update(actor, {
+        ['system.spells.spell' + level + '.value']:
+          actor.system.spells['spell' + level].value - 1,
+      });
   }
+};
+
+export const spendLowestLevelSpellSlot = async (
+  actor: Actor5e,
+): Promise<SpellLevel | null> => {
+  const spellData = getSpellData(actor);
+
+  if (!spellData.hasSpellSlots) {
+    return null;
+  }
+
+  const levels: SpellLevel[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  for (const level of levels) {
+    const key: CombinedKeys = `ac55eSpell${level}`;
+    const slotData = spellData[key];
+
+    if (slotData && slotData.value > 0) {
+      await spendSpellSlot(actor, 'ac55eSpell', level);
+      return level;
+    }
+  }
+
+  // Fallback in case state didn't match hasSpellSlots
+  return null;
 };

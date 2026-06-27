@@ -23,7 +23,7 @@ export const STATUSES = [
 /**
  * Status effect identifiers in D&D5e
  */
-export type Status = typeof STATUSES[number];
+export type Status = (typeof STATUSES)[number];
 
 export interface EffectDuration {
   seconds?: number;
@@ -31,12 +31,12 @@ export interface EffectDuration {
   turns?: number;
 }
 
-type DAESpecialDuration
-  = | 'isDamaged'
-    | 'turnStartSource'
-    | 'turnEndSource'
-    | 'turnStartTarget'
-    | 'turnEndTarget';
+type DAESpecialDuration =
+  | 'isDamaged'
+  | 'turnStartSource'
+  | 'turnEndSource'
+  | 'turnStartTarget'
+  | 'turnEndTarget';
 
 export interface EffectFlags {
   'alternate-classes-55e'?: {
@@ -92,7 +92,7 @@ export interface EffectFlags {
     specialDuration?: string[];
     [key: string]: unknown;
   };
-  'dae'?: {
+  dae?: {
     disableCondition?: string;
     disableIncapacitated?: boolean;
     durationExpression?: string;
@@ -103,7 +103,7 @@ export interface EffectFlags {
     stackable?: 'noneName' | string;
     [key: string]: unknown;
   };
-  'dnd5e'?: {
+  dnd5e?: {
     riders: {
       statuses: string[];
     };
@@ -122,13 +122,7 @@ export interface EffectFlags {
  * - 4: Upgrade
  * - 5: Override
  */
-type EffectChangeMode
-  = | 0
-    | 1
-    | 2
-    | 3
-    | 4
-    | 5;
+type EffectChangeMode = 0 | 1 | 2 | 3 | 4 | 5;
 
 export interface EffectChange {
   key: string;

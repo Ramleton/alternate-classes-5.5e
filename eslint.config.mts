@@ -2,30 +2,26 @@ import stylistic from '@stylistic/eslint-plugin';
 import nodePlugin from 'eslint-plugin-n';
 import globals from 'globals';
 import ts from 'typescript-eslint';
+// 1. Import the Prettier config
+import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default [
   {
-    ignores: [
-      'node_modules/**',
-      'subrepos/**',
-    ],
+    ignores: ['node_modules/**', 'subrepos/**'],
   },
   ...ts.configs.recommended,
   ...ts.configs.stylistic,
   stylistic.configs.customize({
     indent: 2,
     quotes: 'single',
-    semi: true, // Set to false if you prefer no semicolons
+    semi: true,
   }),
   {
-    files: [
-      './src/**/*.{js,mjs,cjs,ts,.d.ts}',
-      './dist/**/*.{js}',
-    ],
-    plugins: { ts, '@stylistic': stylistic, 'n': nodePlugin },
+    files: ['./src/**/*.{js,mjs,cjs,ts,.d.ts}', './dist/**/*.{js}'],
+    plugins: { ts, '@stylistic': stylistic, n: nodePlugin },
     settings: {
       n: {
-        resolvePaths: ['src/scripts/'], // Adjust if your aliases map to a different base directory
+        resolvePaths: ['src/scripts/'],
         typescriptExtensionsMap: [
           ['.ts', '.js'],
           ['.cts', '.cjs'],
@@ -42,18 +38,6 @@ export default [
     },
     rules: {
       'n/file-extension-in-import': ['error', 'always'],
-      '@stylistic/eol-last': ['error', 'always'],
-      '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1, maxBOF: 0 }],
-      '@stylistic/max-len': ['error', {
-        code: 80,
-        tabWidth: 2,
-        ignoreUrls: true,
-        ignoreRegExpLiterals: true,
-        ignorePattern: '^import\\s.+\\sfrom\\s.+;$',
-        // ADD THESE THREE EXCLUSIONS TO BREAK THE CIRCULAR LOOP:
-        ignoreTrailingComments: true,
-        ignoreComments: true,
-      }],
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
@@ -66,6 +50,24 @@ export default [
         },
       ],
       '@typescript-eslint/no-floating-promises': 'error',
+
+      // NOTE: Your custom @stylistic rules (like max-len, eol-last)
+      // are safe to leave here, but eslint-config-prettier will
+      // automatically silence any that conflict with Prettier's layout logic.
+      '@stylistic/max-len': [
+        'error',
+        {
+          code: 80,
+          tabWidth: 2,
+          ignoreUrls: true,
+          ignoreRegExpLiterals: true,
+          ignorePattern: '^import\\s.+\\sfrom\\s.+;$',
+          ignoreTrailingComments: true,
+          ignoreComments: true,
+        },
+      ],
     },
   },
+  // 2. ALWAYS PLACE THIS LAST to disable conflicting formatting rules
+  eslintConfigPrettier,
 ];
