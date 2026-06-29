@@ -24,7 +24,7 @@ const preAutomatedApply: MidiMacroFunction = async ({
   // Slayer I knack required for automatic application on attack
   const slayerI = itemUtils.getItemByIdentifier(feat.actor, 'ac55eSlayerI');
   if (!slayerI) return;
-  if (isQuarry(feat, target)) return;
+  if (isQuarry(feat.actor!, target.actor!)) return;
   // If no item uses left, the actor can instead spend a spell slot
   if (!feat.system.uses?.value) {
     const spellDetails = getSpellData(feat.actor!);
@@ -61,18 +61,22 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
       'quarry-die'
     ] as ScaleValueTypeDice
   ).die;
+  // ? This will automate Beast Master's Primal Beast after updating to Foundry v14
+  // const beastMasterPrimalBeast =
+  //   '(rollingActor.summonerActor.tokenId === effectOriginTokenId && \
+  //    rollingActor.summonerActor.classes["alternate-ranger"].subclass === "beast-master" \
+  //    && rollingActor.summonerActor.classes["alternate-ranger"].levels >= 7)';
   const targetChanges: EffectChange[] = [
     {
       key: 'flags.automated-conditions-5e.grants.damage.bonus',
       mode: 0,
-      value: `bonus=1${quarryDie}; tokenId == effectOriginTokenId;`,
+      value: `bonus=1${quarryDie}; tokenId === effectOriginTokenId;`,
       priority: 20,
     },
     {
       key: 'flags.automated-conditions-5e.grants.attack.noDisadvantage',
       mode: 0,
-      value:
-        'tokenId == effectOriginTokenId; effectOriginActor.attributes.classes.alternate-ranger.levels >= 5;',
+      value: `effectOriginActor.classes['alternate-ranger'].levels >= 5 && tokenId === effectOriginTokenId;`,
       priority: 20,
     },
   ];

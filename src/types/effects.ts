@@ -36,7 +36,9 @@ type DAESpecialDuration =
   | 'turnStartSource'
   | 'turnEndSource'
   | 'turnStartTarget'
-  | 'turnEndTarget';
+  | 'turnEndTarget'
+  | '1Reaction'
+  | '1Attack';
 
 export interface EffectFlags {
   'alternate-classes-55e'?: {
