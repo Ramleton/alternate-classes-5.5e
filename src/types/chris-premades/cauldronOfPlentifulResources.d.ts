@@ -298,7 +298,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           options?: object;
           config?: object;
-          userId: string;
+          userId?: string;
           consumeUsage?: boolean;
           consumeResources?: boolean;
           spellSlot?: boolean;
