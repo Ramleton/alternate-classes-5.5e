@@ -4,7 +4,16 @@ import { DamageType } from '../damage.js';
 import { EffectFlags } from '../effects.js';
 import CharacterData from '../fvtt-types/ConfiguredActor.js';
 import { SkillIdentifier } from '../skills.js';
-import { AuraEvent, CombatEvent, D20Event, EffectEvent, MacroEvent, MidiQOLEvent, MovementEvent, RestEvent } from './macroEvents.js';
+import {
+  AuraEvent,
+  CombatEvent,
+  D20Event,
+  EffectEvent,
+  MacroEvent,
+  MidiQOLEvent,
+  MovementEvent,
+  RestEvent,
+} from './macroEvents.js';
 
 export interface ActiveEffectChange {
   key: string;
@@ -29,7 +38,7 @@ export interface ActiveEffectDuration {
 }
 
 export interface ActiveEffectFlags extends EffectFlags {
-  'core': {
+  core: {
     overlay: boolean;
   };
   'chris-premades'?: {
@@ -76,6 +85,7 @@ export interface MidiActiveEffect {
   sort: number;
   statuses: Set<string>;
   system: object;
+  parent?: Actor5e | unknown;
 }
 
 export interface CastData {
@@ -369,13 +379,16 @@ interface D20RollCharacterData extends CharacterData {
         formula?: string;
       };
     };
-    skills: Record<string, {
-      ability: string;
-      fullKey: string;
-      icon: string;
-      label: string;
-      reference: string;
-    }>;
+    skills: Record<
+      string,
+      {
+        ability: string;
+        fullKey: string;
+        icon: string;
+        label: string;
+        reference: string;
+      }
+    >;
   };
   classes: Record<string, Item<'class'>>;
   effects: MidiActiveEffect[];

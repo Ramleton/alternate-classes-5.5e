@@ -1,7 +1,10 @@
-import { CharacterAttributes, D20RollAbility } from '../chris-premades/macro.js';
+import {
+  CharacterAttributes,
+  D20RollAbility,
+} from '../chris-premades/macro.js';
 import { DamageType } from '../damage.js';
 import { Status } from '../effects.js';
-export { };
+export {};
 
 interface D20RollAbility {
   attack: number;
@@ -42,10 +45,9 @@ interface D20RollAbility {
   saveProf: Proficiency;
 }
 
-type TraitResistanceImmunityVulnerability = Record<string, unknown>; ;
+type TraitResistanceImmunityVulnerability = Record<string, unknown>;
 
-interface TraitDamageResistanceImmunityVulnerability extends
-  TraitResistanceImmunityVulnerability {
+interface TraitDamageResistanceImmunityVulnerability extends TraitResistanceImmunityVulnerability {
   value: DamageType[];
 }
 
@@ -169,45 +171,54 @@ interface ActorData {
     };
   };
   scale: Record<string, Record<string, unknown>>;
-  skills: Record<string, {
-    ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
-    bonus: number;
-    bonuses: { check: string; passive: string };
-    effectValue: number;
-    mod: number;
-    passive: number;
-    prof: Proficiency;
-    proficient: 0 | 0.5 | 1 | 2;
-    roll: {
-      min: number | null;
-      max: number | null;
-      mode: number;
-    };
-    total: number;
-    value: number;
-  }>;
-  spells: Record<string, {
-    label: string;
-    override: undefined;
-    type: string;
-    value: number;
-    max: number;
-  }>;
-  tools: Record<string, {
-    ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
-    bonus: number;
-    bonuses: { check: string };
-    effectValue: number;
-    mod: number;
-    prof: Proficiency;
-    roll: {
-      min: number | null;
-      max: number | null;
-      mode: number;
-    };
-    total: number;
-    value: number;
-  }>;
+  skills: Record<
+    string,
+    {
+      ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+      bonus: number;
+      bonuses: { check: string; passive: string };
+      effectValue: number;
+      mod: number;
+      passive: number;
+      prof: Proficiency;
+      proficient: 0 | 0.5 | 1 | 2;
+      roll: {
+        min: number | null;
+        max: number | null;
+        mode: number;
+      };
+      total: number;
+      value: number;
+    }
+  >;
+  spells: Record<
+    string,
+    {
+      label: string;
+      override: undefined;
+      type: string;
+      value: number;
+      max: number;
+    }
+  >;
+  tools: Record<
+    string,
+    {
+      ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+      bonus: number;
+      bonuses: { check: string };
+      effectValue: number;
+      mod: number;
+      prof: Proficiency;
+      roll: {
+        min: number | null;
+        max: number | null;
+        mode: number;
+      };
+      total: number;
+      value: number;
+    }
+  >;
   traits: {
     dr: TraitDamageResistanceImmunityVulnerability;
     ci: TraitConditionImmunity;
@@ -242,5 +253,6 @@ declare global {
     classes: Record<string, Item<'class'>>;
     system: CharacterData | NPCData;
     items: Item[];
+    type: 'character' | 'npc';
   }
 }

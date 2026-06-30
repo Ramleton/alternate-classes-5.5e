@@ -93,11 +93,18 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
   // Slayer II knack extends duration indefinitely
   const slayerII = itemUtils.getItemByIdentifier(feat.actor!, 'ac55eSlayerII');
   const duration: EffectDuration = slayerII ? {} : { seconds: 3600 };
+  const targetMacros: { type: string; macros: string[] }[] = [];
+  if (itemUtils.getItemByIdentifier(feat.actor!, 'ac55eRelentlessHunter'))
+    targetMacros.push({
+      type: 'midi.actor',
+      macros: ['ac55eRelentlessHunterApply'],
+    });
   await applySourceTargetInterdependentEffects({
     feat,
     target,
     duration,
     targetChanges,
+    targetMacros,
   });
 };
 
