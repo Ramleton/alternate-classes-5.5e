@@ -1048,7 +1048,7 @@ export default interface CauldronOfPlentifulResources {
       addToRoll(
         roll: D20Roll,
         formula: string,
-        options?: any,
+        options?: { rollData?: D20Roll },
       ): Promise<D20Roll>;
       remoteRoll(roll: any, userId: any): Promise<any>;
       remoteDamageRolls(rolls: any, userId: any): Promise<any>;

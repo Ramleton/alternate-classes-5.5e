@@ -457,6 +457,26 @@ export interface Trigger {
   roll: D20Roll;
   saveId: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
   skillId: SkillIdentifier;
+  config: {
+    ability?: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+    advantage?: boolean;
+    disadvantage?: boolean;
+    midiOptions?: {
+      advantage: boolean | undefined;
+      advantageByChoice: boolean | undefined;
+      disadvantage: boolean | undefined;
+      isConcentrationCheck: boolean | undefined;
+      isMagicSave: boolean;
+      itemCardUuid: string | undefined;
+      recomputeAdvantage: boolean;
+      rollAbilities: ('str' | 'dex' | 'con' | 'int' | 'wis' | 'cha')[];
+      rollSkills: SkillIdentifier[];
+      rollTools: string[];
+      saveItemUuid: string | undefined;
+      target: number;
+      workflow: Workflow;
+    };
+  };
 }
 
 export interface CalcDamageOptions {
