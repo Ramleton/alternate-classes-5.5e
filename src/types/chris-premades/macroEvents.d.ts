@@ -15,6 +15,8 @@ export type MidiQOLEvent =
   | 'attackRollComplete' // Runs after the attack roll is complete and the hit is confirmed.
   | 'targetAttackRollComplete' // Runs after the attack roll is complete and the hit is confirmed. Macros are pulled from the target instead of the attacker.
   | 'sceneAttackRollComplete' // Runs after the attack roll is complete and the hit is confirmed. Macros are pulled from all tokens on the scene. (Useful for 3rd party reactions).
+  | 'savesComplete' // Runs after the saving throws are complete.
+  | 'targetSavesComplete' // Runs after the saving throws are complete, but macros are pulled from the target instead of the attacker.
   | 'damageRollComplete' // Runs after the damage roll is complete, but before checking resistances and immunities. (Useful for bonus damage automations).
   | 'targetDamageRollComplete' // Runs after the damage roll is complete, but before checking resistances and immunities. Macros are pulled from the target instead of the attacker.
   | 'sceneDamageRollComplete' // Runs after the damage roll is complete, but before checking resistances and immunities. Macros are pulled from all tokens on the scene. (Useful for 3rd party reactions).

@@ -621,7 +621,7 @@ export default interface CauldronOfPlentifulResources {
           buttons?: string;
           maxes?: any;
         },
-      ): Promise<false | [any, boolean] | any>;
+      ): Promise<false | [Token[], boolean] | [Token, boolean] | Token>;
 
       confirm(
         title: string,
