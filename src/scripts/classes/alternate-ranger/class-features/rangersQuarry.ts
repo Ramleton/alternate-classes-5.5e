@@ -66,11 +66,18 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
   //   '(rollingActor.summonerActor.tokenId === effectOriginTokenId && \
   //    rollingActor.summonerActor.classes["alternate-ranger"].subclass === "beast-master" \
   //    && rollingActor.summonerActor.classes["alternate-ranger"].levels >= 7)';
+  const {
+    utils: { itemUtils },
+  } = chrisPremades;
+  const beguilingStrikes = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eBeguilingStrikes',
+  );
   const targetChanges: EffectChange[] = [
     {
       key: 'flags.automated-conditions-5e.grants.damage.bonus',
       mode: 0,
-      value: `bonus=1${quarryDie}; tokenId === effectOriginTokenId;`,
+      value: `bonus=1${quarryDie}${beguilingStrikes ? '[psychic]' : ''}; tokenId === effectOriginTokenId;`,
       priority: 20,
     },
     {
@@ -80,9 +87,6 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
       priority: 20,
     },
   ];
-  const {
-    utils: { itemUtils },
-  } = chrisPremades;
   // Slayer II knack extends duration indefinitely
   const slayerII = itemUtils.getItemByIdentifier(feat.actor!, 'ac55eSlayerII');
   const duration: EffectDuration = slayerII ? {} : { seconds: 3600 };
