@@ -37,7 +37,7 @@ const prompt: MidiMacroFunction = async ({
     },
   } = chrisPremades;
   const usedSpells =
-    feat.actor.flags['alternate-classes-55e']?.macros?.whimsicalWard ?? [];
+    feat.flags['alternate-classes-55e']?.macros?.whimsicalWard ?? [];
   if (usedSpells.includes(workflow.item.identifier)) return;
   const range = workflow.activity.target?.template?.size
     ? workflow.activity.target.template.size
@@ -103,7 +103,7 @@ const prompt: MidiMacroFunction = async ({
   ]);
   workflow.targets = new Set([...workflow.targets, ...saveWorkflow.targets]);
   await genericUtils.setFlag(
-    feat.actor,
+    feat,
     'alternate-classes-55e',
     'macros.whimsicalWard',
     [...usedSpells, workflow.item.identifier],
