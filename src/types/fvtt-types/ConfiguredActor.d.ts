@@ -55,6 +55,22 @@ interface TraitConditionImmunity extends TraitResistanceImmunityVulnerability {
   value: Status[];
 }
 
+export type CreatureType =
+  | 'aberration'
+  | 'beast'
+  | 'celestial'
+  | 'construct'
+  | 'dragon'
+  | 'elemental'
+  | 'fey'
+  | 'fiend'
+  | 'giant'
+  | 'humanoid'
+  | 'monstrosity'
+  | 'ooze'
+  | 'plant'
+  | 'undead';
+
 interface ActorData {
   abilities: {
     str: D20RollAbility;
@@ -122,7 +138,7 @@ interface ActorData {
     trait: string;
     type: {
       custom: string;
-      value: string;
+      value: CreatureType | unknown;
       subtype: string;
       config: {
         icon: string;

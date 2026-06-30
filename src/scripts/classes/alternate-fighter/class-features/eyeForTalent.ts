@@ -1,9 +1,11 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 
-const preApply = async (
-  { workflow }: { workflow: Workflow },
-): Promise<boolean> => {
+const preApply = async ({
+  workflow,
+}: {
+  workflow: Workflow;
+}): Promise<boolean> => {
   return !!workflow.hitTargets.size;
 };
 const apply = async ({
@@ -14,15 +16,15 @@ const apply = async ({
   workflow: Workflow;
 }): Promise<boolean> => {
   const targetActor = workflow.hitTargets.first()!.actor;
-  if (!targetActor)
-    return false;
-  const { utils: { effectUtils } } = chrisPremades;
+  if (!targetActor) return false;
+  const {
+    utils: { effectUtils },
+  } = chrisPremades;
   const hitEffect = effectUtils.getEffectByIdentifier(
     targetActor,
     `ac55eEyeForTalentBonus|${workflow.actor.id}`,
   );
-  if (hitEffect)
-    await hitEffect.delete();
+  if (hitEffect) await hitEffect.delete();
   const effectData = {
     name: `Eye for Talent: Bonus`,
     img: item.img,
@@ -41,8 +43,7 @@ const apply = async ({
     targetActor,
     `ac55eEyeForTalentFail|${workflow.actor.id}`,
   );
-  if (failEffect)
-    await failEffect.delete();
+  if (failEffect) await failEffect.delete();
   return true;
 };
 const applyWorkflow: MidiMacroFunction = async ({
@@ -51,8 +52,7 @@ const applyWorkflow: MidiMacroFunction = async ({
 }): Promise<void> => {
   const feat = item as Item<'feat'>;
   const res1 = await preApply({ workflow });
-  if (!res1)
-    return;
+  if (!res1) return;
   await apply({
     trigger: { entity: feat },
     workflow,
@@ -69,33 +69,32 @@ const during = async ({
   workflow: Workflow;
 }): Promise<void> => {
   const targetActor = workflow.targets.first()!.actor;
-  if (!targetActor)
-    return;
-  const { utils: {
-    activityUtils,
-    effectUtils,
-    dialogUtils,
-    genericUtils,
-    socketUtils,
-    workflowUtils,
-  } } = chrisPremades;
+  if (!targetActor) return;
+  const {
+    utils: {
+      activityUtils,
+      effectUtils,
+      dialogUtils,
+      genericUtils,
+      socketUtils,
+      workflowUtils,
+    },
+  } = chrisPremades;
   const effect = await effectUtils.getEffectByIdentifier(
     targetActor,
     `ac55eEyeForTalentBonus|${workflow.actor.id}`,
   );
   const checkActivity = activityUtils.getActivityByIdentifier(item, 'search');
-  if (!checkActivity)
-    return;
+  if (!checkActivity) return;
   const newCheckActivity = genericUtils.duplicate(checkActivity.toObject());
-  if (!newCheckActivity)
-    return;
-  const enemyLevel = 'cr' in targetActor.system.details
-    ? targetActor.system.details.cr
-    : targetActor.system.details.level;
+  if (!newCheckActivity) return;
+  const enemyLevel =
+    'cr' in targetActor.system.details
+      ? targetActor.system.details.cr
+      : targetActor.system.details.level;
   const newDC = 8 + enemyLevel;
   newCheckActivity.check.dc.value = newDC;
   newCheckActivity.check.dc.formula = newDC;
-  console.log('Check Activity', newCheckActivity);
   let bonusEffect;
   if (effect) {
     const effectData = {
@@ -130,8 +129,7 @@ const during = async ({
   if (bonusEffect) {
     bonusEffect.delete();
   }
-  if (!checkWorkflow)
-    return;
+  if (!checkWorkflow) return;
   if (!checkWorkflow.saves.size) {
     const failEffectData = {
       name: 'Eye for Talent: Fail',
@@ -144,7 +142,7 @@ const during = async ({
             identifier: `ac55eEyeForTalentFail|${workflow.actor.id}`,
           },
         },
-        'dae': {
+        dae: {
           specialDuration: ['longRest'],
         },
       },
@@ -155,7 +153,6 @@ const during = async ({
   const options: [string, string][] = [
     ['Armor Class', 'armorClass'],
     ['Highest Ability Score', 'highestAbilityScore'],
-    ['All Special Senses', 'allSpecialSenses'],
     ['Lowest Ability Score', 'lowestAbilityScore'],
     [
       'Resistances, Immunities, & Vulnerabilities',
@@ -166,11 +163,12 @@ const during = async ({
   const selection = await dialogUtils.buttonDialog(
     'Eye for Talent: Success',
     'Choose one of the following options:',
-    options, {
+    options,
+    {
       userId: socketUtils.firstOwner(item.actor, true),
-    });
-  if (!selection)
-    return;
+    },
+  );
+  if (!selection) return;
   const endsWithS = targetActor.name.endsWith('s');
   const referenceTarget = endsWithS
     ? `${targetActor.name}'`
@@ -192,10 +190,9 @@ const during = async ({
     str: 'Strength',
     wis: 'Wisdom',
   };
-  const targetAbilities: Record<string, { value: number }>
-    = targetActor.system.abilities;
-  const sortedAbilityScores = Object
-    .entries(targetAbilities)
+  const targetAbilities: Record<string, { value: number }> =
+    targetActor.system.abilities;
+  const sortedAbilityScores = Object.entries(targetAbilities)
     .map(([k, v]) => ({
       ability: mappedAbilities[k],
       ...v,
@@ -204,7 +201,7 @@ const during = async ({
   if (selection === 'highestAbilityScore') {
     await ChatMessage.create({
       user: gmID,
-      // eslint-disable-next-line @stylistic/max-len
+
       content: `<p><b>Eye for Talent: ${referenceTarget} Highest Ability Score:</b></p>\
         ${sortedAbilityScores[0].ability}`,
     });
@@ -213,7 +210,7 @@ const during = async ({
   if (selection === 'lowestAbilityScore') {
     await ChatMessage.create({
       user: gmID,
-      // eslint-disable-next-line @stylistic/max-len
+
       content: `<p><b>Eye for Talent: ${referenceTarget} Lowest Ability Score:</b></p>\
         ${sortedAbilityScores[sortedAbilityScores.length - 1].ability}`,
     });
@@ -225,7 +222,7 @@ const during = async ({
     const tremorsense = targetActor.system.attributes.senses.ranges.tremorsense;
     const truesight = targetActor.system.attributes.senses.ranges.truesight;
     const special = targetActor.system.attributes.senses.special;
-    // eslint-disable-next-line @stylistic/max-len
+
     const message = `<p><b>Eye for Talent: ${referenceTarget} Special Senses:</b></p><ul>\
       ${blindsight ? `<li>Blindsight: ${blindsight} ft</li>` : ''}\
       ${darkvision ? `<li>Darkvision: ${darkvision} ft</li>` : ''}\
@@ -239,25 +236,27 @@ const during = async ({
     return;
   }
   if (selection === 'resistancesImmunitiesVulnerabilities') {
-    const resistances = [...targetActor.system.traits.dr.value].map(r =>
-      r[0].toUpperCase() + r.slice(1),
+    const resistances = [...targetActor.system.traits.dr.value].map(
+      (r) => r[0].toUpperCase() + r.slice(1),
     );
-    const resistanceMessage = `<p>${resistances.length
-      ? `Resistances: ${[...resistances]}`
-      : 'No Resistances'}</p>`;
-    const immunities = [...targetActor.system.traits.di.value].map(i =>
-      i[0].toUpperCase() + i.slice(1),
+    const resistanceMessage = `<p>${
+      resistances.length ? `Resistances: ${[...resistances]}` : 'No Resistances'
+    }</p>`;
+    const immunities = [...targetActor.system.traits.di.value].map(
+      (i) => i[0].toUpperCase() + i.slice(1),
     );
-    const immunityMessage = `<p>${immunities.length
-      ? `Immunities: ${[...immunities]}`
-      : 'No Immunities'}</p>`;
-    const vulnerabilities = [...targetActor.system.traits.dv.value].map(v =>
-      v[0].toUpperCase() + v.slice(1),
+    const immunityMessage = `<p>${
+      immunities.length ? `Immunities: ${[...immunities]}` : 'No Immunities'
+    }</p>`;
+    const vulnerabilities = [...targetActor.system.traits.dv.value].map(
+      (v) => v[0].toUpperCase() + v.slice(1),
     );
-    const vulnerabilityMessage = `<p>${vulnerabilities.length
-      ? `Vulnerability: ${[...vulnerabilities]}`
-      : 'No Vulnerabilities'}</p>`;
-    // eslint-disable-next-line @stylistic/max-len
+    const vulnerabilityMessage = `<p>${
+      vulnerabilities.length
+        ? `Vulnerability: ${[...vulnerabilities]}`
+        : 'No Vulnerabilities'
+    }</p>`;
+
     const message = `<p><b>Eye for Talent: ${referenceTarget} Resistances, Immunities, & Vulnerabilities:</b></p><ul>\
     <li>${resistanceMessage}</li>\
     <li>${immunityMessage}</li>\
@@ -267,22 +266,20 @@ const during = async ({
       content: message,
     });
     return;
-  }
-  else {
+  } else {
     const targetActorActions = targetActor.items.filter((i) => {
-      if (!['feat', 'weapon'].includes(i.type))
-        return false;
+      if (!['feat', 'weapon'].includes(i.type)) return false;
       const rawActivities = i.system?.activities;
       const activities = rawActivities
-        ? (typeof rawActivities.values === 'function'
-            ? Array.from(rawActivities.values())
-            : Object.values(rawActivities))
+        ? typeof rawActivities.values === 'function'
+          ? Array.from(rawActivities.values())
+          : Object.values(rawActivities)
         : [];
 
       return activities.some(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (a: any) => ['action', 'bonus', 'reaction']
-          .includes(a.activation?.type),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (a: any) =>
+          ['action', 'bonus', 'reaction'].includes(a.activation?.type),
       );
     });
     const targetActorTraits = targetActor.items.filter((i) => {
@@ -293,13 +290,13 @@ const during = async ({
       ...targetActorActions,
       ...targetActorTraits,
     ]);
-    if (!actionsOrTraits.size)
-      return;
+    if (!actionsOrTraits.size) return;
     // Randomly get one of the actions or traits
-    const randomActionOrTrait = Array.from(actionsOrTraits)[
-      Math.floor(Math.random() * actionsOrTraits.size)
-    ];
-    // eslint-disable-next-line @stylistic/max-len
+    const randomActionOrTrait =
+      Array.from(actionsOrTraits)[
+        Math.floor(Math.random() * actionsOrTraits.size)
+      ];
+
     const message = `<p><b>Eye for Talent: ${referenceTarget} Action or Trait:</b></p>\
       ${randomActionOrTrait.name}`;
     await ChatMessage.create({
@@ -310,8 +307,7 @@ const during = async ({
 };
 async function workflow({ trigger: { entity: item }, workflow }) {
   const res = pre({ workflow });
-  if (!res)
-    return;
+  if (!res) return;
   await during({
     trigger: { entity: item },
     workflow,

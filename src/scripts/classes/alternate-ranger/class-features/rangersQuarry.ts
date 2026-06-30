@@ -41,17 +41,26 @@ const preAutomatedApply: MidiMacroFunction = async ({
 
 interface PreSpendResult {
   canBeUsed: boolean;
-  spendSpellSlot: boolean;
+  spendExternalUse: boolean;
 }
 
 const pre = async (feat: Item<'feat'>): Promise<PreSpendResult> => {
+  const {
+    utils: { itemUtils },
+  } = chrisPremades;
+  const hatedFoe = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eHatedFoe',
+  ) as Item<'feat'>;
+  if (hatedFoe && hatedFoe.system.uses!.value)
+    return { canBeUsed: true, spendExternalUse: true };
   if (!feat.system.uses?.value) {
     const spellDetails = getSpellData(feat.actor!);
     if (!spellDetails.hasSpellSlots)
-      return { canBeUsed: false, spendSpellSlot: false };
-    return { canBeUsed: true, spendSpellSlot: true };
+      return { canBeUsed: false, spendExternalUse: false };
+    return { canBeUsed: true, spendExternalUse: true };
   }
-  return { canBeUsed: true, spendSpellSlot: false };
+  return { canBeUsed: true, spendExternalUse: false };
 };
 
 const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
@@ -123,6 +132,22 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
   });
 };
 
+const post = async (feat: Item<'feat'>): Promise<void> => {
+  const {
+    utils: { genericUtils, itemUtils },
+  } = chrisPremades;
+  const hatedFoe = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eHatedFoe',
+  ) as Item<'feat'>;
+  if (hatedFoe && hatedFoe.system.uses?.value) {
+    return await genericUtils.update(hatedFoe, {
+      'system.uses.spent': hatedFoe.system.uses.spent + 1,
+    });
+  }
+  await spendLowestLevelSpellSlot(feat.actor!);
+};
+
 const workflow: MidiMacroFunction = async ({
   trigger: { entity },
   workflow,
@@ -132,7 +157,7 @@ const workflow: MidiMacroFunction = async ({
   const res1 = await pre(feat);
   if (!res1) return;
   await applyEffects(feat, workflow);
-  if (res1.spendSpellSlot) await spendLowestLevelSpellSlot(feat.actor);
+  if (res1.spendExternalUse) await post(feat);
 };
 
 const macro: CPRMacro = {
