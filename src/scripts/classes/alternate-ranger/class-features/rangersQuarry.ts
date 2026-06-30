@@ -80,7 +80,7 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
     {
       key: 'flags.automated-conditions-5e.grants.damage.bonus',
       mode: 0,
-      value: `bonus=1${quarryDie}${alterDamageType}; tokenId === effectOriginTokenId;`,
+      value: `bonus=1${quarryDie}${alterDamageType}; hasAttack && tokenId === effectOriginTokenId;`,
       priority: 20,
     },
     {
@@ -90,6 +90,18 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
       priority: 20,
     },
   ];
+  // Some subclass features add extra damage to Ranger's Quarry
+  const ruthlessFocus = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eRuthlessFocus',
+  );
+  if (ruthlessFocus)
+    targetChanges.push({
+      key: 'flags.automated-conditions-5e.grants.damage.bonus',
+      mode: 0,
+      value: `bonus=max(1,rollingActor.abilities.wis.mod); hasAttack && tokenId === effectOriginTokenId;`,
+      priority: 20,
+    });
   // Slayer II knack extends duration indefinitely
   const slayerII = itemUtils.getItemByIdentifier(feat.actor!, 'ac55eSlayerII');
   const duration: EffectDuration = slayerII ? {} : { seconds: 3600 };
@@ -97,7 +109,10 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
   if (itemUtils.getItemByIdentifier(feat.actor!, 'ac55eRelentlessHunter'))
     targetMacros.push({
       type: 'midi.actor',
-      macros: ['ac55eRelentlessHunterApply'],
+      macros: [
+        'ac55eRelentlessHunterApply',
+        'ac55eRuthlessFocusHordeBreakerBonus',
+      ],
     });
   await applySourceTargetInterdependentEffects({
     feat,
