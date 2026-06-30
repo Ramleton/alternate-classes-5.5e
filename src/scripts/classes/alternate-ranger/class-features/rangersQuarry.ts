@@ -73,11 +73,14 @@ const applyEffects = async (feat: Item<'feat'>, workflow: Workflow) => {
     feat.actor!,
     'ac55eBeguilingStrikes',
   );
+  // Some subclass features change the damage type of Ranger's Quarry
+  let alterDamageType = '';
+  if (beguilingStrikes) alterDamageType = '[psychic]';
   const targetChanges: EffectChange[] = [
     {
       key: 'flags.automated-conditions-5e.grants.damage.bonus',
       mode: 0,
-      value: `bonus=1${quarryDie}${beguilingStrikes ? '[psychic]' : ''}; tokenId === effectOriginTokenId;`,
+      value: `bonus=1${quarryDie}${alterDamageType}; tokenId === effectOriginTokenId;`,
       priority: 20,
     },
     {
