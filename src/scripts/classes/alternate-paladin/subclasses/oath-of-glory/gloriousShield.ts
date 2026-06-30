@@ -1,8 +1,8 @@
 import acBoostMacroFactory, {
   ACBoostCallback,
-  PreACBoostCallback,
   preACBoost,
-} from 'automation/ACBoostMacroFactory.js';
+  PreACBoostCallback,
+} from 'automation/acBoostMacroFactory.js';
 import { getDivineFervorUses } from '../../utils/utils.js';
 import { isTargetWithinAuraOfProtection } from '../utils/utils.js';
 

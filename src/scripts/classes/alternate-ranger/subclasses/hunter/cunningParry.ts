@@ -4,7 +4,7 @@ import acBoostMacroFactory, {
   DuringACBoostCallback,
   preACBoost,
   PreACBoostCallback,
-} from 'automation/ACBoostMacroFactory.js';
+} from 'automation/acBoostMacroFactory.js';
 import { getValidWeapons } from 'automation/weaponUtils.js';
 import { isQuarry } from '../../utils/quarryUtils.js';
 
