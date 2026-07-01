@@ -1,9 +1,10 @@
-export type SpellLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+export const SpellLevels = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+export type SpellLevel = (typeof SpellLevels)[number];
 export type SpellType = 'ac55eSpell';
 
 export type CombinedKeys = `${SpellType}${SpellLevel}`;
 
-const MODULE_ID = 'alternate-classes-55e' as const;
+const MODULE_ID = 'alternate-classes-55e';
 const RECOVERY_TEMPLATE_PATH = `modules/${MODULE_ID}/assets/templates/spellRecovery.hbs`;
 
 interface SlotState {
@@ -176,11 +177,14 @@ const buildRecoveryDialogContent = async (
   slots: SlotState[],
   budget: number,
 ): Promise<string> => {
-  return renderTemplate(RECOVERY_TEMPLATE_PATH, {
-    slots,
-    budget,
-    pips: Array.from({ length: budget }),
-  });
+  return foundry.applications.handlebars.renderTemplate(
+    RECOVERY_TEMPLATE_PATH,
+    {
+      slots,
+      budget,
+      pips: Array.from({ length: budget }),
+    },
+  );
 };
 
 const attachRecoveryDialogListeners = (
@@ -196,7 +200,7 @@ const attachRecoveryDialogListeners = (
     const spent = getSpent();
     const remaining = budget - spent;
 
-    const budgetEl = html.querySelector<HTMLElement>('#nr-budget-remaining');
+    const budgetEl = html.querySelector<HTMLElement>('#sr-budget-remaining');
     if (budgetEl) {
       budgetEl.textContent = String(remaining);
       budgetEl.style.color =

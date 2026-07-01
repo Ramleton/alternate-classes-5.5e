@@ -1,18 +1,18 @@
-<div class='natural-recovery-dialog'>
+<div class='spell-recovery-dialog'>
   <div class='budget-display'>
     <span class='budget-label'>Levels Remaining</span>
-    <div class='budget-pip-row' id='nr-pips'>
+    <div class='budget-pip-row' id='sr-pips'>
       {{#each pips}}
         <div class='budget-pip'></div>
       {{/each}}
     </div>
     <span class='budget-remaining'>
-      <strong id='nr-budget-remaining'>{{budget}}</strong>
+      <strong id='sr-budget-remaining'>{{budget}}</strong>
       <span class='budget-of'>/ {{budget}}</span>
     </span>
   </div>
   <table>
-    <tbody id='nr-slot-rows'>
+    <tbody id='sr-slot-rows'>
       {{#each slots}}
         <tr data-level='{{this.level}}'>
           <td class='slot-label'>{{this.label}}</td>
