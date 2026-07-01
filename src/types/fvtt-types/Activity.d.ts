@@ -1,3 +1,5 @@
+import { SkillIdentifier } from 'types/skills.js';
+
 interface ActivityVisibility {
   level: { min?: number | null; max?: number | null };
   requireAttunement: boolean;
@@ -29,20 +31,20 @@ interface IgnoreTraits {
   idm: boolean;
 }
 
-type DamageType
-  = | 'bludgeoning'
-    | 'piercing'
-    | 'slashing'
-    | 'acid'
-    | 'fire'
-    | 'cold'
-    | 'force'
-    | 'lightning'
-    | 'poison'
-    | 'thunder'
-    | 'necrotic'
-    | 'psychic'
-    | 'radiant';
+type DamageType =
+  | 'bludgeoning'
+  | 'piercing'
+  | 'slashing'
+  | 'acid'
+  | 'fire'
+  | 'cold'
+  | 'force'
+  | 'lightning'
+  | 'poison'
+  | 'thunder'
+  | 'necrotic'
+  | 'psychic'
+  | 'radiant';
 
 interface DamagePart {
   custom: { enabled: boolean; formula: string };
@@ -197,11 +199,25 @@ export interface DamageActivity extends BaseActivity {
   };
 }
 
-type Activity
-  = | AttackActivity
-    | DamageActivity
-    | HealActivity
-    | UtilityActivity
-    | SaveActivity
-    | BaseActivity;
+export interface CheckActivity extends BaseActivity {
+  type: 'check';
+  check: {
+    ability: 'cha' | 'con' | 'dex' | 'int' | 'str' | 'wis';
+    associated: Set<SkillIdentifier>;
+    dc: {
+      calculation: string;
+      formula: string;
+      value: string | null;
+    };
+  };
+}
+
+type Activity =
+  | AttackActivity
+  | DamageActivity
+  | HealActivity
+  | UtilityActivity
+  | SaveActivity
+  | BaseActivity
+  | CheckActivity;
 export default Activity;

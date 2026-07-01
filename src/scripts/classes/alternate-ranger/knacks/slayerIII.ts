@@ -11,7 +11,7 @@ const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
     utils: { dialogUtils, socketUtils },
   } = chrisPremades;
   const target = workflow.hitTargets.first() as Token;
-  if (!isQuarry(feat, target)) return;
+  if (!isQuarry(feat.actor!, target.actor!)) return;
   const selection = await dialogUtils.confirmUseItem(feat, {
     userId: socketUtils.firstOwner(feat.actor, true),
   });

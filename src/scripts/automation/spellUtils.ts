@@ -100,3 +100,44 @@ export const spendLowestLevelSpellSlot = async (
   // Fallback in case state didn't match hasSpellSlots
   return null;
 };
+
+export const promptSpellSlotChoice = async (
+  actor: Actor5e,
+): Promise<SpellLevel | null> => {
+  const {
+    utils: { dialogUtils, socketUtils },
+  } = chrisPremades;
+
+  const spellData = getSpellData(actor);
+
+  if (!spellData.hasSpellSlots) return null;
+
+  const levels: SpellLevel[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  const availableLevels = levels.filter((level) => {
+    const slotData = spellData[`ac55eSpell${level}` as CombinedKeys];
+    return slotData && slotData.value > 0;
+  });
+
+  if (availableLevels.length === 0) return null;
+
+  const buttons = availableLevels.map((level) => {
+    const slotData = spellData[`ac55eSpell${level}` as CombinedKeys];
+    return [slotData.label + ` (${slotData.value}/${slotData.max})`, level] as [
+      string,
+      SpellLevel,
+    ];
+  });
+
+  const chosenLevel = (await dialogUtils.buttonDialog(
+    'Spend Spell Slot',
+    'Choose a spell slot level to spend:',
+    buttons,
+    { userId: socketUtils.firstOwner(actor, true) },
+  )) as SpellLevel | null;
+
+  if (!chosenLevel) return null;
+
+  await spendSpellSlot(actor, 'ac55eSpell', chosenLevel);
+  return chosenLevel;
+};

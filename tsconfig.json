@@ -2,10 +2,7 @@
   "compilerOptions": {
     "target": "es2025",
     "module": "es2022",
-    "lib": [
-      "DOM",
-      "ESNext"
-    ],
+    "lib": ["DOM", "ESNext"],
     "allowJs": true,
     "checkJs": false,
     "useDefineForClassFields": true,
@@ -28,47 +25,26 @@
     "noImplicitOverride": false,
     "moduleResolution": "bundler",
     "paths": {
-      "@midi-qol/types/*": [
-        "./subrepos/midi-qol/types/*"
-      ],
-      "@midi-qol/types/module/*": [
-        "./subrepos/midi-qol/types/module/*"
-      ],
-      "fvtt-types/*": [
-        "./src/types/fvtt-types/*"
-      ],
-      "chris-premades/*": [
-        "./src/types/chris-premades/*"
-      ],
-      "exploits/*": [
-        "./src/scripts/exploits/*"
-      ],
-      "martialArts/*": [
-        "./src/scripts/martialArts/*"
-      ],
-      "automation/*": [
-        "./src/scripts/automation/*"
-      ],
-      "types/*": [
-        "./src/types/*"
-      ]
+      "@midi-qol/types/*": ["./subrepos/midi-qol/types/*"],
+      "@midi-qol/types/module/*": ["./subrepos/midi-qol/types/module/*"],
+      "fvtt-types/*": ["./src/types/fvtt-types/*"],
+      "chris-premades/*": ["./src/types/chris-premades/*"],
+      "exploits/*": ["./src/scripts/exploits/*"],
+      "martialArts/*": ["./src/scripts/martialArts/*"],
+      "automation/*": ["./src/scripts/automation/*"],
+      "types/*": ["./src/types/*"]
     },
-    "types": [
-      "@ethaks/fvtt-quench",
-      "fvtt-types",
-    ],
+    "types": ["@ethaks/fvtt-quench", "fvtt-types"],
     "esModuleInterop": true,
     "newLine": "lf",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src",
-    "src/types/chris-premades.d.ts"
+    "src/**/*",
+    "scripts/**/*",
+    "src/types/chris-premades.d.ts",
+    "scripts/generateMacroIndex.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "subrepos/*"
-  ],
+  "exclude": ["node_modules", "dist", "subrepos/*"]
 }
