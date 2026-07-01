@@ -31,17 +31,6 @@ export const syncToFoundry = (foundryPath) => {
       server.watcher.on('add', copy);
     },
     async closeBundle() {
-      await fsp.copyFile(
-        path.resolve('module.json'),
-        path.join('dist', 'module.json'),
-      );
-      if (foundryPath) {
-        await fsp.copyFile(
-          path.resolve('module.json'),
-          path.join(foundryPath, 'module.json'),
-        );
-      }
-      console.log('[foundry-sync] module.json synced.');
       for (const { src, dest, ext } of pairs) {
         if (!fs.existsSync(src)) continue;
         const files = await fsp.readdir(src, { recursive: true });
@@ -61,6 +50,31 @@ export const syncToFoundry = (foundryPath) => {
         }
       }
       console.log('[foundry-sync] Templates and styles synced.');
+      const moduleJsonPath = path.resolve('module.json');
+      const moduleJson = JSON.parse(
+        await fsp.readFile(moduleJsonPath, 'utf-8'),
+      );
+
+      // Discover all copied CSS files and inject into styles array
+      const styleFiles = (await fsp.readdir('src/styles'))
+        .filter((f) => f.endsWith('.css'))
+        .map((f) => `assets/styles/${f}`);
+      moduleJson.styles = styleFiles;
+
+      const moduleJsonOut = JSON.stringify(moduleJson, null, 2);
+
+      // Write to dist/ only — never mutate the source file
+      await fsp.writeFile(path.join('dist', 'module.json'), moduleJsonOut);
+
+      // Sync to Foundry folder if set
+      if (foundryPath) {
+        await fsp.writeFile(
+          path.join(foundryPath, 'module.json'),
+          moduleJsonOut,
+        );
+      }
+
+      console.log('[foundry-sync] module.json synced with styles:', styleFiles);
     },
   };
 };
