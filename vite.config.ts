@@ -1,4 +1,5 @@
 import { defineConfig, loadEnv } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 import { syncToFoundry } from './syncToFoundry.js';
 
 export default defineConfig(({ mode }) => {
@@ -6,13 +7,12 @@ export default defineConfig(({ mode }) => {
   const foundryPath = env.FOUNDRY_MODULE_PATH;
 
   return {
-    plugins: [syncToFoundry(foundryPath)],
+    plugins: [tsconfigPaths(), syncToFoundry(foundryPath)],
     build: {
       outDir: foundryPath,
       emptyOutDir: false,
-      // Use rollupOptions to control exactly how files are named
       rollupOptions: {
-        input: 'src/script.ts', // Use your actual entry file
+        input: 'src/script.ts',
         output: {
           format: 'es',
           entryFileNames: '[name].js',
