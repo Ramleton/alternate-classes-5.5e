@@ -1,0 +1,45 @@
+<div class='spell-recovery-dialog'>
+  <div class='budget-display'>
+    <span class='budget-label'>Levels Remaining</span>
+    <div class='budget-pip-row' id='sr-pips'>
+      {{#each pips}}
+        <div class='budget-pip'></div>
+      {{/each}}
+    </div>
+    <span class='budget-remaining'>
+      <strong id='sr-budget-remaining'>{{budget}}</strong>
+      <span class='budget-of'>/ {{budget}}</span>
+    </span>
+  </div>
+  <table>
+    <tbody id='sr-slot-rows'>
+      {{#each slots}}
+        <tr data-level='{{this.level}}'>
+          <td class='slot-label'>{{this.label}}</td>
+          <td class='slot-current'>
+            <span class='current-val'>{{this.current}}</span>
+            <span class='current-sep'>/</span>
+            <span class='current-max'>{{this.max}}</span>
+          </td>
+          <td class='slot-controls'>
+            <button
+              type='button'
+              class='slot-decrement'
+              data-level='{{this.level}}'
+              disabled
+            >−</button>
+            <span
+              class='slot-recovering'
+              id='recovering-{{this.level}}'
+            >0</span>
+            <button
+              type='button'
+              class='slot-increment'
+              data-level='{{this.level}}'
+            >+</button>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
