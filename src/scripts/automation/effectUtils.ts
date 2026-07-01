@@ -1,4 +1,3 @@
-import CPRMacro from 'chris-premades/macro.js';
 import {
   EffectChange,
   EffectData,
@@ -77,10 +76,10 @@ interface SourceTargetInterdependentEffectData {
   duration?: EffectDuration;
   sourceChanges?: EffectChange[];
   sourceStatuses?: Status[];
-  sourceMacros?: CPRMacro[];
+  sourceMacros?: { type: string; macros: string[] }[];
   targetChanges?: EffectChange[];
   targetStatuses?: Status[];
-  targetMacros?: CPRMacro[];
+  targetMacros?: { type: string; macros: string[] }[];
   concentration?: boolean;
 }
 

@@ -16,7 +16,7 @@ const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
   if (!workflow.hitTargets.size) return;
   const target = workflow.hitTargets.first() as Token;
   // Only apply if the target is the actor's quarry
-  if (!isQuarry(feat, target)) return;
+  if (!isQuarry(feat.actor!, target.actor!)) return;
   const selection = await dialogUtils.confirm(
     feat.name,
     `End your mark to deal the maximum possible damage to ${target.name}?`,

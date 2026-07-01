@@ -11,16 +11,16 @@ export default interface CauldronOfPlentifulResources {
   utils: {
     activityUtils: {
       /**
-         * Retrieves an activity instance from an Item using its unique chris-premades string identifier.
-         * @param item The Foundry VTT Item instance containing the activities.
-         * @param identifier The unique custom identifier string assigned to the activity.
-         * @param options Configuration options.
-         * @param options.strict If true, throws an internal error if the activity cannot be located.
-         */
+       * Retrieves an activity instance from an Item using its unique chris-premades string identifier.
+       * @param item The Foundry VTT Item instance containing the activities.
+       * @param identifier The unique custom identifier string assigned to the activity.
+       * @param options Configuration options.
+       * @param options.strict If true, throws an internal error if the activity cannot be located.
+       */
       getActivityByIdentifier(
         item: Item,
         identifier: string,
-        options?: { strict?: boolean }
+        options?: { strict?: boolean },
       ): any | null;
 
       getIdentifier(activity: object): string | null;
@@ -31,7 +31,7 @@ export default interface CauldronOfPlentifulResources {
         activity: object,
         formulaOrObj: string | DamageFormulaObject,
         types?: string[],
-        options?: { specificIndex?: 0 }
+        options?: { specificIndex?: 0 },
       ): Item;
 
       duplicateActivity(activity: object): Item;
@@ -56,16 +56,10 @@ export default interface CauldronOfPlentifulResources {
     actorUtils: {
       getEffects(
         actor: Actor,
-        options?: { includeItemEffects?: boolean }
+        options?: { includeItemEffects?: boolean },
       ): ActiveEffect[];
-      addFavorites(
-        actor: Actor,
-        entities: any[]
-      ): Promise<void>;
-      removeFavorites(
-        actor: Actor,
-        entities: any[]
-      ): Promise<void>;
+      addFavorites(actor: Actor, entities: any[]): Promise<void>;
+      removeFavorites(actor: Actor, entities: any[]): Promise<void>;
       getTokens(actor: Actor): Token[];
       getFirstToken(actor: Actor5e): Token;
       getLevelOrCR(actor: Actor): number;
@@ -77,7 +71,7 @@ export default interface CauldronOfPlentifulResources {
       getSidebarActor(actor: Actor, options?: { autoImport?: boolean }): Actor;
       getSize<B extends boolean>(
         actor: Actor5e,
-        returnString: B
+        returnString: B,
       ): B extends true ? string : number;
       hasUsedReaction(actor: Actor5e): boolean;
       setReactionUsed(actor: Actor5e): Promise<void>;
@@ -93,7 +87,7 @@ export default interface CauldronOfPlentifulResources {
         origActor: Actor5e,
         newActor: Actor5e,
         options: object,
-        renderSheet?: boolean
+        renderSheet?: boolean,
       ): Promise<void>;
       updateAll(actor: Actor5e): Promise<string>;
       getEquivalentSpellSlotName(
@@ -101,7 +95,7 @@ export default interface CauldronOfPlentifulResources {
         level: number,
         options?: {
           canCast?: boolean;
-        }
+        },
       );
       getEquippedArmor(actor: Actor5e, types?: string[]): Item?;
       getEquippedShield(actor: Actor5e): Item?;
@@ -109,7 +103,7 @@ export default interface CauldronOfPlentifulResources {
       hasConditionBy(
         sourceActor: Actor5e,
         targetActor: Actor5e,
-        statusId: string
+        statusId: string,
       ): Promise<boolean>;
       compareSize(
         source: Actor5e | Token,
@@ -125,7 +119,7 @@ export default interface CauldronOfPlentifulResources {
           | 'lessThan'
           | '<'
           | 'lessThanOrEqualTo'
-          | '<='
+          | '<=',
       ): boolean;
       getBestAbility(actor: Actor, abilities: string[]): string;
       giveHeroicInspiration(actor: Actor): Promise<void>;
@@ -212,25 +206,10 @@ export default interface CauldronOfPlentifulResources {
         'formOfTheBeast',
         'pugilistUnarmedStrike',
       ];
-      weaponTypes: [
-        'martialM',
-        'simpleM',
-        'martialR',
-        'simpleR',
-      ];
-      meleeWeaponTypes: [
-        'martialM',
-        'simpleM',
-      ];
-      rangedWeaponTypes: [
-        'martialR',
-        'simpleR',
-      ];
-      armorTypes: [
-        'light',
-        'medium',
-        'heavy',
-      ];
+      weaponTypes: ['martialM', 'simpleM', 'martialR', 'simpleR'];
+      meleeWeaponTypes: ['martialM', 'simpleM'];
+      rangedWeaponTypes: ['martialR', 'simpleR'];
+      armorTypes: ['light', 'medium', 'heavy'];
       autoOptions: () => { label: string; value: string }[];
       damageTypeOptions: () => { label: string; value: string }[];
       creatureTypeOptions: () => { label: string; value: string }[];
@@ -264,7 +243,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           ignoreCrit?: boolean;
           damageType?: DamageType;
-        }
+        },
       ): Promise<void>;
 
       bonusAttack(workflow: Workflow, formula: string): Promise<void>;
@@ -275,26 +254,26 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           ignoreCrit?: boolean;
           damageType?: DamageType;
-        }
+        },
       ): Promise<void>;
 
       applyDamage(
         tokens: Token[],
         value: number,
-        damageType: DAMAGE_TYPE
+        damageType: DAMAGE_TYPE,
       ): Promise<void>;
 
       completeActivityUse(
         activity: object,
         config?: object,
         dialog?: object,
-        message?: object
+        message?: object,
       ): Promise<Workflow>;
 
       completeItemUse(
         item: Item,
         config?: object,
-        options?: object
+        options?: object,
       ): Promise<Workflow>;
 
       syntheticActivityRoll(
@@ -310,7 +289,7 @@ export default interface CauldronOfPlentifulResources {
           spellSlot?: boolean;
           dialog?: object;
           message?: object;
-        }
+        },
       ): Promise<Workflow>;
 
       syntheticItemRoll(
@@ -319,11 +298,11 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           options?: object;
           config?: object;
-          userId: string;
+          userId?: string;
           consumeUsage?: boolean;
           consumeResources?: boolean;
           spellSlot?: boolean;
-        }
+        },
       ): Promise<Workflow>;
 
       syntheticItemDataRoll(
@@ -334,7 +313,7 @@ export default interface CauldronOfPlentifulResources {
           options?: object;
           config?: object;
           killAnim?: boolean;
-        }
+        },
       ): Promise<Workflow>;
 
       syntheticActivityDataRoll(
@@ -348,7 +327,7 @@ export default interface CauldronOfPlentifulResources {
           atLevel?: number;
           consumeUsage?: boolean;
           consumeResources?: boolean;
-        }
+        },
       ): Promise<Workflow>;
 
       negateDamageItemDamage(ditem: object): void;
@@ -356,7 +335,7 @@ export default interface CauldronOfPlentifulResources {
       setDamageItemDamage(
         ditem: object,
         damageAmount: number,
-        adjustRaw?: boolean
+        adjustRaw?: boolean,
       ): void;
 
       preventDeath(ditem: object): void;
@@ -367,7 +346,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           type?: string;
           multiplier?: number;
-        }
+        },
       ): void;
 
       applyWorkflowDamage(
@@ -379,17 +358,15 @@ export default interface CauldronOfPlentifulResources {
           flavor?: string;
           itemCardId?: string;
           sourceItem?: Item;
-        }
+        },
       ): Workflow;
 
-      getDamageTypes(
-        damageRolls: object[]
-      ): Set<string>;
+      getDamageTypes(damageRolls: object[]): Set<string>;
 
       getTotalDamageOfType(
         damageDetail: object,
         actor: Actor5e,
-        type: string
+        type: string,
       ): number;
 
       handleInstantTemplate(workflow: Workflow): Promise<void>;
@@ -411,19 +388,19 @@ export default interface CauldronOfPlentifulResources {
           spellSlot?: boolean;
           dialog?: object;
           message?: object;
-        }
+        },
       ): Promise<Workflow>;
 
       updateTargets(
         workflow: Workflow,
         targets: Token[],
-        options?: { userId?: string }
+        options?: { userId?: string },
       ): Promise<void>;
 
       removeTargets(
         workflow: Workflow,
         targets: Token[],
-        options?: { userId: string }
+        options?: { userId: string },
       ): Promise<void>;
 
       getActionType(workflow: Workflow): string;
@@ -436,34 +413,27 @@ export default interface CauldronOfPlentifulResources {
           | 'weaponAttack'
           | 'spellAttack'
           | 'rangedWeaponAttack'
-          | 'meleeWeaponAttack'
+          | 'meleeWeaponAttack',
       ): boolean;
 
       swapAttackAbility(
         workflow: Workflow,
-        ability?:
-          | 'str'
-          | 'dex'
-          | 'con'
-          | 'int'
-          | 'wis'
-          | 'cha',
+        ability?: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha',
         options?: {
           validTypes?: string[];
           checkHigher?: boolean;
-        }
+        },
       ): Promise<void>;
 
       addEntityRemoval(
         workflow: unknown,
-        entities: ActiveEffect[]
+        entities: ActiveEffect[],
       ): Promise<void>;
 
       isSustainedRoll(workflow: Workflow): boolean;
     };
 
     effectUtils: {
-
       getCastData(effect: ActiveEffect): object;
 
       getCastLevel(effect: ActiveEffect): number | undefined;
@@ -507,59 +477,49 @@ export default interface CauldronOfPlentifulResources {
           animationFadeIn?: number;
           animationFadeOut?: number;
           animationSound?: string;
-        }
+        },
       ): Promise<ActiveEffect>;
 
       createEffects(
         entity: Actor,
         effectDataArray: object[],
-        effectOptionsArray: object[]
+        effectOptionsArray: object[],
       ): Promise<ActiveEffect[]>;
 
       addDependent(
         entity: object,
         dependents: object[],
-        forceGM?: boolean
+        forceGM?: boolean,
       ): Promise<void>;
 
-      addMacro(
-        effectData: object,
-        type: string,
-        macroList: object
-      ): void;
+      addMacro(effectData: object, type: string, macroList: object): void;
 
       getConcentrationEffect(
         actor: Actor,
-        concentrationItem: Item
+        concentrationItem: Item,
       ): ActiveEffect;
 
       getEffectByIdentifier(
         actor: Actor5e,
-        name: string
+        name: string,
       ): ActiveEffect | undefined;
 
       getAllEffectsByIdentifier(
         actor: Actor,
-        name: string
+        name: string,
       ): (ActiveEffect | undefined)[];
 
-      getEffectByStatusID(
-        actor: Actor,
-        statusID: string
-      ): ActiveEffect;
+      getEffectByStatusID(actor: Actor, statusID: string): ActiveEffect;
 
       applyConditions(
         actor: Actor,
         conditions: string[],
         options?: {
           overlay?: boolean;
-        }
+        },
       ): Promise<void>;
 
-      sidebarEffectHelper(
-        documentId: string,
-        toggle: boolean
-      ): Promise<void>;
+      sidebarEffectHelper(documentId: string, toggle: boolean): Promise<void>;
 
       toggleSidebarEffect(documentId: string): Promise<void>;
 
@@ -587,12 +547,12 @@ export default interface CauldronOfPlentifulResources {
           tokenImgPriority?: number;
           avatarImgPriority?: number;
           keepId?: boolean;
-        }
+        },
       ): Promise<ActiveEffect>;
 
       syntheticActiveEffect(
         effectData: object,
-        entity: object
+        entity: object,
       ): Promise<ActiveEffect>;
 
       getOriginItem(effect: MidiActiveEffect): Promise<Item>;
@@ -609,11 +569,11 @@ export default interface CauldronOfPlentifulResources {
         buttons: [
           string,
           T,
-            options?: { image?: string; displayAsRows?: boolean },
+          options?: { image?: string; displayAsRows?: boolean },
         ][],
         options?: {
           userId?: string;
-        }
+        },
       ): Promise<T>;
 
       numberDialog(
@@ -627,7 +587,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           buttons?: string;
           userId?: string;
-        }
+        },
       ): Promise<object>;
 
       selectDialog(
@@ -641,7 +601,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           buttons?: string;
           userId?: string;
-        }
+        },
       ): Promise<object>;
 
       selectTargetDialog(
@@ -660,8 +620,8 @@ export default interface CauldronOfPlentifulResources {
           userId?: string;
           buttons?: string;
           maxes?: any;
-        }
-      ): Promise<false | [any, boolean] | any>;
+        },
+      ): Promise<false | [Token[], boolean] | [Token, boolean] | Token>;
 
       confirm(
         title: string,
@@ -669,7 +629,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           userId?: string;
           buttons?: string;
-        }
+        },
       ): Promise<boolean>;
 
       confirmUseItem(
@@ -677,7 +637,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           userId?: string;
           buttons?: string;
-        }
+        },
       ): Promise<boolean>;
 
       selectDocumentDialog(
@@ -694,7 +654,7 @@ export default interface CauldronOfPlentifulResources {
           showSpellLevel?: boolean;
           showUses?: boolean;
           displayReference?: boolean;
-        }
+        },
       ): Promise<object>;
 
       selectDocumentsDialog(
@@ -713,7 +673,7 @@ export default interface CauldronOfPlentifulResources {
           checkbox?: boolean;
           weights?: any;
           maxes?: any;
-        }
+        },
       ): Promise<object[]>;
 
       selectHitDie(
@@ -724,7 +684,7 @@ export default interface CauldronOfPlentifulResources {
           max?: number;
           userId?: string;
           sangromancy?: boolean;
-        }
+        },
       ): Promise<false | object[]>;
 
       selectSpellSlot(
@@ -736,7 +696,7 @@ export default interface CauldronOfPlentifulResources {
           minLevel?: number;
           no?: boolean;
           userId?: string;
-        }
+        },
       ): Promise<object>;
 
       selectDamageType(
@@ -746,7 +706,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           addNo?: boolean;
           userId?: string;
-        }
+        },
       ): Promise<string>;
 
       queuedConfirmDialog(
@@ -756,7 +716,7 @@ export default interface CauldronOfPlentifulResources {
           actor?: Actor;
           reason?: string;
           userId?: string;
-        }
+        },
       ): Promise<object>;
 
       selectDie(
@@ -767,7 +727,7 @@ export default interface CauldronOfPlentifulResources {
           max?: number;
           userId?: string;
           buttons?: string;
-        }
+        },
       ): Promise<object>;
     };
 
@@ -784,7 +744,7 @@ export default interface CauldronOfPlentifulResources {
         entity: object,
         updates: object,
         options?: object,
-        forceGM?: boolean
+        forceGM?: boolean,
       ): Promise<void>;
       setFlag(
         entity: object,
@@ -801,12 +761,8 @@ export default interface CauldronOfPlentifulResources {
       isNewerVersion(v1: string, v0: string): boolean;
       randomID(value: any): string;
       checkMedkitPermission(
-        permission:
-          | 'update'
-          | 'automate'
-          | 'configure'
-          | 'homebrew',
-        userId: string
+        permission: 'update' | 'automate' | 'configure' | 'homebrew',
+        userId: string,
       ): boolean | undefined;
       notify(
         message: string,
@@ -814,24 +770,24 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           localize?: boolean;
           permanent?: boolean;
-        }
+        },
       ): void;
       createEmbeddedDocuments(
         entity: object,
         type: string,
         updates: object,
-        options: object
+        options: object,
       ): Promise<object>;
       updateEmbeddedDocuments(
         entity: object,
         type: string,
         updates: object,
-        options: object
+        options: object,
       ): Promise<object>;
       deleteEmbeddedDocuments(
         entity: object,
         type: string,
-        options: object
+        options: object,
       ): Promise<object>;
       updateTargets(targets: Token[], user: any): Promise<void>;
       collapseObjects(...objects: object[]): object;
@@ -843,11 +799,11 @@ export default interface CauldronOfPlentifulResources {
       getRules(entity: object): 'modern' | 'legacy' | string;
       getCPRIdentifier(
         name: string,
-        rules?: 'modern' | 'legacy' | string
+        rules?: 'modern' | 'legacy' | string,
       ): string;
       getCPRIdentifiers(
         name: string,
-        rules?: 'modern' | 'legacy' | string
+        rules?: 'modern' | 'legacy' | string,
       ): string[];
       convertDistance(ft: number): number;
     };
@@ -861,7 +817,7 @@ export default interface CauldronOfPlentifulResources {
         item: Item.Implementation,
         config: object,
         options: object,
-        userId: string
+        userId: string,
       ): Promise<void>;
     };
 
@@ -876,7 +832,7 @@ export default interface CauldronOfPlentifulResources {
           parentEntity?: object;
           identifier?: string;
           castData?: object;
-        }
+        },
       );
       getItemDescription(name: string): string;
       isSpellFeature(item: Item.Implementation): boolean;
@@ -884,22 +840,22 @@ export default interface CauldronOfPlentifulResources {
       setConfig(
         item: Item.Implementation,
         key: string,
-        value: any
+        value: any,
       ): Promise<void>;
       getItemByIdentifier<T extends Item.SubType>(
         actor: Actor.Implementation,
-        identifier: string
+        identifier: string,
       ): Item.OfType<T> | undefined;
       getAllItemsByIdentifier(
         actor: Actor.Implementation,
-        identifier: string
+        identifier: string,
       ): Item.Implementation[];
       getVersion(item: Item.Implementation): string | undefined;
       getSource(item: Item.Implementation): string | undefined;
       isUpToDate(item: Item.Implementation): Promise<boolean>;
       syntheticItem(
         itemData: Item,
-        actor: Actor.Implementation
+        actor: Actor.Implementation,
       ): Item.Implementation;
       enchantItem(
         item: Item.Implementation,
@@ -913,13 +869,13 @@ export default interface CauldronOfPlentifulResources {
           vae?: boolean;
           interdependent?: boolean;
           strictlyInterdependent?: boolean;
-        }
+        },
       );
       convertDuration(entity: any): any;
       getEquipmentState(item: Item.Implementation): boolean;
       getToolProficiency(
         actor: Actor.Implementation,
-        tool: Item.Implementation
+        tool: Item.Implementation,
       ): 0 | 0.5 | 1 | 2;
       getSavedCastData(item: Item.Implementation): any;
       getGenericFeatureConfig(item: Item.Implementation, key: string): any;
@@ -929,12 +885,12 @@ export default interface CauldronOfPlentifulResources {
       setHiddenActivities(
         item: Item.Implementation,
         activityIdentifiers: string[],
-        replace?: boolean
+        replace?: boolean,
       ): Promise<void>;
       setSpellActivities(
         item: Item.Implementation,
         activityIdentifiers: string[],
-        replace?: boolean
+        replace?: boolean,
       ): Promise<void>;
       getHiddenActivities(item: Item.Implementation): string[];
       getSpellActivities(item: Item.Implementation): string[];
@@ -945,17 +901,17 @@ export default interface CauldronOfPlentifulResources {
         updates?: object,
         options?: {
           keepId?: boolean;
-        }
+        },
       ): Item.Implementation;
       correctActivityItemConsumption(
         item: Item.Implementation,
         activityIdentifiers: string[],
-        targetIdentifier: string
+        targetIdentifier: string,
       ): Promise<void>;
       multiCorrectActivityItemConsumption(
         item: Item.Implementation,
         activityIdentifiers: string[],
-        corrections: object
+        corrections: object,
       ): Promise<void>;
       fixScales(item: Item.Implementation): Promise<void>;
       canUse(item: Item.Implementation): boolean;
@@ -968,18 +924,18 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           wallsBlock?: boolean;
           checkCover?: boolean;
-        }
+        },
       ): number;
       checkCollision(token: Token, ray: foundry.canvas.geometry.Ray): boolean;
       moveTokenAlongRay(
         targetToken: Token,
         origRay: foundry.canvas.geometry.Ray,
-        distance: number
+        distance: number,
       ): Promise<void>;
       pushToken(
         sourceToken: Token,
         targetToken: Token,
-        distance: number
+        distance: number,
       ): Promise<void>;
       findNearby(
         token: Token,
@@ -988,7 +944,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           includeIncapacitated?: boolean;
           includeToken?: boolean;
-        }
+        },
       ): Token[];
       checkIncapacitated(token: Token, logResult?: boolean): boolean;
       checkForRoom(token: Token, gridSquares: number): object;
@@ -997,11 +953,11 @@ export default interface CauldronOfPlentifulResources {
       canSense(
         sourceToken: Token,
         targetToken: Token,
-        senseModes: string[]
+        senseModes: string[],
       ): boolean;
       attachToToken(token: Token, uuidsToAttach: string[]): Promise<void>;
       detachFromToken(token: Token, uuidsToDetatch: string[]): Promise<void>;
-      getLightLevel(token: Token): string;
+      getLightLevel(token: Token): 'bright' | 'dim' | 'dark';
       grappleHelper(
         sourceToken: Token,
         targetToken: Token,
@@ -1014,13 +970,13 @@ export default interface CauldronOfPlentifulResources {
           targetEffect: ActiveEffect;
           restrained?: boolean;
           ignoreSizeLimit?: boolean;
-        }
+        },
       );
       isGrappledBy(target: Token, source: Token): boolean;
       getMovementHitTokens(
         startPoint: { x: number; y: number },
         endPoint: { x: number; y: number },
-        radius: number
+        radius: number,
       );
       getLinearDistanceMoved(token: Token): number;
       mountToken(
@@ -1029,7 +985,7 @@ export default interface CauldronOfPlentifulResources {
         options?: {
           vae?: boolean;
           unhideActivities?: boolean;
-        }
+        },
       );
       getBaseActor(token: Token): Actor;
     };
@@ -1059,7 +1015,7 @@ export default interface CauldronOfPlentifulResources {
         token: Token,
         request: string,
         ability: string,
-        options?: any
+        options?: any,
       ): Promise<any>;
       getChangedDamageRoll(origRoll, newType): Promise<any>;
       rollDice(
@@ -1070,7 +1026,7 @@ export default interface CauldronOfPlentifulResources {
           flavor?: any;
           mode?: 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll';
           options?: any;
-        }
+        },
       ): Promise<any>;
       rollDiceSync(
         formula: string,
@@ -1081,18 +1037,18 @@ export default interface CauldronOfPlentifulResources {
             maximize?: boolean;
             minimize?: boolean;
           };
-        }
+        },
       );
       damageRoll(
         formula: string,
         entity: any,
         options?: any,
-        evaluateOptions?: any
+        evaluateOptions?: any,
       ): Promise<any>;
       addToRoll(
         roll: D20Roll,
         formula: string,
-        options?: any
+        options?: { rollData?: D20Roll },
       ): Promise<D20Roll>;
       remoteRoll(roll: any, userId: any): Promise<any>;
       remoteDamageRolls(rolls: any, userId: any): Promise<any>;
@@ -1103,7 +1059,7 @@ export default interface CauldronOfPlentifulResources {
         roll: any,
         termIndex: number,
         resultIndex: number,
-        newValue: any
+        newValue: any,
       ): void;
     };
 
@@ -1115,7 +1071,7 @@ export default interface CauldronOfPlentifulResources {
         entity: any,
         name: string,
         ownTurnOnly: boolean,
-        tokenId: string
+        tokenId: string,
       ): boolean;
       setTurnCheck(entity: any, name: string, reset: boolean): Promise<void>;
       getCurrentCombatantToken(): Token;
@@ -1125,16 +1081,10 @@ export default interface CauldronOfPlentifulResources {
     actorUtils: {
       getEffects(
         actor: Actor,
-        options?: { includeItemEffects?: boolean }
+        options?: { includeItemEffects?: boolean },
       ): ActiveEffect[];
-      addFavorites(
-        actor: Actor,
-        entities: any[]
-      ): Promise<void>;
-      removeFavorites(
-        actor: Actor,
-        entities: any[]
-      ): Promise<void>;
+      addFavorites(actor: Actor, entities: any[]): Promise<void>;
+      removeFavorites(actor: Actor, entities: any[]): Promise<void>;
       getTokens(actor: Actor): Token[];
       getFirstToken(actor: Actor): Token;
       getLevelOrCR(actor: Actor): number;
@@ -1146,7 +1096,7 @@ export default interface CauldronOfPlentifulResources {
       getSidebarActor(actor: Actor, options?: { autoImport?: boolean }): Actor;
       getSize<B extends boolean>(
         actor: Actor,
-        returnString: B
+        returnString: B,
       ): B extends true ? string : number;
       hasUsedReaction(actor: Actor): boolean;
       setReactionUsed(actor: Actor): Promise<void>;
@@ -1162,7 +1112,7 @@ export default interface CauldronOfPlentifulResources {
         origActor: Actor,
         newActor: Actor,
         options: object,
-        renderSheet?: boolean
+        renderSheet?: boolean,
       ): Promise<void>;
       updateAll(actor: Actor): Promise<string>;
       getEquivalentSpellSlotName(
@@ -1170,7 +1120,7 @@ export default interface CauldronOfPlentifulResources {
         level: number,
         options?: {
           canCast?: boolean;
-        }
+        },
       );
       getEquippedArmor(actor: Actor, types?: string[]): Item?;
       getEquippedShield(actor: Actor): Item?;
@@ -1178,7 +1128,7 @@ export default interface CauldronOfPlentifulResources {
       hasConditionBy(
         sourceActor: Actor,
         targetActor: Actor,
-        statusId: string
+        statusId: string,
       ): Promise<boolean>;
       compareSize(
         source: Actor | Token,
@@ -1194,7 +1144,7 @@ export default interface CauldronOfPlentifulResources {
           | 'lessThan'
           | '<'
           | 'lessThanOrEqualTo'
-          | '<='
+          | '<=',
       ): boolean;
       getBestAbility(actor: Actor, abilities: string[]): string;
       giveHeroicInspiration(actor: Actor): Promise<void>;
@@ -1215,7 +1165,7 @@ export default interface CauldronOfPlentifulResources {
           dialogType?: 'use' | 'attackRoll';
           creatureTypes?: string[];
           isOwner?: boolean;
-        }
+        },
       );
       damaged(
         workflow: Workflow,
@@ -1233,7 +1183,7 @@ export default interface CauldronOfPlentifulResources {
           checkHits?: boolean;
           preventZeroHP?: boolean;
           halfDamage?: boolean;
-        }
+        },
       );
     };
 
@@ -1244,7 +1194,7 @@ export default interface CauldronOfPlentifulResources {
           identifier?: string;
           rules?: 'modern' | 'legacy';
           type?: 'character' | 'spell' | 'npc';
-        }
+        },
       );
       getGPSAutomation(
         item,
@@ -1252,7 +1202,7 @@ export default interface CauldronOfPlentifulResources {
           identifier?: string;
           rules?: 'modern' | 'legacy';
           type?: 'character' | 'spell' | 'npc';
-        }
+        },
       );
       getMISCAutomation(
         item,
@@ -1260,7 +1210,7 @@ export default interface CauldronOfPlentifulResources {
           identifier?: string;
           rules?: 'modern' | 'legacy';
           type?: 'character' | 'spell' | 'npc';
-        }
+        },
       );
 
       getACCAutomation(
@@ -1269,7 +1219,7 @@ export default interface CauldronOfPlentifulResources {
           identifier?: string;
           rules?: 'modern' | 'legacy';
           type?: 'character' | 'spell' | 'npc';
-        }
+        },
       );
       getAllAutomations(
         item,
@@ -1277,7 +1227,7 @@ export default interface CauldronOfPlentifulResources {
           identifier?: string;
           rules?: 'modern' | 'legacy';
           type?: 'character' | 'spell' | 'npc';
-        }
+        },
       );
       getPreferredAutomation(
         item,
@@ -1285,7 +1235,7 @@ export default interface CauldronOfPlentifulResources {
           identifier?: string;
           rules?: 'modern' | 'legacy';
           type?: 'character' | 'spell' | 'npc';
-        }
+        },
       );
       getItemFromCompendium(
         key: string,
@@ -1303,7 +1253,7 @@ export default interface CauldronOfPlentifulResources {
           rules?: 'modern' | 'legacy';
           byIdentifier?: boolean;
           bySystemIdentifier?: boolean;
-        }
+        },
       );
       getActorFromCompendium(
         key: string,
@@ -1314,7 +1264,7 @@ export default interface CauldronOfPlentifulResources {
           object?: boolean;
           translate?: boolean;
           identifier?: string;
-        }
+        },
       );
       getFilteredActorDocumentsFromCompendium(
         key: string,
@@ -1324,7 +1274,7 @@ export default interface CauldronOfPlentifulResources {
           creatureTypes: string[];
           creatureSubtypes: string[];
           specificNames: string[];
-        }
+        },
       );
       getFilteredItemDocumentsFromCompendium(
         key: string,
@@ -1333,7 +1283,7 @@ export default interface CauldronOfPlentifulResources {
           types: string[];
           typeValues: string[];
           badProperties: string[];
-        }
+        },
       );
       getAppliedOrPreferredAutomation(
         item,
@@ -1341,7 +1291,7 @@ export default interface CauldronOfPlentifulResources {
           identifier?: string;
           rules?: 'modern' | 'legacy';
           type?: 'character' | 'spell' | 'npc';
-        }
+        },
       );
     };
 
@@ -1353,7 +1303,7 @@ export default interface CauldronOfPlentifulResources {
       getTokensInShape(
         shape: any,
         scene: any,
-        { x: offsetX, y: offsetY }: { x: number; y: number }
+        { x: offsetX, y: offsetY }: { x: number; y: number },
       ): Token[];
       getTokensInTemplate(template): Set<Token>;
       getTemplatesInToken(token): Template[];
@@ -1369,21 +1319,22 @@ export default interface CauldronOfPlentifulResources {
       setSaveDC(template: Template, dc: number): Promise<void>;
       getName(template: Template): string;
       setName(template: Template, name: string): Promise<void>;
-      placeTemplate(templateData: any, returnTokens?: boolean):
-        | Template
-        | { template: Template; tokens: Token[] };
+      placeTemplate(
+        templateData: any,
+        returnTokens?: boolean,
+      ): Template | { template: Template; tokens: Token[] };
       rayIntersectsTemplate(templateDoc: any, ray: any): boolean;
       getIntersections(
         templateObj: any,
         A: any,
         B: any,
-        boolOnly?: boolean
+        boolOnly?: boolean,
       ): any;
       getSourceActor(template: Template): Promise<Actor | undefined>;
       overlap(template1: Template, template2: Template): boolean;
       attachToTemplate(
         template: Template,
-        uuidsToAttach: string[]
+        uuidsToAttach: string[],
       ): Promise<void>;
     };
   };
