@@ -4,6 +4,7 @@ import feyWanderer from './fey-wanderer/macros.js';
 import hunter from './hunter/macros.js';
 import monsterSlayer from './monster-slayer/macros.js';
 import planarWarden from './planar-warden/macros.js';
+import spellbreaker from './spellbreaker/macros.js';
 
 const macros: CPRMacro[] = [
   ...deepStalker,
@@ -11,6 +12,7 @@ const macros: CPRMacro[] = [
   ...hunter,
   ...monsterSlayer,
   ...planarWarden,
+  ...spellbreaker,
 ];
 
 export default macros;
