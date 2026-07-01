@@ -5,15 +5,13 @@ const pre = async (
   item: Item<'feat'>,
   workflow: Workflow,
 ): Promise<boolean> => {
-  if (!workflow.hitTargets.size)
-    return false;
-  if (!workflow.isCritical)
-    return false;
-  if (item.actor!.system.details.level < 15)
-    return false;
-  if (!item.system.uses?.value)
-    return false;
-  const { utils: { dialogUtils, socketUtils } } = chrisPremades;
+  if (!workflow.hitTargets.size) return false;
+  if (!workflow.isCritical) return false;
+  if (item.actor!.system.details.level < 15) return false;
+  if (!item.system.uses?.value) return false;
+  const {
+    utils: { dialogUtils, socketUtils },
+  } = chrisPremades;
   const selection = await dialogUtils.confirmUseItem(item, {
     userId: socketUtils.firstOwner(item.actor, true),
   });
@@ -21,16 +19,18 @@ const pre = async (
 };
 const during = async (workflow: Workflow) => {
   const newDamageRolls = workflow.damageRolls.map(
-    async roll => await Roll.create(roll.formula).evaluate({ maximize: true }),
+    async (roll) =>
+      await Roll.create(roll.formula).evaluate({ maximize: true }),
   );
   await workflow.setDamageRolls(await Promise.all(newDamageRolls));
 };
 const post = async (item: Item<'feat'>): Promise<void> => {
-  const { utils: { genericUtils } } = chrisPremades;
-  await genericUtils.update(
-    item,
-    { 'system.uses.spent': item.system.uses!.spent + 1 },
-  );
+  const {
+    utils: { genericUtils },
+  } = chrisPremades;
+  await genericUtils.update(item, {
+    'system.uses.spent': item.system.uses!.spent + 1,
+  });
 };
 
 const workflow: MidiMacroFunction = async ({
@@ -38,11 +38,9 @@ const workflow: MidiMacroFunction = async ({
   workflow,
 }): Promise<void> => {
   const feat = item as Item<'feat'>;
-  if (!feat.actor)
-    return;
+  if (!feat.actor) return;
   const res1 = await pre(feat, workflow);
-  if (!res1)
-    return;
+  if (!res1) return;
   await during(workflow);
   await post(feat);
 };

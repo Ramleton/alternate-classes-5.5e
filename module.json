@@ -5,6 +5,7 @@
   "manifest": "https://github.com/Ramleton/alternate-classes-55e/releases/latest/download/module.json",
   "download": "https://github.com/Ramleton/alternate-classes-55e/releases/download/1.5.0/module.zip",
   "esmodules": ["script.js"],
+  "styles": ["assets/styles/spellRecovery.css"],
   "compatibility": {
     "minimum": "13",
     "verified": "13"
