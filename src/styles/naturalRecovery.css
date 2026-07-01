@@ -1,0 +1,164 @@
+/* ── Wrapper ── */
+.natural-recovery-dialog {
+  padding: 12px 16px 8px;
+  font-family: var(--font-primary);
+  min-width: 340px;
+}
+
+/* ── Budget banner ── */
+.natural-recovery-dialog .budget-display {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  background: var(--color-bg-option);
+  border-radius: 6px;
+  border: 1px solid var(--color-border-light-primary);
+}
+.natural-recovery-dialog .budget-label {
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-dark-secondary);
+  white-space: nowrap;
+}
+.natural-recovery-dialog .budget-pip-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  flex: 1;
+}
+.natural-recovery-dialog .budget-pip {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid #888 !important;
+  background: transparent;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  flex-shrink: 0;
+}
+.natural-recovery-dialog .budget-pip.used {
+  background: #ccc !important;
+  border-color: #ccc !important;
+}
+.natural-recovery-dialog .budget-pip.over {
+  background: #e05252 !important;
+  border-color: #e05252 !important;
+}
+.natural-recovery-dialog .budget-remaining {
+  font-size: 0.9em;
+  white-space: nowrap;
+  color: var(--color-text-dark-secondary);
+}
+.natural-recovery-dialog .budget-remaining strong {
+  font-size: 1.15em;
+  font-weight: bold;
+  color: var(--color-text-dark-primary);
+}
+.natural-recovery-dialog .budget-of {
+  color: var(--color-text-dark-secondary);
+}
+
+/* ── Slot rows ── */
+.natural-recovery-dialog table {
+  width: 100%;
+  border-collapse: separate !important;
+  border-spacing: 0 6px !important;
+}
+.natural-recovery-dialog tr {
+  background: var(--color-bg-option);
+}
+.natural-recovery-dialog td {
+  padding: 8px 12px;
+  vertical-align: middle !important;
+  border: none !important;
+}
+.natural-recovery-dialog td:first-child {
+  border-radius: 5px 0 0 5px;
+}
+.natural-recovery-dialog td:last-child {
+  border-radius: 0 5px 5px 0;
+}
+.natural-recovery-dialog .slot-label {
+  font-weight: 600;
+  font-size: 0.95em;
+  width: 35%;
+  white-space: nowrap;
+}
+.natural-recovery-dialog .slot-current {
+  width: 20%;
+  text-align: center;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+.natural-recovery-dialog .current-val {
+  font-weight: bold;
+  color: #eee !important;
+}
+.natural-recovery-dialog .current-sep {
+  margin: 0 2px;
+  color: #888 !important;
+}
+.natural-recovery-dialog .current-max {
+  color: #888 !important;
+}
+
+/* ── +/− controls ── */
+.natural-recovery-dialog .slot-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px;
+  white-space: nowrap;
+}
+.natural-recovery-dialog .slot-recovering {
+  min-width: 24px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.05em;
+  display: inline-block !important;
+}
+.natural-recovery-dialog .slot-controls button.slot-decrement,
+.natural-recovery-dialog .slot-controls button.slot-increment {
+  display: inline-flex !important;
+  visibility: visible !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: unset !important;
+  min-height: unset !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 1.2em !important;
+  line-height: 1 !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  border: 1px solid var(--color-border-light-primary) !important;
+  /* Explicit colours instead of variables that may resolve to black */
+  background: #444 !important;
+  color: #eee !important;
+  flex-shrink: 0 !important;
+  transition: background 0.1s !important;
+}
+.natural-recovery-dialog
+  .slot-controls
+  button.slot-decrement:hover:not(:disabled),
+.natural-recovery-dialog
+  .slot-controls
+  button.slot-increment:hover:not(:disabled) {
+  background: #5a5a5a !important;
+}
+.natural-recovery-dialog .slot-controls button.slot-decrement:disabled,
+.natural-recovery-dialog .slot-controls button.slot-increment:disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+}

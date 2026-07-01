@@ -10,10 +10,9 @@ Hooks.once('init', () => {
   CONFIG.DND5E.featureTypes.class.subtypes.enchantedShot = 'Enchanted Shot';
   console.log('Alternate Classes 5e | Initialized class feature types');
 
-  class WuJenSpellcasting extends dnd5e
-    .dataModels
-    .spellcasting
-    .SingleLevelSpellcasting {
+  class WuJenSpellcasting
+    extends dnd5e.dataModels.spellcasting.SingleLevelSpellcasting
+  {
     /** @override */
     // eslint-disable-next-line @typescript-eslint/class-literal-property-style
     static get TYPE() {
@@ -21,8 +20,8 @@ Hooks.once('init', () => {
     }
   }
 
-  dnd5e.dataModels.spellcasting.SpellcastingModel.TYPES.wuJen
-    = WuJenSpellcasting;
+  dnd5e.dataModels.spellcasting.SpellcastingModel.TYPES.wuJen =
+    WuJenSpellcasting;
 
   // Add the Wu Jen Spellcasting type
   CONFIG.DND5E.spellcasting.wuJen = {
@@ -66,8 +65,10 @@ Hooks.once('init', () => {
       roundUp: false,
     },
   };
-  // eslint-disable-next-line @stylistic/max-len
-  console.log('Alternate Classes 5e | Initialized Alternate Classes Spellcasting');
+
+  console.log(
+    'Alternate Classes 5e | Initialized Alternate Classes Spellcasting',
+  );
 
   /**
    * Add Rest Recovery for Alternate Classes Spellcasting Types
@@ -75,8 +76,10 @@ Hooks.once('init', () => {
   CONFIG.DND5E.restTypes.short.recoverSpellSlotTypes.add('wuJen');
   CONFIG.DND5E.restTypes.long.recoverSpellSlotTypes.add('wuJen');
   // CONFIG.DND5E.restTypes.long.recoverSpellSlotTypes.add('ac55eSpell');
-  console.log('Alternate Classes 5e | \
-    Initialized rest recovery for Alternate Classes spellcasting types');
+  console.log(
+    'Alternate Classes 5e | \
+    Initialized rest recovery for Alternate Classes spellcasting types',
+  );
 
   CONFIG.DND5E.armorClasses.ac55eCharismaAC = {
     label: 'Charisma AC',
@@ -95,13 +98,14 @@ Hooks.once('init', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (game.modules.get('alternate-classes-55e') as any).api = {
     isMartialArtsAttack: function ({ workflow }) {
-      const { utils: { itemUtils, workflowUtils } } = chrisPremades;
+      const {
+        utils: { itemUtils, workflowUtils },
+      } = chrisPremades;
       if (!workflowUtils.isAttackType(workflow, 'attack')) return false;
-      const signatureWeapon = itemUtils
-        .getEffectByIdentifier(
-          workflow.item,
-          'ac55eSignatureWeapon',
-        );
+      const signatureWeapon = itemUtils.getEffectByIdentifier(
+        workflow.item,
+        'ac55eSignatureWeapon',
+      );
       if (signatureWeapon) return true;
       const martialArts = itemUtils.getEffectByIdentifier(
         workflow.item,
@@ -112,25 +116,27 @@ Hooks.once('init', () => {
     },
 
     isMeleeMartialArtsAttack: function ({ workflow }) {
-      const { utils: { workflowUtils } } = chrisPremades;
-      const radiantBolt = workflow
-        .item
-        ?.flags
-        ?.['chris-premades']
-        ?.info
-        ?.identifier === 'ac55eRadiantBolt';
+      const {
+        utils: { workflowUtils },
+      } = chrisPremades;
+      const radiantBolt =
+        workflow.item?.flags?.['chris-premades']?.info?.identifier ===
+        'ac55eRadiantBolt';
       if (radiantBolt) return true;
       if (workflowUtils.getActionType(workflow) !== 'mwak') return false;
-      return (game
-        .modules
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .get('alternate-classes-55e') as any)
-        .api
-        .isMartialArtsAttack({ workflow });
+      return (
+        (
+          game.modules
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .get('alternate-classes-55e') as any
+        ).api.isMartialArtsAttack({ workflow })
+      );
     },
 
     getAlternateMartialExploits: function (actor) {
-      const { utils: { itemUtils } } = chrisPremades;
+      const {
+        utils: { itemUtils },
+      } = chrisPremades;
       const martialExploits = itemUtils.getItemByIdentifier(
         actor,
         'martialExploits',
@@ -185,21 +191,10 @@ Hooks.once('init', () => {
         'disorienting-blow',
         'staggering-blow',
       ],
-      postAttackRoll: [
-        'precision-strike',
-        'martial-focus',
-      ],
-      targetAttackRollComplete: [
-        'riposte',
-        'redirect',
-      ],
-      targetApplyDamage: [
-        'mythic-resilience',
-        'unbreakable',
-      ],
-      targetDamageRollComplete: [
-        'shield-impact',
-      ],
+      postAttackRoll: ['precision-strike', 'martial-focus'],
+      targetAttackRollComplete: ['riposte', 'redirect'],
+      targetApplyDamage: ['mythic-resilience', 'unbreakable'],
+      targetDamageRollComplete: ['shield-impact'],
     },
 
     exploitTypes: ['martialExploit', 'savageExploit', 'deviousExploit'],
@@ -208,18 +203,18 @@ Hooks.once('init', () => {
       // 1st Degree Exploits
       'arresting-strike': 1,
       'brace-up': 1,
-      'disarm': 1,
+      disarm: 1,
       'feat-of-strength': 1,
-      'feint': 1,
+      feint: 1,
       'first-aid': 1,
       'heroic-fortitude': 1,
-      'hurl': 1,
+      hurl: 1,
       'imposing-presence': 1,
       'mighty-leap': 1,
       'mighty-thrust': 1,
-      'parry': 1,
+      parry: 1,
       'precision-strike': 1,
-      'riposte': 1,
+      riposte: 1,
       'ruthless-strike': 1,
       'shield-impact': 1,
       'skilled-rider': 1,
@@ -233,9 +228,9 @@ Hooks.once('init', () => {
       'honor-duel': 2,
       'martial-focus': 2,
       'menacing-shout': 2,
-      'redirect': 2,
+      redirect: 2,
       'rending-strike': 2,
-      'volley': 2,
+      volley: 2,
       'whirlwind-strike': 2,
       // 3rd Degree Exploits
       'disorienting-blow': 3,
@@ -249,7 +244,7 @@ Hooks.once('init', () => {
       'fluid-movements': 4,
       'quick-draw': 4,
       'staggering-blow': 4,
-      'unbreakable': 4,
+      unbreakable: 4,
       // 5th Degree Exploits
       'steel-wind-slash': 5,
       'storm-of-arrows': 5,
@@ -257,36 +252,37 @@ Hooks.once('init', () => {
 
     alternateMartialExploitMulticlassingValues: function (totalLevel) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (game.modules.get('alternate-classes-55e') as any)
-        .api.alternateMartialExploitMulticlassingTable[totalLevel - 1];
+      return (game.modules.get('alternate-classes-55e') as any).api
+        .alternateMartialExploitMulticlassingTable[totalLevel - 1];
     },
 
     getAltMartialExploitDieForMulticlassLevel: function (totalLevel) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const formula = (game.modules.get('alternate-classes-55e') as any)
-        .api
+      const formula = (game.modules.get('alternate-classes-55e') as any).api
         .alternateMartialExploitMulticlassingTable[totalLevel - 1].exploitDie;
       return { faces: Number.fromString(formula.replace('d', '')), formula };
     },
 
     getAltMartialMCTotalLevel: function (actor) {
-      const fighterLevels = actor.items.filter(
-        item => item.system.identifier === 'alternate-fighter',
-      )[0]?.system?.levels || 0;
-      const barbarianLevels = actor.items.filter(
-        item => item.system.identifier === 'alternate-barbarian',
-      )[0]?.system?.levels || 0;
-      const rogueLevels = actor.items.filter(
-        item => item.system.identifier === 'alternate-rogue',
-      )[0]?.system?.levels || 0;
+      const fighterLevels =
+        actor.items.filter(
+          (item) => item.system.identifier === 'alternate-fighter',
+        )[0]?.system?.levels || 0;
+      const barbarianLevels =
+        actor.items.filter(
+          (item) => item.system.identifier === 'alternate-barbarian',
+        )[0]?.system?.levels || 0;
+      const rogueLevels =
+        actor.items.filter(
+          (item) => item.system.identifier === 'alternate-rogue',
+        )[0]?.system?.levels || 0;
       const multiclassingLevel = fighterLevels + barbarianLevels + rogueLevels;
       return multiclassingLevel;
     },
 
     getAltMartialMCExploitsRemaining: function (totalLevel) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (game.modules.get('alternate-classes-55e') as any)
-        .api
+      return (game.modules.get('alternate-classes-55e') as any).api
         .alternateMartialExploitMulticlassingTable[totalLevel - 1].exploitDice;
     },
 
@@ -341,7 +337,9 @@ Hooks.once('init', () => {
     // },
 
     _spendAltFighterMartialSuperiority: async function (item) {
-      const { utils: { itemUtils, genericUtils } } = chrisPremades;
+      const {
+        utils: { itemUtils, genericUtils },
+      } = chrisPremades;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
       // Only use Martial Superiority for 1st and 2nd degree exploits
@@ -360,41 +358,40 @@ Hooks.once('init', () => {
     },
 
     spendAlternateMartialExploitUses: async function (uses, item) {
-      const { utils: { genericUtils } } = chrisPremades;
+      const {
+        utils: { genericUtils },
+      } = chrisPremades;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
       // Alternate Fighter Martial Superiority
       if (
-        uses === 1
-        && item?.system?.type?.subtype === 'martialExploit'
-        && await moduleAPI._spendAltFighterMartialSuperiority(item)
+        uses === 1 &&
+        item?.system?.type?.subtype === 'martialExploit' &&
+        (await moduleAPI._spendAltFighterMartialSuperiority(item))
       )
         return;
-      const {
-        martialExploits,
-        savageExploits,
-        deviousExploits,
-      } = moduleAPI.getAlternateMartialExploits(item.actor);
+      const { martialExploits, savageExploits, deviousExploits } =
+        moduleAPI.getAlternateMartialExploits(item.actor);
       if (deviousExploits) {
-        const remainingUses
-          = deviousExploits.system.uses.max - deviousExploits.system.uses.spent;
+        const remainingUses =
+          deviousExploits.system.uses.max - deviousExploits.system.uses.spent;
         await genericUtils.update(deviousExploits, {
-          'system.uses.spent': deviousExploits.system.uses.spent
-            + Math.min(uses, remainingUses),
+          'system.uses.spent':
+            deviousExploits.system.uses.spent + Math.min(uses, remainingUses),
         });
         uses -= Math.min(uses, remainingUses);
       }
       if (savageExploits && uses) {
-        const remainingUses
-          = savageExploits.system.uses.max - savageExploits.system.uses.spent;
+        const remainingUses =
+          savageExploits.system.uses.max - savageExploits.system.uses.spent;
         return await genericUtils.update(savageExploits, {
-          'system.uses.spent': savageExploits.system.uses.spent
-            + Math.min(uses, remainingUses),
+          'system.uses.spent':
+            savageExploits.system.uses.spent + Math.min(uses, remainingUses),
         });
       }
       if (martialExploits && uses) {
-        const remainingUses
-          = martialExploits.system.uses.max - martialExploits.system.uses.spent;
+        const remainingUses =
+          martialExploits.system.uses.max - martialExploits.system.uses.spent;
         return await genericUtils.update(martialExploits, {
           'system.uses.spent':
             martialExploits.system.uses.spent + Math.min(uses, remainingUses),
@@ -408,31 +405,26 @@ Hooks.once('init', () => {
     getAlternateMartialExploitDie: function (item) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
-      const multiclassingLevel
-        = moduleAPI.getAltMartialMCTotalLevel(item.actor);
-      const multiclassingDie = moduleAPI
-        .getAltMartialExploitDieForMulticlassLevel(multiclassingLevel);
-      let fighterDie = item.actor.system.scale?.
-        ['alternate-fighter']?.['exploit-die'];
-      const masterAtArms = item
-        .actor
-        .classes['alternate-fighter']
-        ?.subclass
-        ?.identifier === 'master-at-arms';
+      const multiclassingLevel = moduleAPI.getAltMartialMCTotalLevel(
+        item.actor,
+      );
+      const multiclassingDie =
+        moduleAPI.getAltMartialExploitDieForMulticlassLevel(multiclassingLevel);
+      let fighterDie =
+        item.actor.system.scale?.['alternate-fighter']?.['exploit-die'];
+      const masterAtArms =
+        item.actor.classes['alternate-fighter']?.subclass?.identifier ===
+        'master-at-arms';
       if (masterAtArms) {
-        fighterDie = item.actor.system.scale
-          ?.['master-at-arms']?.['exploit-die'];
+        fighterDie =
+          item.actor.system.scale?.['master-at-arms']?.['exploit-die'];
       }
-      const barbarianDie = item.actor.system.scale?.
-        ['alternate-barbarian']?.['exploit-die'];
-      const rogueDie = item.actor.system.scale?.
-        ['alternate-rogue']?.['exploit-die'];
-      const maxSingleClassDie = [
-        fighterDie,
-        barbarianDie,
-        rogueDie,
-      ]
-        .filter(maxDie => maxDie)
+      const barbarianDie =
+        item.actor.system.scale?.['alternate-barbarian']?.['exploit-die'];
+      const rogueDie =
+        item.actor.system.scale?.['alternate-rogue']?.['exploit-die'];
+      const maxSingleClassDie = [fighterDie, barbarianDie, rogueDie]
+        .filter((maxDie) => maxDie)
         .sort((die1, die2) => die2.faces - die1.faces)[0];
       if (maxSingleClassDie?.faces < multiclassingDie.faces)
         return multiclassingDie;
@@ -443,28 +435,21 @@ Hooks.once('init', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const moduleAPI = (game.modules.get('alternate-classes-55e') as any).api;
       const multiclassingLevel = moduleAPI.getAltMartialMCTotalLevel(actor);
-      const multiclassingDie = moduleAPI
-        .getAltMartialExploitDieForMulticlassLevel(multiclassingLevel);
-      let fighterDie = actor.system.scale?.
-        ['alternate-fighter']?.['exploit-die'];
-      const masterAtArms = actor
-        .classes['alternate-fighter']
-        ?.subclass
-        ?.identifier === 'master-at-arms';
+      const multiclassingDie =
+        moduleAPI.getAltMartialExploitDieForMulticlassLevel(multiclassingLevel);
+      let fighterDie =
+        actor.system.scale?.['alternate-fighter']?.['exploit-die'];
+      const masterAtArms =
+        actor.classes['alternate-fighter']?.subclass?.identifier ===
+        'master-at-arms';
       if (masterAtArms) {
-        fighterDie = actor.system.scale
-          ?.['master-at-arms']?.['exploit-die'];
+        fighterDie = actor.system.scale?.['master-at-arms']?.['exploit-die'];
       }
-      const barbarianDie = actor.system.scale?.
-        ['alternate-barbarian']?.['exploit-die'];
-      const rogueDie = actor.system.scale?.
-        ['alternate-rogue']?.['exploit-die'];
-      const maxSingleClassDie = [
-        fighterDie,
-        barbarianDie,
-        rogueDie,
-      ]
-        .filter(maxDie => maxDie)
+      const barbarianDie =
+        actor.system.scale?.['alternate-barbarian']?.['exploit-die'];
+      const rogueDie = actor.system.scale?.['alternate-rogue']?.['exploit-die'];
+      const maxSingleClassDie = [fighterDie, barbarianDie, rogueDie]
+        .filter((maxDie) => maxDie)
         .sort((die1, die2) => die2.faces - die1.faces)[0];
       if (maxSingleClassDie?.faces < multiclassingDie.faces)
         return multiclassingDie;
@@ -476,7 +461,9 @@ Hooks.once('init', () => {
 
 // Register CPR Macros
 Hooks.on('ready', () => {
-  const { utils: { macroUtils } } = chrisPremades;
+  const {
+    utils: { macroUtils },
+  } = chrisPremades;
   macroUtils.registerMacros(macros);
   console.log('Alternate Classes 5e | Registered CPR Macros');
 });
