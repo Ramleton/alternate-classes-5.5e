@@ -41,8 +41,8 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src",
-    "scripts",
+    "src/**/*",
+    "scripts/**/*",
     "src/types/chris-premades.d.ts",
     "scripts/generateMacroIndex.ts"
   ],
