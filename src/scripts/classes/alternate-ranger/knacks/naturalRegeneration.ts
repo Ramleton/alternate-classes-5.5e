@@ -1,6 +1,7 @@
 import {
   applySpellSlotRecovery,
   formatRecoveredSummary,
+  getSlotStates,
   promptSpellSlotRecovery,
 } from 'automation/spellUtils.js';
 import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
@@ -9,6 +10,12 @@ const prompt: MacroFunction = async ({ trigger: { entity } }) => {
   const feat = entity as Item<'feat'>;
   if (!feat.actor) return;
   if (!feat.system.uses?.value) return;
+  const wisMod = feat.actor.system.abilities.wis.mod;
+  const budget = Math.max(1, wisMod);
+  const availableSlots = getSlotStates(feat.actor).filter(
+    (s) => s.level <= budget,
+  );
+  if (availableSlots.length === 0) return;
 
   const {
     utils: { dialogUtils, genericUtils, socketUtils },
@@ -17,9 +24,6 @@ const prompt: MacroFunction = async ({ trigger: { entity } }) => {
   const userId = socketUtils.firstOwner(feat.actor, true);
   const selection = await dialogUtils.confirmUseItem(feat, { userId });
   if (!selection) return;
-
-  const wisMod = feat.actor.system.abilities.wis.mod;
-  const budget = Math.max(1, wisMod);
 
   const slotsToRecover = await promptSpellSlotRecovery(feat.actor, budget);
   if (!slotsToRecover) return;
