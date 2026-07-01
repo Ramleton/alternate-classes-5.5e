@@ -1,12 +1,14 @@
 {
   "[javascript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.formatOnSave": true
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.formatOnSave": true
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
@@ -15,9 +17,12 @@
   "editor.insertSpaces": true,
   "cSpell.words": [
     "blindsight",
+    "Counterspell",
     "darkvision",
     "ditem",
+    "ethaks",
     "fvtt",
+    "Geas",
     "halfling",
     "msak",
     "multiclass",
@@ -31,6 +36,8 @@
     "runecarver",
     "rwak",
     "Shadowdancer",
+    "Spellbane",
+    "Spellbreaker",
     "spellcasting",
     "subrepos",
     "temphp",
@@ -40,5 +47,6 @@
     "warcry"
   ],
   "files.insertFinalNewline": false,
-  "js/ts.preferences.importModuleSpecifierEnding": "js"
+  "js/ts.preferences.importModuleSpecifierEnding": "js",
+  "js/ts.tsserver.maxMemory": 4096
 }

@@ -39,7 +39,7 @@ ln -s /path/to/alternate-classes-5.5e /path/to/foundry/data/modules/ac55e
 ## Requirements
 
 - **Foundry VTT** — v12.0 or later
-- **D&D 5e System** — v4.0 or later
+- **D&D 5e System** — v5.0 or later
 - **midi-qol** — v11.x or later (required for automation)
 - **chris-premades** — v1.x or later (required for macro framework)
 
@@ -114,7 +114,7 @@ Upcoming: CPR macro automation for extended Ranger options with improved bonus a
 
 Macros follow the chris-premades pattern with clear separation of concerns:
 
-- **Hook Functions** — `early`, `during`, `after` workflow phases
+- **Hook Functions** — `pre`, `during`, `post` workflow phases
 - **Workflow Utilities** — Damage type filtering, activity data management
 - **Item Registration** — Automatic macro binding to subclass features
 - **Error Handling** — Graceful fallbacks for missing prerequisites
@@ -134,10 +134,10 @@ Macros follow the chris-premades pattern with clear separation of concerns:
 All macros are fully typed using extended dnd5e item/actor types:
 
 ```typescript
-const healActivityData = (await getActivityData(feat, "heal")) as HealActivity;
+const healActivityData = (await getActivityData(feat, 'heal')) as HealActivity;
 ```
 
-TypeScript ensures activity properties match dnd5e 4.x schema.
+TypeScript ensures activity properties match dnd5e 5.x schema.
 
 ## Testing
 
@@ -159,7 +159,7 @@ Test workflow automation with:
 
 - Requires midi-qol v11+ for workflow automation
 - Some features depend on d&d5e active effects system
-- Item activity types must match d&d5e 4.x schemas
+- Item activity types must match d&d5e 5.x schemas
 
 ## Contributing
 

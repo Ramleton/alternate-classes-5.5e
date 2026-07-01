@@ -4,7 +4,16 @@ import { DamageType } from '../damage.js';
 import { EffectFlags } from '../effects.js';
 import CharacterData from '../fvtt-types/ConfiguredActor.js';
 import { SkillIdentifier } from '../skills.js';
-import { AuraEvent, CombatEvent, D20Event, EffectEvent, MacroEvent, MidiQOLEvent, MovementEvent, RestEvent } from './macroEvents.js';
+import {
+  AuraEvent,
+  CombatEvent,
+  D20Event,
+  EffectEvent,
+  MacroEvent,
+  MidiQOLEvent,
+  MovementEvent,
+  RestEvent,
+} from './macroEvents.js';
 
 export interface ActiveEffectChange {
   key: string;
@@ -29,7 +38,7 @@ export interface ActiveEffectDuration {
 }
 
 export interface ActiveEffectFlags extends EffectFlags {
-  'core': {
+  core: {
     overlay: boolean;
   };
   'chris-premades'?: {
@@ -76,6 +85,7 @@ export interface MidiActiveEffect {
   sort: number;
   statuses: Set<string>;
   system: object;
+  parent?: Actor5e | unknown;
 }
 
 export interface CastData {
@@ -369,13 +379,16 @@ interface D20RollCharacterData extends CharacterData {
         formula?: string;
       };
     };
-    skills: Record<string, {
-      ability: string;
-      fullKey: string;
-      icon: string;
-      label: string;
-      reference: string;
-    }>;
+    skills: Record<
+      string,
+      {
+        ability: string;
+        fullKey: string;
+        icon: string;
+        label: string;
+        reference: string;
+      }
+    >;
   };
   classes: Record<string, Item<'class'>>;
   effects: MidiActiveEffect[];
@@ -444,6 +457,26 @@ export interface Trigger {
   roll: D20Roll;
   saveId: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
   skillId: SkillIdentifier;
+  config: {
+    ability?: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+    advantage?: boolean;
+    disadvantage?: boolean;
+    midiOptions?: {
+      advantage: boolean | undefined;
+      advantageByChoice: boolean | undefined;
+      disadvantage: boolean | undefined;
+      isConcentrationCheck: boolean | undefined;
+      isMagicSave: boolean;
+      itemCardUuid: string | undefined;
+      recomputeAdvantage: boolean;
+      rollAbilities: ('str' | 'dex' | 'con' | 'int' | 'wis' | 'cha')[];
+      rollSkills: SkillIdentifier[];
+      rollTools: string[];
+      saveItemUuid: string | undefined;
+      target: number;
+      workflow: Workflow;
+    };
+  };
 }
 
 export interface CalcDamageOptions {
