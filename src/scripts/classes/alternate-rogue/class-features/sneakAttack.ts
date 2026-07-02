@@ -1,41 +1,20 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getSneakAttack } from '../utils/sneakAttackUtils.js';
+import {
+  getSneakAttack,
+  qualifiesForSneakAttack,
+} from '../utils/sneakAttackUtils.js';
 
 const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
-  if (!workflow.hitTargets.size) return;
+  if (!workflow.targets.size) return;
   const feat = entity as Item<'feat'>;
   if (!feat.system.uses?.value) return;
+  const useSneakAttack =
+    feat.actor!.flags['alternate-classes-55e']?.macros?.['sneak-attack'];
+  if (useSneakAttack) return;
+  if (!qualifiesForSneakAttack(feat, workflow)) return;
   const {
-    utils: { genericUtils, socketUtils, tokenUtils, workflowUtils },
+    utils: { genericUtils, socketUtils },
   } = chrisPremades;
-  const actionType = workflowUtils.getActionType(workflow);
-  // If the attack is not a finesse or ranged weapon attack, don't prompt
-  if (
-    !(
-      actionType === 'mwak' &&
-      (workflow.item as Item<'weapon'>).system.properties.some(
-        (p) => p === 'fin',
-      )
-    ) &&
-    actionType !== 'rwak'
-  )
-    return;
-  const target = workflow.hitTargets.first() as Token;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const attackRollOptions = workflow.attackRoll!.options as any;
-  const hadAdvantage = attackRollOptions.attributions.some(
-    (a) => a.type === 'ADV',
-  );
-  const hadDisadvantage = attackRollOptions.attributions.some(
-    (a) => a.type === 'DIS',
-  );
-  const nearbyEnemy = !!tokenUtils.findNearby(target, 5, 'enemy', {
-    includeIncapacitated: false,
-    includeToken: false,
-  }).length;
-  const qualifiesForSneakAttack =
-    (hadAdvantage || nearbyEnemy) && !hadDisadvantage;
-  if (!qualifiesForSneakAttack) return;
   const userId = socketUtils.firstOwner(feat.actor, true);
   const selection = await chrisPremades.utils.dialogUtils.confirmUseItem(feat, {
     userId,
@@ -47,9 +26,6 @@ const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
     'macros.sneak-attack',
     1,
   );
-  await genericUtils.update(feat, {
-    'system.uses.spent': feat.system.uses!.spent + 1,
-  });
 };
 
 const damageBonus: MidiMacroFunction = async ({
@@ -70,6 +46,9 @@ const damageBonus: MidiMacroFunction = async ({
   );
   const sneakAttack = getSneakAttack(feat.actor!);
   await workflowUtils.bonusDamage(workflow, sneakAttack.formula);
+  await genericUtils.update(feat, {
+    'system.uses.spent': feat.system.uses!.spent + 1,
+  });
 };
 
 const macro: CPRMacro = {
@@ -83,7 +62,7 @@ const macro: CPRMacro = {
       {
         pass: 'attackRollComplete',
         macro: prompt,
-        priority: 100,
+        priority: 150,
       },
       {
         pass: 'damageRollComplete',
