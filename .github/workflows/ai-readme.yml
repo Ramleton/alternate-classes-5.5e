@@ -1,8 +1,4 @@
-name: Local AI README Updater
-
-# on:
-#   release:
-#     types: [created, published] # Triggers automatically when a GitHub Release is published
+name: Gemini AI README Updater
 
 on:
   workflow_dispatch:
@@ -19,44 +15,25 @@ on:
 jobs:
   build-readme:
     runs-on: ubuntu-latest
-
-    # Required to allow the GitHub Actions bot to commit changes back to your repository
     permissions:
       contents: write
 
     steps:
-      # 1. Checkout the source code
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Setup Ollama natively on the runner using the official install script
-      - name: Setup Ollama
+      - name: Generate New README via Gemini API
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          curl -fsSL https://ollama.com/install.sh | sh
-          # Start the Ollama background service running in the background
-          ollama serve &
-          # Wait 5 seconds for the local server instance to fully wake up
-          sleep 5
-
-      # 3. Pull a fast, lightweight open weights model
-      - name: Load AI Model
-        run: ollama pull phi3:mini
-
-      # 4. Extract project files and stream them directly into the local model
-      - name: Generate New README via Local AI
-        run: |
-          # 1. Safely load key context files into local variables
           MODULE_JSON=$(cat module.json 2>/dev/null || echo "No module.json file found.")
           CURRENT_README=$(cat README.md 2>/dev/null || echo "No README.md found.")
 
-          # Force the version tag string to include the 'v' prefix for the documentation layout
-          VERSION_TAG="v${{ github.event.release.tag_name }}"
-
-          # Capture the markdown description body where your features are listed
-          RELEASE_NOTES="${{ github.event.release.body }}"
+          VERSION_TAG="v${{ github.event.inputs.version_tag }}"
+          RELEASE_NOTES="${{ github.event.inputs.release_body }}"
           CURRENT_DATE=$(date +"%B %Y")
 
-          # 2. Build a clear, structured prompt
+          # 1. Build the exact same structured prompt
           PROMPT="You are an expert technical documentation assistant updating the README.md for a Foundry VTT module called 'Alternate Classes 5.5e'.
 
           Here is the existing README.md:
@@ -89,13 +66,19 @@ jobs:
           CRITICAL RULES:
           - Do not alter or delete the Installation steps, Requirements list, Technology Stack, Project Structure, or Credits sections. Keep them exactly as they are written.
           - Output ONLY the full, updated raw markdown content. 
-          - Do not include any chat commentary, introduction, or wrap the final output in backticks (\`\`\`)."
+          - Do not include any chat commentary, introduction, or wrap the final output in backticks."
 
-          # 3. Pipe the text prompt straight into Ollama and write to file
-          echo "$PROMPT" | ollama run phi3:mini > README.md
-          echo "AI has finished processing the new README file layout."
+          # 2. Escape the prompt string cleanly for a JSON payload
+          JSON_PAYLOAD=$(node -e "echo(JSON.stringify({contents: [{parts: [{text: process.env.PROMPT}]}]}))" env:PROMPT="$PROMPT" 2>/dev/null || jq -n --arg msg "$PROMPT" '{contents: [{parts: [{text: $msg}]}]}')
 
-      # 5. Check for updates and commit the new README back to the main branch
+          # 3. Hit Google's API endpoint instantly
+          curl -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$JSON_PAYLOAD" \
+            | jq -r '.candidates[0].content.parts[0].text' > README.md
+
+          echo "Gemini has finished processing the new README file layout."
+
       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions[bot]"
@@ -103,8 +86,7 @@ jobs:
 
           if ! git diff --exit-code README.md; then
             git add README.md
-            # Commits with the 'v' prefix explicitly added back to the string
-            git commit -m "docs: local AI rewrite of README.md for v${{ github.event.release.tag_name }} [skip ci]"
+            git commit -m "docs: AI rewrite of README.md for v${{ github.event.inputs.version_tag }} [skip ci]"
             git push origin HEAD:${{ github.event.repository.default_branch }}
           else
             echo "No semantic layout modifications detected. Skipping commit."
