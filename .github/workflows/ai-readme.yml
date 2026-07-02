@@ -1,0 +1,88 @@
+name: Local AI README Updater
+
+on:
+  release:
+    types: [created] # Triggers automatically when a GitHub Release is published
+
+jobs:
+  build-readme:
+    runs-on: ubuntu-latest
+
+    # Required to allow the GitHub Actions bot to commit changes back to your repository
+    permissions:
+      contents: write
+
+    steps:
+      # 1. Checkout the source code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Ollama natively on the runner
+      - name: Setup Ollama
+        uses: ai-action/setup-ollama@v2
+
+      # 3. Pull a fast, lightweight open weights model
+      - name: Load AI Model
+        run: ollama pull phi3:mini
+
+      # 4. Extract project files and stream them directly into the local model
+      - name: Generate New README via Local AI
+        run: |
+          # 1. Safely load key context files into local variables
+          MODULE_JSON=$(cat module.json 2>/dev/null || echo "No module.json file found.")
+          CURRENT_README=$(cat README.md 2>/dev/null || echo "No README.md found.")
+          RELEASE_NOTES="${{ github.event.release.body }}"
+          VERSION_TAG="${{ github.event.release.tag_name }}"
+          CURRENT_DATE=$(date +"%B %Y")
+
+          # 2. Build a clear, structured prompt
+          PROMPT="You are an expert technical documentation assistant updating the README.md for a Foundry VTT module called 'Alternate Classes 5.5e'.
+
+          Here is the existing README.md:
+          '''
+          $CURRENT_README
+          '''
+
+          Here is the new module.json configuration:
+          '''
+          $MODULE_JSON
+          '''
+
+          Recent Changes / Release Notes:
+          '''
+          $RELEASE_NOTES
+          '''
+
+          TASK:
+          Update the provided README.md strictly using these rules:
+          1. Locate the 'Supported Classes & Automation Status' table. If the release notes state that a new alternate class has been completed or automated (e.g., Bard, Cleric, etc.), change that class's row status from '❌ Upcoming' to '🔄 Implemented'. Do not modify classes that aren't mentioned.
+          2. Locate the '## Changelog' header. Insert a new subsection directly below it for the new release, formatted exactly like this:
+             ### Version $VERSION_TAG ($CURRENT_DATE)
+             [Summarize or paste the core bullet points from the Release Notes here]
+             Keep the previous version history below it intact.
+          3. Go to the very bottom footer and update the variables exactly to:
+             **Current Module Version:** $VERSION_TAG  
+             **Latest Release Date:** $CURRENT_DATE
+
+          CRITICAL RULES:
+          - Do not alter or delete the Installation steps, Requirements list, Technology Stack, Project Structure, or Credits sections. Keep them exactly as they are written.
+          - Output ONLY the full, updated raw markdown content. 
+          - Do not include any chat commentary, introduction, or wrap the final output in backticks (\`\`\`)."
+
+          # 3. Pipe the text prompt straight into Ollama and write to file
+          echo "$PROMPT" | ollama run phi3:mini > README.md
+          echo "AI has finished processing the new README file layout."
+
+      # 5. Check for updates and commit the new README back to the main branch
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if ! git diff --exit-code README.md; then
+            git add README.md
+            git commit -m "docs: local AI rewrite of README.md for ${{ github.event.release.tag_name }} [skip ci]"
+            git push origin HEAD:${{ github.event.repository.default_branch }}
+          else
+            echo "No semantic layout modifications detected. Skipping commit."
+          fi

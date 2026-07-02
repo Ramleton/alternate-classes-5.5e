@@ -8,17 +8,24 @@ This module adds comprehensive D&D 5e alternate subclass options with full autom
 
 **Inspiration:** This project automates the excellent alternate class designs created by [Laserllama](https://www.patreon.com/cw/laserllama), bringing their creative work to FoundryVTT with full midi-qol/CPR integration.
 
-### Key Features
+### Supported Classes & Automation Status
 
-- **Custom Subclass Implementations** — Alternative class options for core D&D 5e classes (Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, Wizard)
-  - Note: Currently, only Barbarian, Fighter, Monk, Paladin, Ranger, and Rogue are implemented.
-- **Automated Workflows** — CPR macro integration enabling automated ability checks, damage rolls, and special mechanics
-- **Type-Safe Codebase** — Built entirely in TypeScript with strict type checking and full ambient declarations for FoundryVTT APIs
-- **ESLint Async Safety** — Enforces async/await best practices to prevent workflow race conditions
+| Class         | Automation Status |
+| :------------ | :---------------: |
+| **Barbarian** |  🔄 Implemented   |
+| **Bard**      |    ❌ Upcoming    |
+| **Cleric**    |    ❌ Upcoming    |
+| **Druid**     |    ❌ Upcoming    |
+| **Fighter**   |  🔄 Implemented   |
+| **Monk**      |  🔄 Implemented   |
+| **Paladin**   |  🔄 Implemented   |
+| **Ranger**    |  🔄 Implemented   |
+| **Rogue**     |  🔄 Implemented   |
+| **Sorcerer**  |    ❌ Upcoming    |
+| **Warlock**   |    ❌ Upcoming    |
+| **Wizard**    |    ❌ Upcoming    |
 
 ## Installation
-
-### Via Manifest URL
 
 1. In FoundryVTT, go to **Add-on Modules** → **Install Module**
 2. Paste the module manifest URL:
@@ -27,60 +34,43 @@ This module adds comprehensive D&D 5e alternate subclass options with full autom
    ```
 3. Click **Install** and activate in your world
 
-### Manual Installation
-
-Clone this repository and symlink it to your FoundryVTT modules directory:
-
-```bash
-git clone https://github.com/Ramleton/alternate-classes-5.5e.git
-ln -s /path/to/alternate-classes-5.5e /path/to/foundry/data/modules/ac55e
-```
-
 ## Requirements
 
-- **Foundry VTT** — v12.0 or later
-- **D&D 5e System** — v5.0 or later
-- **midi-qol** — v11.x or later (required for automation)
-- **chris-premades** — v1.x or later (required for macro framework)
+- **Foundry VTT** — v13.351
+- **D&D 5e System** — v5.3.3 or later
+- **MidiQOL** — v13.0.63 or later (required for automation)
+- **Aura Effects** — v1.5.2 or later (required for automation)
+- **Automated Conditions 5e** — v13.5330.1.4 (required for automation)
+- **Cauldron of Plentiful Resources** — v1.5.40 or later (required for automation)
+- **Dungeons & Dragons Player's Handbook** — v2.1.0 or later (required for spells)
+- **Times Up** — v13.1.9 or later (required for automation)
+- **Active Token Effects** — v1.1.1 or later (required for automation)
 
 ## Technology Stack
 
 - **Language** — TypeScript with strict mode enabled
 - **Build Tool** — Vite 5.x for optimized bundling
-- **Package Manager** — npm with lockfile for reproducible builds
+- **Package Manager** — pnpm with lockfile for reproducible builds
 - **Linting** — ESLint with custom async safety rules
 - **Type Definitions** — Ambient module declarations for FoundryVTT and third-party modules
-
-### Build Scripts
-
-```bash
-# Install dependencies
-npm install
-
-# Build for production
-npm run build
-
-# Watch mode for development
-npm run dev
-
-# Lint TypeScript
-npm run lint
-```
 
 ## Project Structure
 
 ```
 src/
-├── macros/           # CPR macro implementations
-│   ├── features/     # Subclass feature macros
-│   └── utils/        # Shared macro utilities
+├── scripts/          # CPR macro implementations
+│   ├── automation/   # Generic helper utils for automation
+│   ├── classes/      # Class and Subclass feature macros
+│   ├── exploits/     # Devious, Martial, and Savage Exploit macros
+│   └── martialArts/  # Helper utils for Martial Arts macro automation
+├── styles/           # CSS files, primarily for styling prompts used in macros
+├── templates/        # Handlebar files, templates for generic prompts in macros
 ├── types/            # TypeScript type definitions
-├── module.ts         # Module initialization and hooks
 └── index.ts          # Entry point
-
 packs/                # FoundryVTT compendiums (JSON)
 lang/                 # Localization files
-assets/               # Icons and artwork
+assets/               # Icons, artwork, HTML, and CSS
+module.json           # Module initialization and hooks
 ```
 
 ## Featured Implementations
@@ -106,60 +96,11 @@ const necroticHeal: MidiMacroFunction = async ({
 };
 ```
 
-### Alternate Ranger Features
+## Changelog
 
-Upcoming: CPR macro automation for extended Ranger options with improved bonus action and reaction handling.
+### Version 1.5.0 (June 2026)
 
-## Macro Architecture
-
-Macros follow the chris-premades pattern with clear separation of concerns:
-
-- **Hook Functions** — `pre`, `during`, `post` workflow phases
-- **Workflow Utilities** — Damage type filtering, activity data management
-- **Item Registration** — Automatic macro binding to subclass features
-- **Error Handling** — Graceful fallbacks for missing prerequisites
-
-## Development
-
-### Adding a New Subclass
-
-1. Create feature macros in `src/macros/features/[class]/`
-2. Add type definitions to `src/types/`
-3. Register in module initialization (item lookup + macro binding)
-4. Add compendium entry to `packs/`
-5. Test with midi-qol and CPR enabled
-
-### Type Safety
-
-All macros are fully typed using extended dnd5e item/actor types:
-
-```typescript
-const healActivityData = (await getActivityData(feat, 'heal')) as HealActivity;
-```
-
-TypeScript ensures activity properties match dnd5e 5.x schema.
-
-## Testing
-
-Test workflow automation with:
-
-1. Create a character with the subclass
-2. Use abilities in combat and verify midi-qol hooks fire correctly
-3. Check macro logs in browser console for async race conditions
-4. Validate damage calculations and effect application order
-
-## Performance Considerations
-
-- Vite builds output minified, tree-shaken distributions
-- Lazy-load macro initialization on demand
-- Use `tsc-alias` for path rewriting (avoids runtime path resolution)
-- ESLint async rules prevent unintended blocking calls
-
-## Known Limitations
-
-- Requires midi-qol v11+ for workflow automation
-- Some features depend on d&d5e active effects system
-- Item activity types must match d&d5e 5.x schemas
+- Initial tracking and implementation setup for alternate classes.
 
 ## Contributing
 
@@ -169,7 +110,7 @@ This is a solo project. For issues or suggestions, open a GitHub issue or submit
 
 See LICENSE file in repository.
 
-## Acknowledgments
+## Credits
 
 This module is heavily inspired by the exceptional work of **Laserllama**. Their original alternate class designs, balance philosophy, and creative implementations provided the foundation for this FoundryVTT automation project.
 
@@ -180,5 +121,5 @@ This module is heavily inspired by the exceptional work of **Laserllama**. Their
 
 ---
 
-**Current Version:** 1.5.0  
-**Last Updated:** June 2026
+**Current Module Version:** 1.5.0  
+**Latest Release Date:** June 2026
