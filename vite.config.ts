@@ -10,9 +10,11 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: foundryPath,
       emptyOutDir: false,
-      // Use rollupOptions to control exactly how files are named
+      resolve: {
+        tsconfigPaths: true,
+      },
       rollupOptions: {
-        input: 'src/script.ts', // Use your actual entry file
+        input: 'src/script.ts',
         output: {
           format: 'es',
           entryFileNames: '[name].js',

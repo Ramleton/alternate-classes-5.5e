@@ -8,7 +8,7 @@
     "useDefineForClassFields": true,
     "resolveJsonModule": true,
     "sourceMap": false,
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist/src",
     "declarationDir": "./types",
     "declaration": true,
