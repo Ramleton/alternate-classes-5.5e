@@ -60,8 +60,12 @@ jobs:
                [Summarize or paste the core bullet points from the Release Notes here]
                Keep the previous version history below it intact.
             4. Go to the very bottom footer and update the variables exactly to:
-               **Current Module Version:** ${process.env.VERSION_TAG}  
+               **Current Module Version:** ${process.env.VERSION_TAG}
                **Latest Release Date:** ${process.env.CURRENT_DATE}
+            5. Locate any GitHub download links pointing to the module manifest file in the installation instructions. Specifically look for URLs resembling:
+               https://github.com/Ramleton/alternate-classes-5.5e/releases/download/latest/module.json
+               Update the "latest" portion of the path to match the current release version tag exactly:
+               https://github.com/Ramleton/alternate-classes-5.5e/releases/download/${process.env.VERSION_TAG}/module.json
             
             CRITICAL RULES:
             - Do not alter or delete the Installation steps, Requirements list, Technology Stack, Project Structure, or Credits sections. Keep them exactly as they are written.
