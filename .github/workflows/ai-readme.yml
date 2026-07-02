@@ -31,8 +31,12 @@ jobs:
           # 1. Safely load key context files into local variables
           MODULE_JSON=$(cat module.json 2>/dev/null || echo "No module.json file found.")
           CURRENT_README=$(cat README.md 2>/dev/null || echo "No README.md found.")
+
+          # Force the version tag string to include the 'v' prefix for the documentation layout
+          VERSION_TAG="v${{ github.event.release.tag_name }}"
+
+          # Capture the markdown description body where your features are listed
           RELEASE_NOTES="${{ github.event.release.body }}"
-          VERSION_TAG="${{ github.event.release.tag_name }}"
           CURRENT_DATE=$(date +"%B %Y")
 
           # 2. Build a clear, structured prompt
@@ -48,19 +52,20 @@ jobs:
           $MODULE_JSON
           '''
 
-          Recent Changes / Release Notes:
+          Recent Changes / Release Notes (READ THIS CAREFULLY TO IDENTIFY WORK DONE):
           '''
           $RELEASE_NOTES
           '''
 
           TASK:
           Update the provided README.md strictly using these rules:
-          1. Locate the 'Supported Classes & Automation Status' table. If the release notes state that a new alternate class has been completed or automated (e.g., Bard, Cleric, etc.), change that class's row status from '❌ Upcoming' to '🔄 Implemented'. Do not modify classes that aren't mentioned.
-          2. Locate the '## Changelog' header. Insert a new subsection directly below it for the new release, formatted exactly like this:
+          1. Carefully read the 'Recent Changes / Release Notes' above. Identify which alternate classes were explicitly worked on, automated, or implemented in this release.
+          2. Locate the 'Supported Classes & Automation Status' table in the README. If your analysis of the Release Notes shows a class listed there has now been completed or automated, update that specific class's row status from '❌ Upcoming' to '🔄 Implemented'. Do not modify rows for classes not mentioned in the notes.
+          3. Locate the '## Changelog' header. Insert a new subsection directly below it for the new release, formatted exactly like this:
              ### Version $VERSION_TAG ($CURRENT_DATE)
              [Summarize or paste the core bullet points from the Release Notes here]
              Keep the previous version history below it intact.
-          3. Go to the very bottom footer and update the variables exactly to:
+          4. Go to the very bottom footer and update the variables exactly to:
              **Current Module Version:** $VERSION_TAG  
              **Latest Release Date:** $CURRENT_DATE
 
@@ -81,7 +86,8 @@ jobs:
 
           if ! git diff --exit-code README.md; then
             git add README.md
-            git commit -m "docs: local AI rewrite of README.md for ${{ github.event.release.tag_name }} [skip ci]"
+            # Commits with the 'v' prefix explicitly added back to the string
+            git commit -m "docs: local AI rewrite of README.md for v${{ github.event.release.tag_name }} [skip ci]"
             git push origin HEAD:${{ github.event.repository.default_branch }}
           else
             echo "No semantic layout modifications detected. Skipping commit."
