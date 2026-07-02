@@ -1,16 +1,8 @@
 name: Gemini AI README Updater
 
 on:
-  workflow_dispatch:
-    inputs:
-      version_tag:
-        description: 'Version Tag (e.g., 1.6.0)'
-        required: true
-        default: '1.6.0'
-      release_body:
-        description: 'Release Notes / Changes'
-        required: true
-        default: '- Added full automation support for the Alternate Bard class features and its core subclasses.\n- Integrated Bardic Inspiration mechanics into the macro engine.'
+  release:
+    types: [published]
 
 jobs:
   build-readme:
