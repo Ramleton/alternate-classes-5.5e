@@ -1,67 +1,128 @@
-import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import {
+  ExploitPrerequisiteCheck,
+  isWeaponAttack,
+  meleeWeaponAttackHitCheck,
+  meleeWeaponAttackRedirectCheck,
+  weaponAttackHitCheck,
+} from 'automation/weaponUtils.js';
+import CPRMacro, { DItem, Trigger } from 'chris-premades/macro.js';
+import { genericARCWorkflow } from 'exploits/handling/genericARCExploit.js';
+import { useWorkflow } from 'exploits/handling/genericUseExploit.js';
+import { AutoExploitWorkflow } from 'exploits/types/autoExploitTypes.js';
+import { getAltMartialExploitsRemaining } from 'exploits/utils.js';
 
-const CUNNING_STRIKE_PAR_DEVIOUS_EXPLOIT_IDENTIFIERS = [
-  'ac55ePrecisionStrikeExploit',
-] as const;
+type ExploitHandler = AutoExploitWorkflow;
 
-const CUNNING_STRIKE_ARC_DEVIOUS_EXPLOIT_IDENTIFIERS = [
-  'ac55eArrestingStrikeExploit',
-  'ac55eDisarmExploit',
-  'ac55eSweepingStrikeExploit',
-  'ac55eCripplingStrikeExploit',
-  'ac55eDirtyHitExploit',
-  'ac55eExposingStrike',
-] as const;
+type AutoExploitType = 'ARC' | 'PAR';
+
+interface ExploitData {
+  prerequisiteCheck: ExploitPrerequisiteCheck;
+  handler: ExploitHandler;
+}
+
+const getExploitData = (
+  prerequisiteCheck: ExploitPrerequisiteCheck,
+  autoExploitType: AutoExploitType,
+): ExploitData => {
+  let handler = genericARCWorkflow;
+  if (autoExploitType === 'PAR') handler = useWorkflow;
+  return {
+    prerequisiteCheck,
+    handler,
+  };
+};
+
+const PAR_DEVIOUS_EXPLOITS: Record<string, ExploitData> = {
+  ac55ePrecisionStrikeExploit: getExploitData(isWeaponAttack, 'PAR'),
+};
+
+const ARC_DEVIOUS_EXPLOITS: Record<string, ExploitData> = {
+  ac55eArrestingStrikeExploit: getExploitData(weaponAttackHitCheck, 'ARC'),
+  ac55eDisarmExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC'),
+  ac55eSweepingStrikeExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC'),
+  ac55eCripplingStrikeExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC'),
+  ac55eDirtyHitExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC'),
+  ac55eExposingStrikeExploit: getExploitData(weaponAttackHitCheck, 'ARC'),
+  ac55eGlancingBlowExploit: getExploitData(
+    meleeWeaponAttackRedirectCheck,
+    'ARC',
+  ),
+};
+
+const checkExploitUsable = (
+  feat: Item<'feat'>,
+  token: Token,
+  workflow: Workflow,
+  exploitHandler: ExploitPrerequisiteCheck,
+): boolean => {
+  // ? Remove exploits that cannot be used by the actor
+  if (!getAltMartialExploitsRemaining(feat)) return false;
+  return exploitHandler({ feat, token, workflow });
+};
 
 const pre = (feat: Item<'feat'>): boolean => {
   if (!feat.actor) return false;
   const altClasses55eFlags = feat.actor.flags['alternate-classes-55e'];
-  if (!altClasses55eFlags?.macros?.['sneak-attack']) return false;
   if (altClasses55eFlags?.macros?.exploit?.used) return false;
-  return true;
-};
-
-const promptEarly: MidiMacroFunction = async ({ trigger: { entity } }) => {
-  const feat = entity as Item<'feat'>;
-  if (!pre(feat)) return;
+  if (altClasses55eFlags?.macros?.['cunning-strike']) return false;
   const {
     utils: { itemUtils },
   } = chrisPremades;
-  const ownedDeviousExploits =
-    CUNNING_STRIKE_PAR_DEVIOUS_EXPLOIT_IDENTIFIERS.map((i) =>
-      itemUtils.getItemByIdentifier(feat.actor!, i),
-    )
-      .filter(Boolean)
-      .map((i) => i as Item<'feat'>)
-      .filter((i) => i.system.type.subtype === 'deviousExploit');
-  if (!ownedDeviousExploits.length) return;
-
-  // Using Cunning Strike means using Sneak Attack by default
-  await post(feat);
+  const sneakAttack = itemUtils.getItemByIdentifier(
+    feat.actor,
+    'ac55eSneakAttack',
+  ) as Item<'feat'> | undefined;
+  if (!sneakAttack?.system.uses?.value) return false;
+  return true;
 };
 
-const prompt: MidiMacroFunction = async ({ trigger: { entity } }) => {
+type PromptFunction = ({
+  trigger,
+  workflow,
+  ditem,
+  deviousExploits,
+}: {
+  trigger: Trigger;
+  workflow: Workflow;
+  ditem?: DItem;
+  deviousExploits: Record<string, ExploitData>;
+}) => Promise<void>;
+
+const prompt: PromptFunction = async ({
+  trigger,
+  workflow,
+  deviousExploits,
+}) => {
+  const { entity, token } = trigger;
   const feat = entity as Item<'feat'>;
   if (!pre(feat)) return;
   const {
     utils: { dialogUtils, itemUtils, socketUtils },
   } = chrisPremades;
-  const ownedDeviousExploits =
-    CUNNING_STRIKE_ARC_DEVIOUS_EXPLOIT_IDENTIFIERS.map((i) =>
-      itemUtils.getItemByIdentifier(feat.actor!, i),
+  // Check for usable devious exploits
+  const usableDeviousExploits = Object.keys(deviousExploits)
+    .filter((i) =>
+      checkExploitUsable(
+        feat,
+        token,
+        workflow,
+        deviousExploits[i].prerequisiteCheck,
+      ),
     )
-      .filter(Boolean)
-      .map((i) => i as Item<'feat'>)
-      .filter((i) => i.system.type.subtype === 'deviousExploit');
-  if (!ownedDeviousExploits.length) return;
+    .map((i) => itemUtils.getItemByIdentifier(feat.actor!, i))
+    .filter(Boolean)
+    .map((i) => i as Item<'feat'>)
+    .filter((i) => i.system.type.subtype === 'deviousExploit');
+  if (!usableDeviousExploits.length) return;
   const userId = socketUtils.firstOwner(feat.actor!, true);
   const selection = await dialogUtils.confirmUseItem(feat, { userId });
   if (!selection) return;
   let selectedDeviousExploit: Item<'feat'>;
-  if (ownedDeviousExploits.length === 1) {
-    selectedDeviousExploit = ownedDeviousExploits[0];
+  if (usableDeviousExploits.length === 1) {
+    selectedDeviousExploit = usableDeviousExploits[0];
   } else {
-    const buttons: [string, Item<'feat'>][] = ownedDeviousExploits.map((i) => [
+    const buttons: [string, Item<'feat'>][] = usableDeviousExploits.map((i) => [
       i.name,
       i,
     ]);
@@ -73,20 +134,36 @@ const prompt: MidiMacroFunction = async ({ trigger: { entity } }) => {
     );
     if (!selectedDeviousExploit) return;
   }
-  console.log(selectedDeviousExploit);
+  // Use devious exploit
+  await deviousExploits[
+    selectedDeviousExploit.flags['chris-premades'].info.identifier
+  ].handler({
+    trigger: { ...trigger, entity: selectedDeviousExploit },
+    workflow,
+    ditem: undefined,
+    pre: async (_) => true,
+  });
   // Using Cunning Strike means using Sneak Attack by default
-  await post(feat);
+  await post(selectedDeviousExploit);
 };
 
-const post = async (feat: Item<'feat'>) => {
+const post = async (exploit: Item<'feat'>) => {
   const {
     utils: { genericUtils },
   } = chrisPremades;
   await genericUtils.setFlag(
-    feat.actor!,
+    exploit.actor!,
     'alternate-classes-55e',
     'macros.sneak-attack',
     1,
+  );
+  const prerequisiteLevel = exploit.system.prerequisites.level ?? 1;
+  const sneakAttackDiceCost = 1 + Math.floor((prerequisiteLevel - 1) / 4);
+  await genericUtils.setFlag(
+    exploit.actor!,
+    'alternate-classes-55e',
+    'macros.cunning-strike',
+    sneakAttackDiceCost,
   );
 };
 
@@ -100,13 +177,15 @@ const macro: CPRMacro = {
     actor: [
       {
         pass: 'postAttackRoll',
-        macro: promptEarly,
-        priority: 60,
+        macro: async (data) =>
+          await prompt({ ...data, deviousExploits: PAR_DEVIOUS_EXPLOITS }),
+        priority: 5,
       },
       {
         pass: 'attackRollComplete',
-        macro: prompt,
-        priority: 60,
+        macro: async (data) =>
+          await prompt({ ...data, deviousExploits: ARC_DEVIOUS_EXPLOITS }),
+        priority: 5,
       },
     ],
   },
