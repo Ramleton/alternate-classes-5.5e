@@ -17,8 +17,8 @@ jobs:
       - name: Generate New README via Gemini API
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          VERSION_INPUT: ${{ github.event.inputs.version_tag }}
-          RELEASE_INPUT: ${{ github.event.inputs.release_body }}
+          VERSION_INPUT: ${{ github.event.release.tag_name }}
+          RELEASE_INPUT: ${{ github.event.release.body }}
         run: |
           # Export system context to environment
           export MODULE_JSON=$(cat module.json 2>/dev/null || echo "No module.json file found.")
@@ -68,7 +68,6 @@ jobs:
             - Output ONLY the full, updated raw markdown content. 
             - Do not include any chat commentary, introduction, or wrap the final output in backticks.`;
 
-            // Updated endpoint routing to active gemini-3.5-flash
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
             
             try {
@@ -103,7 +102,7 @@ jobs:
 
           if ! git diff --exit-code README.md; then
             git add README.md
-            git commit -m "docs: AI rewrite of README.md for v${{ github.event.inputs.version_tag }} [skip ci]"
+            git commit -m "docs: AI rewrite of README.md for v${{ github.event.release.tag_name }} [skip ci]"
             git push origin HEAD:${{ github.event.repository.default_branch }}
           else
             echo "No semantic layout modifications detected. Skipping commit."
