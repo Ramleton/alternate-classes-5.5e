@@ -29,9 +29,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Setup Ollama natively on the runner
+      # 2. Setup Ollama natively on the runner using the official install script
       - name: Setup Ollama
-        uses: ai-action/setup-ollama@v2
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          # Start the Ollama background service running in the background
+          ollama serve &
+          # Wait 5 seconds for the local server instance to fully wake up
+          sleep 5
 
       # 3. Pull a fast, lightweight open weights model
       - name: Load AI Model
