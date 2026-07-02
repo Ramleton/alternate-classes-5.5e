@@ -1,8 +1,20 @@
 name: Local AI README Updater
 
+# on:
+#   release:
+#     types: [created, published] # Triggers automatically when a GitHub Release is published
+
 on:
-  release:
-    types: [created, published] # Triggers automatically when a GitHub Release is published
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version Tag (e.g., 1.6.0)'
+        required: true
+        default: '1.6.0'
+      release_body:
+        description: 'Release Notes / Changes'
+        required: true
+        default: '- Added full automation support for the Alternate Bard class features and its core subclasses.\n- Integrated Bardic Inspiration mechanics into the macro engine.'
 
 jobs:
   build-readme:
