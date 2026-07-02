@@ -1,5 +1,4 @@
 import { defineConfig, loadEnv } from 'vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { syncToFoundry } from './syncToFoundry.js';
 
 export default defineConfig(({ mode }) => {
@@ -7,10 +6,13 @@ export default defineConfig(({ mode }) => {
   const foundryPath = env.FOUNDRY_MODULE_PATH;
 
   return {
-    plugins: [tsconfigPaths(), syncToFoundry(foundryPath)],
+    plugins: [syncToFoundry(foundryPath)],
     build: {
       outDir: foundryPath,
       emptyOutDir: false,
+      resolve: {
+        tsconfigPaths: true,
+      },
       rollupOptions: {
         input: 'src/script.ts',
         output: {

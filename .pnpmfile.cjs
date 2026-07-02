@@ -1,4 +1,3 @@
-// .pnpmfile.cjs
 let githubPackageIndex = 0;
 const githubPackageNames = ['dnd5e', 'fvtt-types', 'sequencer'];
 
@@ -11,4 +10,10 @@ function readPackage(pkg, context) {
   return pkg;
 }
 
-module.exports = { hooks: { readPackage } };
+const pnpmFile = {
+  hooks: {
+    readPackage,
+  },
+};
+
+module.exports = pnpmFile;
