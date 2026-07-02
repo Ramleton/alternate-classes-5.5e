@@ -1,0 +1,96 @@
+name: Gemini AI Issue Status Tracker
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  update-issue-status:
+    if: github.event.label.name == 'in-progress'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Process Issue Status via Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          export CURRENT_README=$(cat README.md 2>/dev/null || echo "No README.md found.")
+
+          node -e '
+          async function run() {
+            const apiKey = process.env.GEMINI_API_KEY;
+            if (!apiKey) {
+              console.error("Error: GEMINI_API_KEY secret is missing.");
+              process.exit(1);
+            }
+
+            const prompt = `You are an expert technical documentation assistant maintaining a Foundry VTT module repository.
+            
+            Here is the current README.md:
+            """
+            ${process.env.CURRENT_README}
+            """
+            
+            An issue has just been moved to active development:
+            Title: "${process.env.ISSUE_TITLE}"
+            Body description:
+            """
+            ${process.env.ISSUE_BODY}
+            """
+
+            TASK:
+            1. Analyze the Issue Title and Body to determine which specific alternate D&D class listed in the "Supported Classes & Automation Status" table of the README is currently being worked on.
+            2. Locate that specific class row in the Markdown table and update its status icon and text to exactly "🔄 Updating".
+            3. Do not alter any other text, versions, headers, installation rules, or codeblocks in the document.
+            4. If the issue text does not mention any classes present in the layout table, make absolutely no changes to the content.
+
+            CRITICAL RULES:
+            - Output ONLY the full, updated raw markdown content.
+            - Do not include any chat commentary or wrap the output in backticks.`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+            
+            try {
+              const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+              });
+              
+              const data = await response.json();
+              const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+              
+              if (!textOutput) {
+                console.error("API Error: Missing text payload.", JSON.stringify(data));
+                process.exit(1);
+              }
+              
+              require("fs").writeFileSync("README.md", textOutput.trim());
+              console.log("README status table updated safely to Updating.");
+            } catch (err) {
+              console.error("Execution failure:", err);
+              process.exit(1);
+            }
+          }
+          run();
+          '
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if ! git diff --exit-code README.md; then
+            git add README.md
+            git commit -m "docs: set class status to 'Updating' via Issue #${{ github.event.issue.number }} [skip ci]"
+            git push origin HEAD:${{ github.event.repository.default_branch }}
+          else
+            echo "No semantic alterations required or no matching class detected."
+          fi
