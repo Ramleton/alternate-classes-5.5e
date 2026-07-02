@@ -2,7 +2,7 @@ name: Gemini AI README Updater
 
 on:
   release:
-    types: [published]
+    types: [published, edited]
 
 jobs:
   build-readme:
