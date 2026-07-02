@@ -28,22 +28,20 @@ jobs:
           VERSION_INPUT: ${{ github.event.inputs.version_tag }}
           RELEASE_INPUT: ${{ github.event.inputs.release_body }}
         run: |
-          # 1. Gather files safely
-          MODULE_JSON=$(cat module.json 2>/dev/null || echo "No module.json file found.")
-          CURRENT_README=$(cat README.md 2>/dev/null || echo "No README.md found.")
+          # Export system context to environment
+          export MODULE_JSON=$(cat module.json 2>/dev/null || echo "No module.json file found.")
+          export CURRENT_README=$(cat README.md 2>/dev/null || echo "No README.md found.")
+          export VERSION_TAG="v$VERSION_INPUT"
+          export CURRENT_DATE=$(date +"%B %Y")
 
-          VERSION_TAG="v$VERSION_INPUT"
-          CURRENT_DATE=$(date +"%B %Y")
-
-          # 2. Export variables to environment context for Node to safely access
-          export MODULE_JSON
-          export CURRENT_README
-          export VERSION_TAG
-          export RELEASE_INPUT
-          export CURRENT_DATE
-
-          # 3. Use inline Node script to construct a bulletproof JSON string and save to payload.json
           node -e '
+          async function run() {
+            const apiKey = process.env.GEMINI_API_KEY;
+            if (!apiKey) {
+              console.error("Error: GEMINI_API_KEY secret is missing or empty.");
+              process.exit(1);
+            }
+
             const prompt = `You are an expert technical documentation assistant updating the README.md for a Foundry VTT module called "Alternate Classes 5.5e".
             
             Here is the existing README.md:
@@ -78,19 +76,32 @@ jobs:
             - Output ONLY the full, updated raw markdown content. 
             - Do not include any chat commentary, introduction, or wrap the final output in backticks.`;
 
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
-            require("fs").writeFileSync("payload.json", JSON.stringify(payload));
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            
+            try {
+              const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+              });
+              
+              const data = await response.json();
+              const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+              
+              if (!textOutput) {
+                console.error("API Response Error: Missing text payload.", JSON.stringify(data));
+                process.exit(1);
+              }
+              
+              require("fs").writeFileSync("README.md", textOutput.trim());
+              console.log("README.md updated successfully via Node.js fetch engine.");
+            } catch (err) {
+              console.error("Network or API execution failure:", err);
+              process.exit(1);
+            }
+          }
+          run();
           '
-
-          # 4. Fire the endpoint utilizing payload file, ensuring jq reads the string field properly
-          curl -s -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}" \
-            -H "Content-Type: application/json" \
-            -d @payload.json \
-            | jq -r '.candidates[0].content.parts[0].text // empty' > README.md
-
-          # 5. Clean up temporary payload file
-          rm -f payload.json
-          echo "Gemini API request cycle complete."
 
       - name: Commit and Push Changes
         run: |
