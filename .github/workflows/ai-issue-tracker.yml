@@ -47,7 +47,7 @@ jobs:
 
             TASK:
             1. Analyze the Issue Title and Body to determine which specific alternate D&D class listed in the "Supported Classes & Automation Status" table of the README is currently being worked on.
-            2. Locate that specific class row in the Markdown table and update its status icon and text to exactly "🔄 Updating".
+            2. Locate that specific class row in the Markdown table and update its status icon and text to exactly "🛠️ In Progress".
             3. Do not alter any other text, versions, headers, installation rules, or codeblocks in the document.
             4. If the issue text does not mention any classes present in the layout table, make absolutely no changes to the content.
 
