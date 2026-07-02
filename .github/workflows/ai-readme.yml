@@ -25,59 +25,72 @@ jobs:
       - name: Generate New README via Gemini API
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          VERSION_INPUT: ${{ github.event.inputs.version_tag }}
+          RELEASE_INPUT: ${{ github.event.inputs.release_body }}
         run: |
+          # 1. Gather files safely
           MODULE_JSON=$(cat module.json 2>/dev/null || echo "No module.json file found.")
           CURRENT_README=$(cat README.md 2>/dev/null || echo "No README.md found.")
 
-          VERSION_TAG="v${{ github.event.inputs.version_tag }}"
-          RELEASE_NOTES="${{ github.event.inputs.release_body }}"
+          VERSION_TAG="v$VERSION_INPUT"
           CURRENT_DATE=$(date +"%B %Y")
 
-          # 1. Build the exact same structured prompt
-          PROMPT="You are an expert technical documentation assistant updating the README.md for a Foundry VTT module called 'Alternate Classes 5.5e'.
+          # 2. Export variables to environment context for Node to safely access
+          export MODULE_JSON
+          export CURRENT_README
+          export VERSION_TAG
+          export RELEASE_INPUT
+          export CURRENT_DATE
 
-          Here is the existing README.md:
-          '''
-          $CURRENT_README
-          '''
+          # 3. Use inline Node script to construct a bulletproof JSON string and save to payload.json
+          node -e '
+            const prompt = `You are an expert technical documentation assistant updating the README.md for a Foundry VTT module called "Alternate Classes 5.5e".
+            
+            Here is the existing README.md:
+            """
+            ${process.env.CURRENT_README}
+            """
+            
+            Here is the new module.json configuration:
+            """
+            ${process.env.MODULE_JSON}
+            """
+            
+            Recent Changes / Release Notes (READ THIS CAREFULLY TO IDENTIFY WORK DONE):
+            """
+            ${process.env.RELEASE_INPUT}
+            """
 
-          Here is the new module.json configuration:
-          '''
-          $MODULE_JSON
-          '''
+            TASK:
+            Update the provided README.md strictly using these rules:
+            1. Carefully read the "Recent Changes / Release Notes" above. Identify which alternate classes were explicitly worked on, automated, or implemented in this release.
+            2. Locate the "Supported Classes & Automation Status" table in the README. If your analysis of the Release Notes shows a class listed there has now been completed or automated, update that specific class’s row status from "❌ Upcoming" to "🔄 Implemented". Do not modify rows for classes not mentioned in the notes.
+            3. Locate the "## Changelog" header. Insert a new subsection directly below it for the new release, formatted exactly like this:
+               ### Version ${process.env.VERSION_TAG} (${process.env.CURRENT_DATE})
+               [Summarize or paste the core bullet points from the Release Notes here]
+               Keep the previous version history below it intact.
+            4. Go to the very bottom footer and update the variables exactly to:
+               **Current Module Version:** ${process.env.VERSION_TAG}  
+               **Latest Release Date:** ${process.env.CURRENT_DATE}
+            
+            CRITICAL RULES:
+            - Do not alter or delete the Installation steps, Requirements list, Technology Stack, Project Structure, or Credits sections. Keep them exactly as they are written.
+            - Output ONLY the full, updated raw markdown content. 
+            - Do not include any chat commentary, introduction, or wrap the final output in backticks.`;
 
-          Recent Changes / Release Notes (READ THIS CAREFULLY TO IDENTIFY WORK DONE):
-          '''
-          $RELEASE_NOTES
-          '''
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+            require("fs").writeFileSync("payload.json", JSON.stringify(payload));
+          '
 
-          TASK:
-          Update the provided README.md strictly using these rules:
-          1. Carefully read the 'Recent Changes / Release Notes' above. Identify which alternate classes were explicitly worked on, automated, or implemented in this release.
-          2. Locate the 'Supported Classes & Automation Status' table in the README. If your analysis of the Release Notes shows a class listed there has now been completed or automated, update that specific class's row status from '❌ Upcoming' to '🔄 Implemented'. Do not modify rows for classes not mentioned in the notes.
-          3. Locate the '## Changelog' header. Insert a new subsection directly below it for the new release, formatted exactly like this:
-             ### Version $VERSION_TAG ($CURRENT_DATE)
-             [Summarize or paste the core bullet points from the Release Notes here]
-             Keep the previous version history below it intact.
-          4. Go to the very bottom footer and update the variables exactly to:
-             **Current Module Version:** $VERSION_TAG  
-             **Latest Release Date:** $CURRENT_DATE
-
-          CRITICAL RULES:
-          - Do not alter or delete the Installation steps, Requirements list, Technology Stack, Project Structure, or Credits sections. Keep them exactly as they are written.
-          - Output ONLY the full, updated raw markdown content. 
-          - Do not include any chat commentary, introduction, or wrap the final output in backticks."
-
-          # 2. Escape the prompt string cleanly for a JSON payload
-          JSON_PAYLOAD=$(node -e "echo(JSON.stringify({contents: [{parts: [{text: process.env.PROMPT}]}]}))" env:PROMPT="$PROMPT" 2>/dev/null || jq -n --arg msg "$PROMPT" '{contents: [{parts: [{text: $msg}]}]}')
-
-          # 3. Hit Google's API endpoint instantly
-          curl -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}" \
+          # 4. Fire the endpoint utilizing payload file, ensuring jq reads the string field properly
+          curl -s -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}" \
             -H "Content-Type: application/json" \
-            -d "$JSON_PAYLOAD" \
-            | jq -r '.candidates[0].content.parts[0].text' > README.md
+            -d @payload.json \
+            | jq -r '.candidates[0].content.parts[0].text // empty' > README.md
 
-          echo "Gemini has finished processing the new README file layout."
+          # 5. Clean up temporary payload file
+          rm -f payload.json
+          echo "Gemini API request cycle complete."
 
       - name: Commit and Push Changes
         run: |
