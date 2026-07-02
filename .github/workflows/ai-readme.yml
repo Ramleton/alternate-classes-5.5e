@@ -76,7 +76,8 @@ jobs:
             - Output ONLY the full, updated raw markdown content. 
             - Do not include any chat commentary, introduction, or wrap the final output in backticks.`;
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            // Fixed endpoint pointing to gemini-1.5-flash-latest
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
             
             try {
               const response = await fetch(url, {
