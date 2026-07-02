@@ -1,12 +1,41 @@
 import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
-import { ViteDevServer } from 'vite';
-export const syncToFoundry = (foundryPath: string) => {
+import { build, InlineConfig, ViteDevServer } from 'vite';
+export const syncToFoundry = (
+  foundryPath: string,
+  viteConfig?: InlineConfig,
+) => {
   const pairs = [
     { src: 'src/templates', dest: 'assets/templates', ext: '.hbs' },
     { src: 'src/styles', dest: 'assets/styles', ext: '.css' },
   ];
+
+  let rebuilding = false;
+
+  const rebuildScripts = async () => {
+    if (rebuilding) return;
+    rebuilding = true;
+    try {
+      console.log('[foundry-sync] Script change detected, rebuilding...');
+      await build({ ...viteConfig, logLevel: 'silent' });
+      // Copy the rebuilt script to Foundry
+      const scriptSrc = path.join('dist', 'script.js');
+      if (foundryPath && fs.existsSync(scriptSrc)) {
+        await fsp.copyFile(scriptSrc, path.join(foundryPath, 'script.js'));
+        console.log('[foundry-sync] script.js rebuilt and synced.');
+      }
+    } finally {
+      rebuilding = false;
+    }
+  };
+
+  // Debounce to avoid triggering multiple builds on rapid saves
+  let rebuildTimeout: ReturnType<typeof setTimeout> | null = null;
+  const debouncedRebuild = () => {
+    if (rebuildTimeout) clearTimeout(rebuildTimeout);
+    rebuildTimeout = setTimeout(rebuildScripts, 300);
+  };
 
   // Helper function to build and sync module.json
   const syncModuleJson = async () => {
@@ -68,7 +97,14 @@ export const syncToFoundry = (foundryPath: string) => {
     name: 'foundry-sync',
     configureServer(server: ViteDevServer) {
       server.watcher.add(path.resolve('module.json'));
-      server.watcher.on('change', copy);
+      server.watcher.add(path.resolve('src/scripts'));
+      server.watcher.on('change', (filePath) => {
+        if (filePath.includes(path.join('src', 'scripts'))) {
+          debouncedRebuild();
+        } else {
+          copy(filePath);
+        }
+      });
       server.watcher.on('add', copy);
       server.watcher.on('unlink', copy);
     },
