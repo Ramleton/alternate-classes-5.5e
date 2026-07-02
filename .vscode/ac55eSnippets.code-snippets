@@ -32,7 +32,7 @@
       "",
       "const macro: CPRMacro = {",
       "  identifier: 'ac55e${1:${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}}',",
-      "  name: '${1/(^[a-z])|([A-Z])/ ${1:/upcase}${2:/upcase}/g}',",
+      "  name: '${2:${TM_FILENAME_BASE/(^[A-Za-z])|([a-z])([A-Z])|-([A-Za-z0-9])/${1:/upcase}${2}${3:+ }${3}${4:+ }${4:/upcase}/g}}',",
       "  source: 'Alternate Classes 5.5e',",
       "  version: '1.0.0',",
       "  rules: 'modern',",
