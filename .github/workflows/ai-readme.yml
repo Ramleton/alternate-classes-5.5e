@@ -2,7 +2,7 @@ name: Local AI README Updater
 
 on:
   release:
-    types: [created] # Triggers automatically when a GitHub Release is published
+    types: [created, published] # Triggers automatically when a GitHub Release is published
 
 jobs:
   build-readme:
