@@ -20,7 +20,7 @@ This module adds comprehensive D&D 5e alternate subclass options with full autom
 | **Monk**      |  🔄 Implemented   |
 | **Paladin**   |  🔄 Implemented   |
 | **Ranger**    |  🔄 Implemented   |
-| **Rogue**     |  🔄 Implemented   |
+| **Rogue**     |   🔄 Updating    |
 | **Sorcerer**  |    ❌ Upcoming    |
 | **Warlock**   |    ❌ Upcoming    |
 | **Wizard**    |    ❌ Upcoming    |
