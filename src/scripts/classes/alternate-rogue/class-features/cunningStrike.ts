@@ -155,6 +155,7 @@ const prompt: PromptFunction = async ({
     workflow,
     ditem: undefined,
     pre: async (_) => true,
+    post: async (_) => Promise.resolve(),
   });
 };
 
