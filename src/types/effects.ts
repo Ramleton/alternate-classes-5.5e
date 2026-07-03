@@ -38,7 +38,8 @@ type DAESpecialDuration =
   | 'turnStartTarget'
   | 'turnEndTarget'
   | '1Reaction'
-  | '1Attack';
+  | '1Attack'
+  | 'isSave';
 
 export interface EffectFlags {
   'alternate-classes-55e'?: {

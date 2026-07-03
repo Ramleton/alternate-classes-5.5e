@@ -116,7 +116,15 @@ const prompt: PromptFunction = async ({
     .filter((i) => i.system.type.subtype === 'deviousExploit');
   if (!usableDeviousExploits.length) return;
   const userId = socketUtils.firstOwner(feat.actor!, true);
-  const selection = await dialogUtils.confirmUseItem(feat, { userId });
+  let message: string;
+  switch (deviousExploits) {
+    case PAR_DEVIOUS_EXPLOITS:
+      message = 'Post Attack Roll: Use Cunning Strike?';
+      break;
+    default:
+      message = 'Attack Roll Complete: Use Cunning Strike?';
+  }
+  const selection = await dialogUtils.confirm(feat.name, message, { userId });
   if (!selection) return;
   let selectedDeviousExploit: Item<'feat'>;
   if (usableDeviousExploits.length === 1) {
@@ -124,16 +132,21 @@ const prompt: PromptFunction = async ({
   } else {
     const buttons: [string, Item<'feat'>][] = usableDeviousExploits.map((i) => [
       i.name,
-      i,
+      i.flags['chris-premades'].info.identifier,
     ]);
-    selectedDeviousExploit = await dialogUtils.buttonDialog(
+    const selectedId = await dialogUtils.buttonDialog(
       feat.name,
       'Select Devious Exploit',
       buttons,
       { userId },
     );
+    selectedDeviousExploit = usableDeviousExploits.find(
+      (i) => i.flags['chris-premades'].info.identifier === selectedId,
+    )!;
     if (!selectedDeviousExploit) return;
   }
+  // Using Cunning Strike means using Sneak Attack by default
+  await spendUses(selectedDeviousExploit, workflow);
   // Use devious exploit
   await deviousExploits[
     selectedDeviousExploit.flags['chris-premades'].info.identifier
@@ -143,11 +156,9 @@ const prompt: PromptFunction = async ({
     ditem: undefined,
     pre: async (_) => true,
   });
-  // Using Cunning Strike means using Sneak Attack by default
-  await post(selectedDeviousExploit);
 };
 
-const post = async (exploit: Item<'feat'>) => {
+const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
   const {
     utils: { genericUtils },
   } = chrisPremades;
@@ -155,9 +166,9 @@ const post = async (exploit: Item<'feat'>) => {
     exploit.actor!,
     'alternate-classes-55e',
     'macros.sneak-attack',
-    1,
+    workflow.item.system.identifier,
   );
-  const prerequisiteLevel = exploit.system.prerequisites.level ?? 1;
+  const prerequisiteLevel = exploit.system.prerequisites?.level ?? 1;
   const sneakAttackDiceCost = 1 + Math.floor((prerequisiteLevel - 1) / 4);
   await genericUtils.setFlag(
     exploit.actor!,

@@ -246,23 +246,22 @@ interface ActorData {
 
 type ActorDataCommon = Omit<ActorData, 'details'>;
 
-interface CharacterDetails {
+export interface CharacterDetails {
   level: number;
 }
 
-interface NPCDetails {
+export interface NPCDetails {
   cr: number;
 }
 
-export interface CharacterData extends ActorDataCommon {
-  details: ActorData['details'] & CharacterDetails;
-}
-
-export interface NPCData extends ActorDataCommon {
-  details: ActorData['details'] & NPCDetails;
-}
-
 declare global {
+  interface CharacterData extends ActorDataCommon {
+    details: ActorData['details'] & CharacterDetails;
+  }
+
+  interface NPCData extends ActorDataCommon {
+    details: ActorData['details'] & NPCDetails;
+  }
   class Actor5e<
     SubType extends Actor.SubType = Actor.SubType,
   > extends Actor<SubType> {
