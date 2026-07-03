@@ -1,4 +1,5 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import { runActivity } from 'automation/utils.js';
 import {
   ExploitPrerequisiteCheck,
   isWeaponAttack,
@@ -116,7 +117,14 @@ const prompt: PromptFunction = async ({
     .filter(Boolean)
     .map((i) => i as Item<'feat'>)
     .filter((i) => i.system.type.subtype === 'deviousExploit');
-  if (!usableDeviousExploits.length) return;
+  const deadlyBlades = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eDeadlyBlades',
+  ) as Item<'feat'> | undefined;
+  const usableFeatures: Item<'feat'>[] = usableDeviousExploits;
+  if (deadlyBlades && deviousExploits === ARC_DEVIOUS_EXPLOITS)
+    usableFeatures.push(deadlyBlades);
+  if (!usableFeatures.length) return;
   const userId = socketUtils.firstOwner(feat.actor!, true);
   let message: string;
   switch (deviousExploits) {
@@ -128,37 +136,44 @@ const prompt: PromptFunction = async ({
   }
   const selection = await dialogUtils.confirm(feat.name, message, { userId });
   if (!selection) return;
-  let selectedDeviousExploit: Item<'feat'>;
-  if (usableDeviousExploits.length === 1) {
-    selectedDeviousExploit = usableDeviousExploits[0];
+  let selectedFeature: Item<'feat'>;
+  if (usableFeatures.length === 1) {
+    selectedFeature = usableFeatures[0];
   } else {
-    const buttons: [string, Item<'feat'>][] = usableDeviousExploits.map((i) => [
+    const buttons: [string, Item<'feat'>][] = usableFeatures.map((i) => [
       i.name,
       i.flags['chris-premades'].info.identifier,
     ]);
     const selectedId = await dialogUtils.buttonDialog(
       feat.name,
-      'Select Devious Exploit',
+      'Select Devious Exploit or Subclass Feature',
       buttons,
       { userId },
     );
-    selectedDeviousExploit = usableDeviousExploits.find(
+    selectedFeature = usableFeatures.find(
       (i) => i.flags['chris-premades'].info.identifier === selectedId,
     )!;
-    if (!selectedDeviousExploit) return;
+    if (!selectedFeature) return;
   }
   // Using Cunning Strike means using Sneak Attack by default
-  await spendUses(selectedDeviousExploit, workflow);
-  // Use devious exploit
-  await deviousExploits[
-    selectedDeviousExploit.flags['chris-premades'].info.identifier
-  ].handler({
-    trigger: { ...trigger, entity: selectedDeviousExploit },
-    workflow,
-    ditem: undefined,
-    pre: async (_) => true,
-    post: async (_) => Promise.resolve(),
-  });
+  await spendUses(selectedFeature, workflow);
+  const target = workflow.hitTargets.first() as Token;
+  switch (selectedFeature.system.identifier) {
+    case 'deadly-blades':
+      await runActivity(selectedFeature, 'save', [target]);
+      break;
+    default:
+      // Use devious exploit
+      await deviousExploits[
+        selectedFeature.flags['chris-premades'].info.identifier
+      ].handler({
+        trigger: { ...trigger, entity: selectedFeature },
+        workflow,
+        ditem: undefined,
+        pre: async (_) => true,
+        post: async (_) => Promise.resolve(),
+      });
+  }
 };
 
 const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
@@ -171,8 +186,17 @@ const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
     'macros.sneak-attack',
     workflow.item.system.identifier,
   );
-  const prerequisiteLevel = exploit.system.prerequisites?.level ?? 1;
-  const sneakAttackDiceCost = 1 + Math.floor((prerequisiteLevel - 1) / 4);
+  let sneakAttackDiceCost = 0;
+  if (exploit.system.type.subtype === 'deviousExploit') {
+    const prerequisiteLevel = exploit.system.prerequisites?.level ?? 1;
+    sneakAttackDiceCost = 1 + Math.floor((prerequisiteLevel - 1) / 4);
+  } else {
+    switch (exploit.system.identifier) {
+      case 'deadly-blades':
+        sneakAttackDiceCost = 1;
+        break;
+    }
+  }
   await genericUtils.setFlag(
     exploit.actor!,
     'alternate-classes-55e',

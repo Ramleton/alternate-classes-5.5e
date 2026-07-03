@@ -9,7 +9,7 @@ import {
 } from 'exploits/utils.js';
 
 const autoCritical: MidiMacroFunction = async ({
-  trigger: { entity, token },
+  trigger: { entity },
   workflow,
 }) => {
   const feat = entity as Item<'feat'>;
@@ -27,10 +27,32 @@ const autoCritical: MidiMacroFunction = async ({
   const isTargetSurprised = target.actor!.statuses.has('surprised');
   if (!isTargetIncapacitated && !isTargetSurprised) return;
   workflow.isCritical = true;
-  await ChatMessage.create({
-    content: `${feat.name}: Critical Hit`,
-    speaker: ChatMessage.getSpeaker({ token: token }),
+  // ? WIP: Update Chat Card with Critical Hit
+  // // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // const chatMessage = (game.messages as any).get(
+  //   workflow.itemCardId,
+  // ) as ChatMessage;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updatedAttackRoll = workflow.attackRoll as any;
+  const attributions = updatedAttackRoll.options.attributions ?? [];
+  attributions.push({
+    type: 'CRIT',
+    source: feat.name,
+    displayName: 'Critical Hit',
   });
+  // updatedAttackRoll.options.attributions = attributions;
+  // const newAttackRollHTML =
+  //   await MidiQOL.midiRenderAttackRoll(updatedAttackRoll);
+  // // Update Chat Card
+  // const container = document.createElement('div');
+  // container.innerHTML = workflow.chatCard.content;
+  // const oldAttackRollDiv = container.querySelector('.midi-qol-attack-roll');
+  // console.log(container, oldAttackRollDiv, newAttackRollHTML);
+  // if (oldAttackRollDiv) {
+  //   oldAttackRollDiv.outerHTML = newAttackRollHTML;
+  //   await chatMessage.update({ content: container.innerHTML });
+  // }
+  await workflow.setAttackRoll(updatedAttackRoll);
 };
 
 const prompt: MacroFunction = async ({ trigger: { entity, token } }) => {
