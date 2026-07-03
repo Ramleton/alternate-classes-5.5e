@@ -19,12 +19,13 @@ export const reduceSneakAttack = (workflow: Workflow, amount: number) => {
 
 export const qualifiesForSneakAttack = (
   sneakAttack: Item<'feat'>,
+  token: Token,
   workflow: Workflow,
 ): boolean => {
   if (!sneakAttack.system.uses?.value) return false;
   if (getWorkflowProperty(workflow, 'sneakAttack')) return false;
   const {
-    utils: { tokenUtils, workflowUtils },
+    utils: { effectUtils, tokenUtils, workflowUtils },
   } = chrisPremades;
   const actionType = workflowUtils.getActionType(workflow);
   // If the attack is not a finesse or ranged weapon attack, don't prompt
@@ -47,9 +48,22 @@ export const qualifiesForSneakAttack = (
   const hadDisadvantage = attackRollOptions.attributions.some(
     (a: { type: string }) => a.type === 'DIS',
   );
-  const nearbyEnemy = !!tokenUtils.findNearby(target, 5, 'enemy', {
+  const distanceToTarget = tokenUtils.getDistance(token, target);
+  const nearbyEnemies = tokenUtils.findNearby(target, 5, 'enemy', {
     includeIncapacitated: false,
     includeToken: false,
   }).length;
-  return (hadAdvantage || nearbyEnemy) && !hadDisadvantage;
+  if (distanceToTarget <= 5 && nearbyEnemies < 2) {
+    return false;
+  } else if (!nearbyEnemies) {
+    return false;
+  }
+  const predictiveFightingEffect = effectUtils.getEffectByIdentifier(
+    target.actor!,
+    'ac55ePredictiveFightingTarget',
+  );
+  if (predictiveFightingEffect) {
+    return !!nearbyEnemies && !hadDisadvantage;
+  }
+  return (hadAdvantage || !!nearbyEnemies) && !hadDisadvantage;
 };

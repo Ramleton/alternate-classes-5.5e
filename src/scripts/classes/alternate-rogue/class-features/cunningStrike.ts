@@ -75,7 +75,7 @@ const checkExploitUsable = (
   return exploitHandler({ feat, token, workflow });
 };
 
-const pre = (feat: Item<'feat'>, workflow: Workflow): boolean => {
+const pre = (feat: Item<'feat'>, token: Token, workflow: Workflow): boolean => {
   if (!feat.actor) return false;
   const altClasses55eFlags = feat.actor.flags['alternate-classes-55e'];
   if (altClasses55eFlags?.macros?.exploit?.used) return false;
@@ -87,7 +87,7 @@ const pre = (feat: Item<'feat'>, workflow: Workflow): boolean => {
     feat.actor,
     'ac55eSneakAttack',
   ) as Item<'feat'>;
-  if (!qualifiesForSneakAttack(sneakAttack, workflow)) return false;
+  if (!qualifiesForSneakAttack(sneakAttack, token, workflow)) return false;
   return true;
 };
 
@@ -110,7 +110,7 @@ const prompt: PromptFunction = async ({
 }) => {
   const { entity, token } = trigger;
   const feat = entity as Item<'feat'>;
-  if (!pre(feat, workflow)) return;
+  if (!pre(feat, token, workflow)) return;
   const {
     utils: { dialogUtils, itemUtils, socketUtils },
   } = chrisPremades;

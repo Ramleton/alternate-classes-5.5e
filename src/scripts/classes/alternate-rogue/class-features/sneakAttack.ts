@@ -8,13 +8,16 @@ import {
   qualifiesForSneakAttack,
 } from '../utils/sneakAttackUtils.js';
 
-const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
+const prompt: MidiMacroFunction = async ({
+  trigger: { entity, token },
+  workflow,
+}) => {
   if (!workflow.hitTargets.size) return;
   const feat = entity as Item<'feat'>;
   if (!feat.system.uses?.value) return;
   const useSneakAttack = getWorkflowProperty(workflow, 'sneakAttack');
   if (useSneakAttack) return;
-  if (!qualifiesForSneakAttack(feat, workflow)) return;
+  if (!qualifiesForSneakAttack(feat, token, workflow)) return;
   const {
     utils: { socketUtils },
   } = chrisPremades;
