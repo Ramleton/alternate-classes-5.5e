@@ -13,6 +13,7 @@ export interface ScaleValueTypeDice {
   die: 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';
   modifiers: Set<string>;
   number: number | null;
+  formula: string;
   [key: string]: unknown;
 }
 

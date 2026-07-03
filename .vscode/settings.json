@@ -17,10 +17,12 @@
   "editor.insertSpaces": true,
   "cSpell.words": [
     "adriangaro",
+    "auraeffects",
     "blindsight",
     "Counterspell",
     "darkvision",
     "ditem",
+    "esmodules",
     "ethaks",
     "fantasycalendar",
     "fvtt",
@@ -42,8 +44,10 @@
     "Spellbreaker",
     "spellcasting",
     "subrepos",
+    "TARC",
     "temphp",
     "tempmax",
+    "TPAR",
     "tremorsense",
     "truesight",
     "warcry"
