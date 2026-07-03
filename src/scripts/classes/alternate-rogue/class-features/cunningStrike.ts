@@ -74,9 +74,8 @@ const pre = (feat: Item<'feat'>, workflow: Workflow): boolean => {
   const sneakAttack = itemUtils.getItemByIdentifier(
     feat.actor,
     'ac55eSneakAttack',
-  ) as Item<'feat'> | undefined;
-  if (!sneakAttack?.system.uses?.value) return false;
-  if (!qualifiesForSneakAttack(feat, workflow)) return false;
+  ) as Item<'feat'>;
+  if (!qualifiesForSneakAttack(sneakAttack, workflow)) return false;
   return true;
 };
 
