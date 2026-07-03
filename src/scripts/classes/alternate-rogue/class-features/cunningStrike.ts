@@ -127,9 +127,15 @@ const prompt: PromptFunction = async ({
     feat.actor!,
     'ac55eDeadlyBlades',
   ) as Item<'feat'> | undefined;
+  const supremeSneak = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eSupremeSneak',
+  ) as Item<'feat'> | undefined;
   const usableFeatures: Item<'feat'>[] = usableDeviousExploits;
   if (deadlyBlades && deviousExploits === ARC_DEVIOUS_EXPLOITS)
     usableFeatures.push(deadlyBlades);
+  if (supremeSneak && deviousExploits === ARC_DEVIOUS_EXPLOITS)
+    usableFeatures.push(supremeSneak);
   if (!usableFeatures.length) return;
   const userId = socketUtils.firstOwner(feat.actor!, true);
   let message: string;
@@ -168,6 +174,8 @@ const prompt: PromptFunction = async ({
     case 'deadly-blades':
       await runActivity(selectedFeature, 'save', [target]);
       break;
+    case 'supreme-sneak':
+      break;
     default:
       // Use devious exploit
       await deviousExploits[
@@ -191,6 +199,7 @@ const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
   } else {
     switch (exploit.system.identifier) {
       case 'deadly-blades':
+      case 'supreme-sneak':
         sneakAttackDiceCost = 1;
         break;
     }
