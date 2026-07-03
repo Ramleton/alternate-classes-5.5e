@@ -59,6 +59,11 @@ const ARC_DEVIOUS_EXPLOITS: Record<string, ExploitData> = {
   ),
 };
 
+const SUBCLASS_FEATURE_IDENTIFIERS = [
+  'ac55eDeadlyBlades',
+  'ac55eSupremeSneak',
+] as const;
+
 const checkExploitUsable = (
   feat: Item<'feat'>,
   token: Token,
@@ -123,19 +128,14 @@ const prompt: PromptFunction = async ({
     .filter(Boolean)
     .map((i) => i as Item<'feat'>)
     .filter((i) => i.system.type.subtype === 'deviousExploit');
-  const deadlyBlades = itemUtils.getItemByIdentifier(
-    feat.actor!,
-    'ac55eDeadlyBlades',
-  ) as Item<'feat'> | undefined;
-  const supremeSneak = itemUtils.getItemByIdentifier(
-    feat.actor!,
-    'ac55eSupremeSneak',
-  ) as Item<'feat'> | undefined;
   const usableFeatures: Item<'feat'>[] = usableDeviousExploits;
-  if (deadlyBlades && deviousExploits === ARC_DEVIOUS_EXPLOITS)
-    usableFeatures.push(deadlyBlades);
-  if (supremeSneak && deviousExploits === ARC_DEVIOUS_EXPLOITS)
-    usableFeatures.push(supremeSneak);
+  for (const identifier of SUBCLASS_FEATURE_IDENTIFIERS) {
+    const subclassFeature = itemUtils.getItemByIdentifier(
+      feat.actor!,
+      identifier,
+    ) as Item<'feat'> | undefined;
+    if (subclassFeature) usableFeatures.push(subclassFeature);
+  }
   if (!usableFeatures.length) return;
   const userId = socketUtils.firstOwner(feat.actor!, true);
   let message: string;
@@ -170,11 +170,11 @@ const prompt: PromptFunction = async ({
   // Using Cunning Strike means using Sneak Attack by default
   await spendUses(selectedFeature, workflow);
   const target = workflow.hitTargets.first() as Token;
-  switch (selectedFeature.system.identifier) {
-    case 'deadly-blades':
+  switch (selectedFeature.flags['chris-premades']?.info?.identifier) {
+    case 'ac55eDeadlyBlades':
       await runActivity(selectedFeature, 'save', [target]);
       break;
-    case 'supreme-sneak':
+    case 'ac55eSupremeSneak':
       break;
     default:
       // Use devious exploit
