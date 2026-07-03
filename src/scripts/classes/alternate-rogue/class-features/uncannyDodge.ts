@@ -10,9 +10,17 @@ const prompt: MidiMacroFunction = async ({
   const feat = entity as Item<'feat'>;
   const {
     Teleport,
-    utils: { actorUtils, dialogUtils, effectUtils, socketUtils, workflowUtils },
+    utils: {
+      actorUtils,
+      dialogUtils,
+      effectUtils,
+      socketUtils,
+      tokenUtils,
+      workflowUtils,
+    },
   } = chrisPremades;
   if (actorUtils.hasUsedReaction(feat.actor!)) return;
+  if (!tokenUtils.canSee(token, workflow.token!)) return;
   const userId = socketUtils.firstOwner(feat.actor!, true);
   const selection = await dialogUtils.confirmUseItem(feat, { userId });
   if (!selection) return;
