@@ -8,10 +8,10 @@ export const getSneakAttack = (actor: Actor5e) => {
 };
 
 export const qualifiesForSneakAttack = (
-  feat: Item<'feat'>,
+  sneakAttack: Item<'feat'>,
   workflow: Workflow,
 ): boolean => {
-  if (!feat.system.uses?.value) return false;
+  if (!sneakAttack.system.uses?.value) return false;
   const {
     utils: { tokenUtils, workflowUtils },
   } = chrisPremades;
