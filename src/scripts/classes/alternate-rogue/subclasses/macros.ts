@@ -1,5 +1,7 @@
 import CPRMacro from '../../../../types/chris-premades/macro.js';
 
-const macros: CPRMacro[] = [];
+import assassin from './assassin/macros.js';
+
+const macros: CPRMacro[] = [...assassin];
 
 export default macros;
