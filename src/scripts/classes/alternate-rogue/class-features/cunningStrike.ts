@@ -7,12 +7,19 @@ import {
   meleeWeaponAttackRedirectCheck,
   weaponAttackHitCheck,
 } from 'automation/weaponUtils.js';
+import {
+  getWorkflowProperty,
+  setWorkflowProperty,
+} from 'automation/workflowUtils.js';
 import CPRMacro, { DItem, Trigger } from 'chris-premades/macro.js';
 import { genericARCWorkflow } from 'exploits/handling/genericARCExploit.js';
 import { useWorkflow } from 'exploits/handling/genericUseExploit.js';
 import { AutoExploitWorkflow } from 'exploits/types/autoExploitTypes.js';
 import { getAltMartialExploitsRemaining } from 'exploits/utils.js';
-import { qualifiesForSneakAttack } from '../utils/sneakAttackUtils.js';
+import {
+  qualifiesForSneakAttack,
+  reduceSneakAttack,
+} from '../utils/sneakAttackUtils.js';
 
 type ExploitHandler = AutoExploitWorkflow;
 
@@ -67,7 +74,7 @@ const pre = (feat: Item<'feat'>, workflow: Workflow): boolean => {
   if (!feat.actor) return false;
   const altClasses55eFlags = feat.actor.flags['alternate-classes-55e'];
   if (altClasses55eFlags?.macros?.exploit?.used) return false;
-  if (altClasses55eFlags?.macros?.['cunning-strike']) return false;
+  if (getWorkflowProperty(workflow, 'cunningStrike')) return false;
   const {
     utils: { itemUtils },
   } = chrisPremades;
@@ -176,15 +183,7 @@ const prompt: PromptFunction = async ({
 };
 
 const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
-  const {
-    utils: { genericUtils },
-  } = chrisPremades;
-  await genericUtils.setFlag(
-    exploit.actor!,
-    'alternate-classes-55e',
-    'macros.sneak-attack',
-    workflow.item.system.identifier,
-  );
+  setWorkflowProperty(workflow, 'sneakAttack', 1);
   let sneakAttackDiceCost = 0;
   if (exploit.system.type.subtype === 'deviousExploit') {
     const prerequisiteLevel = exploit.system.prerequisites?.level ?? 1;
@@ -196,12 +195,7 @@ const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
         break;
     }
   }
-  await genericUtils.setFlag(
-    exploit.actor!,
-    'alternate-classes-55e',
-    'macros.cunning-strike',
-    sneakAttackDiceCost,
-  );
+  reduceSneakAttack(workflow, sneakAttackDiceCost);
 };
 
 const macro: CPRMacro = {

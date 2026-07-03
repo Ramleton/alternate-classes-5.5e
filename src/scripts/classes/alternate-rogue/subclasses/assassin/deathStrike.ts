@@ -1,11 +1,11 @@
+import { getWorkflowProperty } from 'automation/workflowUtils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 
 const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
   const feat = entity as Item<'feat'>;
   if (!feat.actor) return;
   if (!feat.system.uses?.value) return;
-  if (!feat.actor.flags['alternate-classes-55e']?.macros?.['sneak-attack'])
-    return;
+  if (!getWorkflowProperty(workflow, 'sneakAttack')) return;
   if (!workflow.hitTargets.size) return;
   const target = workflow.targets.first() as Token;
   const isTargetIncapacitated = target.actor!.statuses.has('incapacitated');

@@ -1,3 +1,4 @@
+import { getWorkflowProperty } from 'automation/workflowUtils.js';
 import CPRMacro, {
   MacroFunction,
   MidiMacroFunction,
@@ -14,8 +15,7 @@ const autoCritical: MidiMacroFunction = async ({
 }) => {
   const feat = entity as Item<'feat'>;
   if (!feat.actor) return;
-  if (!feat.actor.flags['alternate-classes-55e']?.macros?.['sneak-attack'])
-    return;
+  if (!getWorkflowProperty(workflow, 'sneakAttack')) return;
   if (!workflow.hitTargets.size) return;
   const {
     utils: { constants, workflowUtils },

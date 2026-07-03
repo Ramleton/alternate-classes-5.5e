@@ -1,4 +1,8 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import {
+  getWorkflowProperty,
+  setWorkflowProperty,
+} from 'automation/workflowUtils.js';
 import { ScaleValueTypeDice } from 'fvtt-types/CharacterSystemData.js';
 
 export const getSneakAttack = (actor: Actor5e) => {
@@ -7,11 +11,18 @@ export const getSneakAttack = (actor: Actor5e) => {
   ] as ScaleValueTypeDice;
 };
 
+export const reduceSneakAttack = (workflow: Workflow, amount: number) => {
+  const currReduction =
+    (getWorkflowProperty(workflow, 'sneakAttackReduction') as number) ?? 0;
+  setWorkflowProperty(workflow, 'sneakAttackReduction', currReduction + amount);
+};
+
 export const qualifiesForSneakAttack = (
   sneakAttack: Item<'feat'>,
   workflow: Workflow,
 ): boolean => {
   if (!sneakAttack.system.uses?.value) return false;
+  if (getWorkflowProperty(workflow, 'sneakAttack')) return false;
   const {
     utils: { tokenUtils, workflowUtils },
   } = chrisPremades;
