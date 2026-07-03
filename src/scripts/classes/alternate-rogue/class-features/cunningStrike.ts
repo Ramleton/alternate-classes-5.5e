@@ -11,6 +11,7 @@ import { genericARCWorkflow } from 'exploits/handling/genericARCExploit.js';
 import { useWorkflow } from 'exploits/handling/genericUseExploit.js';
 import { AutoExploitWorkflow } from 'exploits/types/autoExploitTypes.js';
 import { getAltMartialExploitsRemaining } from 'exploits/utils.js';
+import { qualifiesForSneakAttack } from '../utils/sneakAttackUtils.js';
 
 type ExploitHandler = AutoExploitWorkflow;
 
@@ -61,7 +62,7 @@ const checkExploitUsable = (
   return exploitHandler({ feat, token, workflow });
 };
 
-const pre = (feat: Item<'feat'>): boolean => {
+const pre = (feat: Item<'feat'>, workflow: Workflow): boolean => {
   if (!feat.actor) return false;
   const altClasses55eFlags = feat.actor.flags['alternate-classes-55e'];
   if (altClasses55eFlags?.macros?.exploit?.used) return false;
@@ -74,6 +75,7 @@ const pre = (feat: Item<'feat'>): boolean => {
     'ac55eSneakAttack',
   ) as Item<'feat'> | undefined;
   if (!sneakAttack?.system.uses?.value) return false;
+  if (!qualifiesForSneakAttack(feat, workflow)) return false;
   return true;
 };
 
@@ -96,7 +98,7 @@ const prompt: PromptFunction = async ({
 }) => {
   const { entity, token } = trigger;
   const feat = entity as Item<'feat'>;
-  if (!pre(feat)) return;
+  if (!pre(feat, workflow)) return;
   const {
     utils: { dialogUtils, itemUtils, socketUtils },
   } = chrisPremades;
