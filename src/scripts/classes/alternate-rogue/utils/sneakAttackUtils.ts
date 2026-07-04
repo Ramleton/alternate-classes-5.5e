@@ -32,9 +32,7 @@ export const qualifiesForSneakAttack = (
   if (
     !(
       actionType === 'mwak' &&
-      (workflow.item as Item<'weapon'>).system.properties.some(
-        (p) => p === 'fin',
-      )
+      (workflow.item as Item<'weapon'>).system.properties.has('fin')
     ) &&
     actionType !== 'rwak'
   )
@@ -50,15 +48,15 @@ export const qualifiesForSneakAttack = (
    */
   const potentInsightEffect = effectUtils.getEffectByIdentifier(
     sneakAttack.actor!,
-    'ac55ePotentInsight',
+    'ac55ePotentInsightEffect',
   );
   if (potentInsightEffect) return false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const attackRollOptions = workflow.attackRoll!.options as any;
-  const hadAdvantage = attackRollOptions.attributions.some(
+  const hadAdvantage = attackRollOptions.attributions?.some(
     (a: { type: string }) => a.type === 'ADV',
   );
-  const hadDisadvantage = attackRollOptions.attributions.some(
+  const hadDisadvantage = attackRollOptions.attributions?.some(
     (a: { type: string }) => a.type === 'DIS',
   );
   const distanceToTarget = tokenUtils.getDistance(token, target);
