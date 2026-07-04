@@ -11,7 +11,7 @@ import { getSneakAttack } from '../../utils/sneakAttackUtils.js';
  * your next turn.
  */
 const prompt: MidiMacroFunction = async ({
-  trigger: { entity, sourceActor },
+  trigger: { entity, sourceToken },
   workflow,
 }) => {
   const {
@@ -34,11 +34,11 @@ const prompt: MidiMacroFunction = async ({
     'ac55eTacticalAcumenEffect',
   );
   if (!tacticalAcumenEffect) return;
-  if (!tacticalAcumenEffect.origin!.includes(feat.actor!.id!)) return;
   await tacticalAcumenEffect.delete();
-  const selection = dialogUtils.confirm(
+  if (!tacticalAcumenEffect.origin!.includes(feat.actor!.id!)) return;
+  const selection = await dialogUtils.confirm(
     feat.name,
-    `Add your Sneak Attack bonus to ${sourceActor!.name}'s damage roll?`,
+    `Add your Sneak Attack bonus to ${sourceToken!.actor!.name}'s damage roll?`,
     { userId: socketUtils.firstOwner(feat.actor!, true) },
   );
   if (!selection) return;
