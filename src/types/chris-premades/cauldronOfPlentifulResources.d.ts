@@ -833,7 +833,7 @@ export default interface CauldronOfPlentifulResources {
           identifier?: string;
           castData?: object;
         },
-      );
+      ): Promise<Item[]>;
       getItemDescription(name: string): string;
       isSpellFeature(item: Item.Implementation): boolean;
       getConfig(item: Item.Implementation, key: string): any;
