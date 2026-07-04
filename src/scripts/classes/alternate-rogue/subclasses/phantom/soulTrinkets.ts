@@ -5,6 +5,7 @@ const prompt: MidiMacroFunction = async ({
   trigger: { entity, token },
   workflow,
 }) => {
+  if (!workflow.damageItem.oldHP) return;
   const {
     utils: {
       actorUtils,
@@ -24,13 +25,7 @@ const prompt: MidiMacroFunction = async ({
     // Filter out targets with less than 5 int
     .filter((t) => t.actor!.system.abilities.int.value >= 5)
     // Filter out targets that are more than 30ft away
-    .filter((t) => tokenUtils.getDistance(token, t as Token) <= 30)
-    // Filter out targets that were already dead before the attack was rolled
-    .filter(
-      (t) =>
-        workflow.damageItem.damageDetail.find((d) => d.actorId === t.actor!.id!)
-          ?.oldHP !== 0,
-    );
+    .filter((t) => tokenUtils.getDistance(token, t as Token) <= 30);
   if (!validTargets.size) return;
   const soulTrinkets = itemUtils.getItemByIdentifier(
     feat.actor!,
