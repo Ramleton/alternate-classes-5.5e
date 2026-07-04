@@ -38,12 +38,25 @@ const damageBonus: MidiMacroFunction = async ({
   if (!useSneakAttack) return;
   const sneakAttackReduction =
     (getWorkflowProperty(workflow, 'sneakAttackReduction') as number) ?? 0;
+  const {
+    utils: { effectUtils, genericUtils, workflowUtils },
+  } = chrisPremades;
+  const targetActor = workflow.targets.first()!.actor!;
+  const predictiveFightingTarget = effectUtils.getEffectByIdentifier(
+    targetActor,
+    'ac55ePredictiveFightingTarget',
+  );
   const sneakAttack = getSneakAttack(feat.actor!);
   const sneakAttackDice = sneakAttack.number! - sneakAttackReduction;
-  const formula = `${sneakAttackDice}${sneakAttack.die}`;
-  const {
-    utils: { genericUtils, workflowUtils },
-  } = chrisPremades;
+  let formula = `${sneakAttackDice}${sneakAttack.die}`;
+  // Alternate Rogue - Investigator - Exploit Weakness
+  if (
+    feat.actor!.classes['alternate-rogue'].system.levels >= 17 &&
+    predictiveFightingTarget &&
+    predictiveFightingTarget.origin!.includes(feat.actor!.id!)
+  ) {
+    formula = `${sneakAttackDice}d8`;
+  }
   await workflowUtils.bonusDamage(workflow, formula);
   await genericUtils.update(feat, {
     'system.uses.spent': feat.system.uses!.spent + 1,
