@@ -1,4 +1,5 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import { infoCheckWorkflow } from 'automation/infoCheckMacroFactory.js';
 import { runActivity } from 'automation/utils.js';
 import {
   ExploitPrerequisiteCheck,
@@ -62,6 +63,7 @@ const ARC_DEVIOUS_EXPLOITS: Record<string, ExploitData> = {
 const SUBCLASS_FEATURE_IDENTIFIERS = [
   'ac55eDeadlyBlades',
   'ac55eSupremeSneak',
+  'ac55eInsightfulStrike',
 ] as const;
 
 const checkExploitUsable = (
@@ -176,6 +178,9 @@ const prompt: PromptFunction = async ({
       break;
     case 'ac55eSupremeSneak':
       break;
+    case 'ac55eInsightfulStrike':
+      await infoCheckWorkflow({ trigger, workflow });
+      break;
     default:
       // Use devious exploit
       await deviousExploits[
@@ -200,6 +205,7 @@ const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
     switch (exploit.system.identifier) {
       case 'deadly-blades':
       case 'supreme-sneak':
+      case 'insightful-strike':
         sneakAttackDiceCost = 1;
         break;
     }

@@ -4,7 +4,7 @@ import { getActivityData } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { CheckActivity } from 'fvtt-types/Activity.js';
 import { isCharacterActor, isNPCActor } from 'types/actors.js';
-import { EffectChange } from 'types/effects.js';
+import { EffectChange, EffectData } from 'types/effects.js';
 
 const use: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
   if (!workflow.targets.size) return;
@@ -24,14 +24,41 @@ const use: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
   const checkDC = 8 + targetCR;
   searchActivityData.check.dc.value = '' + checkDC;
   const {
-    utils: { workflowUtils },
+    utils: { effectUtils, workflowUtils },
   } = chrisPremades;
+  const effect = effectUtils.getEffectByIdentifier(
+    targetActor,
+    'ac55eInsightfulStrikeTarget',
+  );
+  const effectData: EffectData = {
+    name: 'Insightful Strike: Advantage',
+    icon: effect?.icon || null,
+    duration: { seconds: 1 },
+    origin: feat.uuid!,
+    flags: {},
+    changes: [
+      {
+        key: 'flags.midi-qol.advantage.check.all',
+        mode: 0,
+        value: '1',
+        priority: 20,
+      },
+    ],
+    statuses: [],
+  };
+  let bonusEffect: ActiveEffect | undefined = undefined;
+  if (effect && effect.origin!.includes(feat.actor!.id!)) {
+    bonusEffect = await effectUtils.createEffect(targetActor, effectData);
+  }
   const checkWorkflow: Workflow = await workflowUtils.syntheticActivityDataRoll(
     searchActivityData,
     feat,
     feat.actor!,
     [target],
   );
+  if (bonusEffect) {
+    await bonusEffect.delete();
+  }
   if (!checkWorkflow.saves.size) return;
   const targetChanges: EffectChange[] = [
     {

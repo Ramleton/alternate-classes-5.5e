@@ -163,19 +163,19 @@ interface CheckOption {
 }
 
 interface WorkflowArgs extends MidiMacroFunctionArgs {
-  preCheck: (args: MidiMacroFunctionArgs) => Promise<void>;
-  postCheck: (args: PostCheckArgs) => Promise<void>;
-  checkOptions: CheckOption[];
+  preCheck?: (data: MidiMacroFunctionArgs) => Promise<void>;
+  postCheck?: (data: PostCheckArgs) => Promise<void>;
+  checkOptions?: CheckOption[];
 }
 
 type WorkflowFunction = (data: WorkflowArgs) => Promise<void>;
 
-const workflow: WorkflowFunction = async ({
+export const infoCheckWorkflow: WorkflowFunction = async ({
   trigger,
   workflow,
-  preCheck,
-  postCheck,
-  checkOptions,
+  preCheck = () => Promise.resolve(),
+  postCheck = () => Promise.resolve(),
+  checkOptions = DEFAULT_CHECK_OPTIONS,
 }): Promise<void> => {
   if (!workflow.targets.size) return;
   const feat = trigger.entity as Item<'feat'>;
@@ -275,7 +275,7 @@ const factory: InfoCheckMacroFactory = ({
         {
           pass: 'rollFinished',
           macro: (data) =>
-            workflow({ ...data, preCheck, postCheck, checkOptions }),
+            infoCheckWorkflow({ ...data, preCheck, postCheck, checkOptions }),
           priority: 100,
           activities: ['use'],
         },
