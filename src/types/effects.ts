@@ -32,6 +32,7 @@ export interface EffectDuration {
 }
 
 type DAESpecialDuration =
+  | 'isAttacked'
   | 'isDamaged'
   | 'turnStartSource'
   | 'turnEndSource'

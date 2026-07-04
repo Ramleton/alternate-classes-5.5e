@@ -40,6 +40,19 @@ export const qualifiesForSneakAttack = (
   )
     return false;
   const target = workflow.targets.first() as Token;
+  /**
+   * Alternate Rogue - Mastermind - Potent Insight
+   *
+   * When you use the Help action to aid an ally in attacking a creature and
+   * their attack hits, you can use your reaction to add your Sneak Attack bonus
+   * to its damage roll. However, if you do so, you cannot use Sneak Attack on
+   * your next turn.
+   */
+  const potentInsightEffect = effectUtils.getEffectByIdentifier(
+    sneakAttack.actor!,
+    'ac55ePotentInsight',
+  );
+  if (potentInsightEffect) return false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const attackRollOptions = workflow.attackRoll!.options as any;
   const hadAdvantage = attackRollOptions.attributions.some(
