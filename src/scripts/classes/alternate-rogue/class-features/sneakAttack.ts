@@ -16,7 +16,11 @@ const prompt: MidiMacroFunction = async ({
   if (!workflow.hitTargets.size) return;
   const feat = entity as Item<'feat'>;
   if (!feat.system.uses?.value) return;
-  const useSneakAttack = getWorkflowProperty(workflow, 'sneakAttack');
+  const useSneakAttack = getWorkflowProperty(
+    workflow,
+    feat.actor!,
+    'sneakAttack',
+  );
   if (useSneakAttack) return;
   if (!qualifiesForSneakAttack(feat, token, workflow)) return;
   const {
@@ -27,7 +31,7 @@ const prompt: MidiMacroFunction = async ({
     userId,
   });
   if (!selection) return;
-  setWorkflowProperty(workflow, 'sneakAttack', 1);
+  setWorkflowProperty(workflow, feat.actor!, 'sneakAttack', 1);
 };
 
 const damageBonus: MidiMacroFunction = async ({
@@ -35,10 +39,18 @@ const damageBonus: MidiMacroFunction = async ({
   workflow,
 }) => {
   const feat = entity as Item<'feat'>;
-  const useSneakAttack = getWorkflowProperty(workflow, 'sneakAttack');
+  const useSneakAttack = getWorkflowProperty(
+    workflow,
+    feat.actor!,
+    'sneakAttack',
+  );
   if (!useSneakAttack) return;
   const sneakAttackReduction =
-    (getWorkflowProperty(workflow, 'sneakAttackReduction') as number) ?? 0;
+    (getWorkflowProperty(
+      workflow,
+      feat.actor!,
+      'sneakAttackReduction',
+    ) as number) ?? 0;
   const {
     utils: { effectUtils, genericUtils, workflowUtils },
   } = chrisPremades;
@@ -58,8 +70,11 @@ const damageBonus: MidiMacroFunction = async ({
   ) {
     formula = `${sneakAttackDice}d8`;
   }
-  const dmgType = getWorkflowProperty(workflow, 'sneakAttackDamageType') as
-    DamageType | undefined;
+  const dmgType = getWorkflowProperty(
+    workflow,
+    feat.actor!,
+    'sneakAttackDamageType',
+  ) as DamageType | undefined;
   await workflowUtils.bonusDamage(workflow, formula, { damageType: dmgType });
   await genericUtils.update(feat, {
     'system.uses.spent': feat.system.uses!.spent + 1,

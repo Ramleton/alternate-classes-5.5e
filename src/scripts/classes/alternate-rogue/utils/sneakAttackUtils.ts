@@ -11,10 +11,20 @@ export const getSneakAttack = (actor: Actor5e) => {
   ] as ScaleValueTypeDice;
 };
 
-export const reduceSneakAttack = (workflow: Workflow, amount: number) => {
+export const reduceSneakAttack = (
+  workflow: Workflow,
+  actor: Actor5e,
+  amount: number,
+) => {
   const currReduction =
-    (getWorkflowProperty(workflow, 'sneakAttackReduction') as number) ?? 0;
-  setWorkflowProperty(workflow, 'sneakAttackReduction', currReduction + amount);
+    (getWorkflowProperty(workflow, actor, 'sneakAttackReduction') as number) ??
+    0;
+  setWorkflowProperty(
+    workflow,
+    actor,
+    'sneakAttackReduction',
+    currReduction + amount,
+  );
 };
 
 export const qualifiesForSneakAttack = (
@@ -23,7 +33,8 @@ export const qualifiesForSneakAttack = (
   workflow: Workflow,
 ): boolean => {
   if (!sneakAttack.system.uses?.value) return false;
-  if (getWorkflowProperty(workflow, 'sneakAttack')) return false;
+  if (getWorkflowProperty(workflow, sneakAttack.actor!, 'sneakAttack'))
+    return false;
   const {
     utils: { effectUtils, tokenUtils, workflowUtils },
   } = chrisPremades;

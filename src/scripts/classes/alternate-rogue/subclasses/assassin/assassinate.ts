@@ -15,7 +15,7 @@ const autoCritical: MidiMacroFunction = async ({
 }) => {
   const feat = entity as Item<'feat'>;
   if (!feat.actor) return;
-  if (!getWorkflowProperty(workflow, 'sneakAttack')) return;
+  if (!getWorkflowProperty(workflow, feat.actor!, 'sneakAttack')) return;
   if (!workflow.hitTargets.size) return;
   const {
     utils: { constants, workflowUtils },

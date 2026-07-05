@@ -13,16 +13,16 @@ const prompt: MidiMacroFunction = async ({
   } = chrisPremades;
   const actionType = workflowUtils.getActionType(workflow);
   if (!constants.meleeAttacks.some((type) => type === actionType)) return;
-  if (!getWorkflowProperty(workflow, 'sneakAttack')) return;
+  const feat = entity as Item<'feat'>;
+  if (!getWorkflowProperty(workflow, feat.actor!, 'sneakAttack')) return;
   const {
     utils: { dialogUtils, socketUtils },
   } = chrisPremades;
-  const feat = entity as Item<'feat'>;
   const selection = await dialogUtils.confirmUseItem(feat, {
     userId: socketUtils.firstOwner(feat.actor, true),
   });
   if (!selection) return;
-  reduceSneakAttack(workflow, 1);
+  reduceSneakAttack(workflow, feat.actor!, 1);
   const sltWorkflow = await runActivity(feat, 'slt', [workflow.token!]);
   if (!sltWorkflow) return;
   const userTotal = sltWorkflow.saveResults[0].total;

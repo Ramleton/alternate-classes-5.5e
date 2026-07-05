@@ -24,7 +24,7 @@ const forceSave: MidiMacroFunction = async ({
   } = chrisPremades;
   const actionType = workflowUtils.getActionType(workflow);
   if (!constants.attacks.some((type) => type === actionType)) return;
-  if (!getWorkflowProperty(workflow, 'sneakAttack')) return;
+  if (!getWorkflowProperty(workflow, feat.actor!, 'sneakAttack')) return;
   const nearbyTokens = tokenUtils
     .findNearby(token, 30, 'any', {
       includeIncapacitated: true,

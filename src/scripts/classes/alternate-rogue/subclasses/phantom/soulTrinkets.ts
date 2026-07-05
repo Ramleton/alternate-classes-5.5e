@@ -65,11 +65,11 @@ const graveSmite: MidiMacroFunction = async ({
   trigger: { entity },
   workflow,
 }) => {
-  if (!getWorkflowProperty(workflow, 'sneakAttack')) return;
+  const feat = entity as Item<'feat'>;
+  if (!getWorkflowProperty(workflow, feat.actor!, 'sneakAttack')) return;
   const {
     utils: { dialogUtils, genericUtils, itemUtils, socketUtils },
   } = chrisPremades;
-  const feat = entity as Item<'feat'>;
   const soulTrinkets = itemUtils.getItemByIdentifier(
     feat.actor!,
     'ac55eSoulTrinkets',
@@ -84,7 +84,12 @@ const graveSmite: MidiMacroFunction = async ({
   await genericUtils.update(soulTrinkets, {
     'system.uses.spent': soulTrinkets.system.uses!.spent + 1,
   });
-  setWorkflowProperty(workflow, 'sneakAttackDamageType', 'necrotic');
+  setWorkflowProperty(
+    workflow,
+    feat.actor!,
+    'sneakAttackDamageType',
+    'necrotic',
+  );
 };
 
 const macro: CPRMacro = {

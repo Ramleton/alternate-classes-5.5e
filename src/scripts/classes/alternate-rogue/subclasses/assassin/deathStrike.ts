@@ -5,7 +5,7 @@ const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
   const feat = entity as Item<'feat'>;
   if (!feat.actor) return;
   if (!feat.system.uses?.value) return;
-  if (!getWorkflowProperty(workflow, 'sneakAttack')) return;
+  if (!getWorkflowProperty(workflow, feat.actor, 'sneakAttack')) return;
   if (!workflow.hitTargets.size) return;
   const target = workflow.targets.first() as Token;
   const isTargetIncapacitated = target.actor!.statuses.has('incapacitated');

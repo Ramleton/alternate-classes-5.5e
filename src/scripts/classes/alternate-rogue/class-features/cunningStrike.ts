@@ -81,7 +81,7 @@ const pre = (feat: Item<'feat'>, token: Token, workflow: Workflow): boolean => {
   if (!feat.actor) return false;
   const altClasses55eFlags = feat.actor.flags['alternate-classes-55e'];
   if (altClasses55eFlags?.macros?.exploit?.used) return false;
-  if (getWorkflowProperty(workflow, 'cunningStrike')) return false;
+  if (getWorkflowProperty(workflow, feat.actor, 'cunningStrike')) return false;
   const {
     utils: { itemUtils },
   } = chrisPremades;
@@ -196,7 +196,7 @@ const prompt: PromptFunction = async ({
 };
 
 const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
-  setWorkflowProperty(workflow, 'sneakAttack', 1);
+  setWorkflowProperty(workflow, exploit.actor!, 'sneakAttack', 1);
   let sneakAttackDiceCost = 0;
   if (exploit.system.type.subtype === 'deviousExploit') {
     const prerequisiteLevel = exploit.system.prerequisites?.level ?? 1;
@@ -210,7 +210,7 @@ const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
         break;
     }
   }
-  reduceSneakAttack(workflow, sneakAttackDiceCost);
+  reduceSneakAttack(workflow, exploit.actor!, sneakAttackDiceCost);
 };
 
 const macro: CPRMacro = {
