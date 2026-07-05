@@ -3,6 +3,7 @@ import {
   setWorkflowProperty,
 } from 'automation/workflowUtils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { DamageType } from 'types/damage.js';
 import {
   getSneakAttack,
   qualifiesForSneakAttack,
@@ -57,7 +58,9 @@ const damageBonus: MidiMacroFunction = async ({
   ) {
     formula = `${sneakAttackDice}d8`;
   }
-  await workflowUtils.bonusDamage(workflow, formula);
+  const dmgType = getWorkflowProperty(workflow, 'sneakAttackDamageType') as
+    DamageType | undefined;
+  await workflowUtils.bonusDamage(workflow, formula, { damageType: dmgType });
   await genericUtils.update(feat, {
     'system.uses.spent': feat.system.uses!.spent + 1,
   });

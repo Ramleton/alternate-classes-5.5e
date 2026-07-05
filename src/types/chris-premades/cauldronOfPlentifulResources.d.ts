@@ -1322,7 +1322,7 @@ export default interface CauldronOfPlentifulResources {
       placeTemplate(
         templateData: any,
         returnTokens?: boolean,
-      ): Template | { template: Template; tokens: Token[] };
+      ): Promise<Template | { template: Template; tokens: Set<Token> }>;
       rayIntersectsTemplate(templateDoc: any, ray: any): boolean;
       getIntersections(
         templateObj: any,

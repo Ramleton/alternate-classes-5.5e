@@ -1,4 +1,8 @@
 import { ac55ePackIDs } from 'automation/constants.js';
+import {
+  getWorkflowProperty,
+  setWorkflowProperty,
+} from 'automation/workflowUtils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 
 const prompt: MidiMacroFunction = async ({
@@ -29,11 +33,10 @@ const prompt: MidiMacroFunction = async ({
   if (!validTargets.size) return;
   const soulTrinkets = itemUtils.getItemByIdentifier(
     feat.actor!,
-    'ac55eSoulTrinket',
-  ) as Item<'consumable'> | undefined;
-  const rogueLevel = feat.actor!.classes['alternate-rogue'].system.levels;
-  const maxCapacity = Math.floor(rogueLevel / 2);
-  const currentCapacity = soulTrinkets?.system.quantity ?? 0;
+    'ac55eSoulTrinkets',
+  ) as Item<'feat'>;
+  const maxCapacity = soulTrinkets.system.uses!.max;
+  const currentCapacity = soulTrinkets.system.uses!.value ?? 0;
   if (currentCapacity >= maxCapacity) return;
   const selection = await dialogUtils.confirm(
     feat.name,
@@ -43,7 +46,7 @@ const prompt: MidiMacroFunction = async ({
   if (!selection) return;
   if (soulTrinkets) {
     await genericUtils.update(soulTrinkets, {
-      'system.quantity': currentCapacity + 1,
+      'system.uses.spent': soulTrinkets.system.uses!.spent + 1,
     });
   } else {
     const soulTrinketData = await compendiumUtils.getItemFromCompendium(
@@ -58,6 +61,32 @@ const prompt: MidiMacroFunction = async ({
   await actorUtils.setReactionUsed(feat.actor!);
 };
 
+const graveSmite: MidiMacroFunction = async ({
+  trigger: { entity },
+  workflow,
+}) => {
+  if (!getWorkflowProperty(workflow, 'sneakAttack')) return;
+  const {
+    utils: { dialogUtils, genericUtils, itemUtils, socketUtils },
+  } = chrisPremades;
+  const feat = entity as Item<'feat'>;
+  const soulTrinkets = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eSoulTrinkets',
+  ) as Item<'feat'> | undefined;
+  if (!soulTrinkets || !soulTrinkets.system.uses!.value) return;
+  const selection = await dialogUtils.confirm(
+    feat.name,
+    'Grave Smite: Use a Soul Trinket?',
+    { userId: socketUtils.firstOwner(feat.actor!, true) },
+  );
+  if (!selection) return;
+  await genericUtils.update(soulTrinkets, {
+    'system.uses.spent': soulTrinkets.system.uses!.spent + 1,
+  });
+  setWorkflowProperty(workflow, 'sneakAttackDamageType', 'necrotic');
+};
+
 const macro: CPRMacro = {
   identifier: 'ac55eSoulTrinkets',
   name: 'Phantom: Soul Trinkets',
@@ -70,6 +99,11 @@ const macro: CPRMacro = {
         pass: 'sceneRollFinished',
         macro: prompt,
         priority: 500,
+      },
+      {
+        pass: 'attackRollComplete',
+        macro: graveSmite,
+        priority: 100,
       },
     ],
   },
