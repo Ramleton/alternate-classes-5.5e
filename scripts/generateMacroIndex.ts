@@ -1,5 +1,6 @@
-import { readdirSync, statSync, writeFileSync } from 'fs';
+import { readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { basename, join } from 'path';
+import { format, resolveConfig } from 'prettier';
 
 function toCamelCase(fileName: string): string {
   return fileName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
@@ -47,7 +48,38 @@ export default macros;
   return names;
 }
 
-function generateSubclassIndices(targetPath: string) {
+async function formatGeneratedFiles(targetPath: string) {
+  const prettierConfig = await resolveConfig(targetPath);
+
+  const filesToFormat = [
+    join(targetPath, 'macros.ts'),
+    join(targetPath, '../../subclasses', 'macros.ts'),
+  ];
+  const subclassesPath = join(targetPath, '../../subclasses');
+  if (isDirectory(subclassesPath)) {
+    const subdirs = readdirSync(subclassesPath).filter((f) =>
+      isDirectory(join(subclassesPath, f)),
+    );
+    for (const subdir of subdirs) {
+      filesToFormat.push(join(subclassesPath, subdir, 'macros.ts'));
+    }
+  }
+
+  for (const filePath of filesToFormat) {
+    try {
+      const content = readFileSync(filePath, 'utf-8');
+      const formatted = await format(content, {
+        parser: 'typescript',
+        ...prettierConfig,
+      });
+      writeFileSync(filePath, formatted);
+    } catch (error) {
+      console.error(`Error formatting ${filePath}: ${error}`);
+    }
+  }
+}
+
+async function generateSubclassIndices(targetPath: string) {
   const subclassesPath = join(targetPath, '../../subclasses');
 
   if (!isDirectory(subclassesPath)) {
@@ -94,6 +126,8 @@ export default macros;
 
   // Step 3: Generate top-level macros.ts
   generateMacrosIndex(targetPath);
+
+  await formatGeneratedFiles(targetPath);
 }
 
 // Usage: pass the class folder path

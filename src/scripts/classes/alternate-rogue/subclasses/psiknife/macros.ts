@@ -4,6 +4,11 @@ import mentalScourge from './mentalScourge.js';
 import psiBlade from './psiBlade.js';
 import psionicAwakening from './psionicAwakening.js';
 
-const macros: CPRMacro[] = [empoweredBlades, mentalScourge, psiBlade, psionicAwakening];
+const macros: CPRMacro[] = [
+  empoweredBlades,
+  mentalScourge,
+  psiBlade,
+  psionicAwakening,
+];
 
 export default macros;
