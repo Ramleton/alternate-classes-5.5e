@@ -26,7 +26,7 @@ jobs:
         run: npm install -g pnpm
 
       - name: Install dependencies
-        run: pnpm install --allow-scripts
+        run: pnpm install
 
       - name: Run AI code review
         env:
