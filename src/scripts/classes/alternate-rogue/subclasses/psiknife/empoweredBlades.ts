@@ -1,19 +1,10 @@
 import { runActivity } from 'automation/utils.js';
-import CPRMacro, {
-  MidiMacroFunction,
-  MidiMacroFunctionArgs,
-} from 'chris-premades/macro.js';
+import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { CunningStrikeSubclassFeatureHandler } from '../../types/cunningStrike.js';
 import { reduceSneakAttack } from '../../utils/sneakAttackUtils.js';
 
-interface handleMindRendArgs extends MidiMacroFunctionArgs {
-  selectedFeature: Item<'feat'>;
-  target: Token;
-}
-
-type HandleMindRendFunction = (args: handleMindRendArgs) => Promise<unknown>;
-
-export const handleMindRend: HandleMindRendFunction = async ({
+export const handleMindRend: CunningStrikeSubclassFeatureHandler = async ({
   trigger: { entity },
   workflow,
   selectedFeature,

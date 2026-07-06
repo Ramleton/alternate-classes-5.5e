@@ -84,11 +84,8 @@ export const qualifiesForSneakAttack = (
     includeIncapacitated: false,
     includeToken: false,
   }).length;
-  if (distanceToTarget <= 5 && nearbyEnemies < 2) {
-    return false;
-  } else if (!nearbyEnemies) {
-    return false;
-  }
+  const viableNearbyEnemies =
+    (distanceToTarget <= 5 && nearbyEnemies > 1) || !!nearbyEnemies;
   const predictiveFightingEffect = effectUtils.getEffectByIdentifier(
     target.actor!,
     'ac55ePredictiveFightingTarget',
@@ -110,6 +107,6 @@ export const qualifiesForSneakAttack = (
     nearbyUser <= 1 &&
     !hadDisadvantage;
   const sneakAttackApplies =
-    (hadAdvantage || !!nearbyEnemies) && !hadDisadvantage;
+    (hadAdvantage || viableNearbyEnemies) && !hadDisadvantage;
   return sneakAttackApplies || swashbucklerSneakAttackApplies;
 };

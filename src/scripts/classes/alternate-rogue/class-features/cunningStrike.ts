@@ -12,29 +12,22 @@ import {
   getWorkflowProperty,
   setWorkflowProperty,
 } from 'automation/workflowUtils.js';
-import CPRMacro, {
-  DItem,
-  MidiMacroFunctionArgs,
-  Trigger,
-} from 'chris-premades/macro.js';
+import CPRMacro from 'chris-premades/macro.js';
 import { genericARCWorkflow } from 'exploits/handling/genericARCExploit.js';
 import { useWorkflow } from 'exploits/handling/genericUseExploit.js';
-import { AutoExploitWorkflow } from 'exploits/types/autoExploitTypes.js';
 import { getAltMartialExploitsRemaining } from 'exploits/utils.js';
 import { handleMindRend } from '../subclasses/psiknife/empoweredBlades.js';
+import { handlePanache } from '../subclasses/swashbuckler/panache.js';
+import {
+  AutoExploitType,
+  ExploitData,
+  PromptFunction,
+  SubclassFeatureCunningStrikeData,
+} from '../types/cunningStrike.js';
 import {
   qualifiesForSneakAttack,
   reduceSneakAttack,
 } from '../utils/sneakAttackUtils.js';
-
-type ExploitHandler = AutoExploitWorkflow;
-
-type AutoExploitType = 'ARC' | 'PAR';
-
-interface ExploitData {
-  prerequisiteCheck: ExploitPrerequisiteCheck;
-  handler: ExploitHandler;
-}
 
 const getExploitData = (
   prerequisiteCheck: ExploitPrerequisiteCheck,
@@ -65,12 +58,7 @@ const ARC_DEVIOUS_EXPLOITS: Record<string, ExploitData> = {
   ),
 };
 
-interface SUBCLASS_FEATURE_CUNNING_STRIKE {
-  identifier: string;
-  preCheck: (args: MidiMacroFunctionArgs) => Promise<boolean>;
-}
-
-const SUBCLASS_FEATURE_CUNNING_STRIKES: SUBCLASS_FEATURE_CUNNING_STRIKE[] = [
+const SUBCLASS_FEATURE_CUNNING_STRIKES: SubclassFeatureCunningStrikeData[] = [
   {
     identifier: 'ac55eDeadlyBlades',
     preCheck: () => Promise.resolve(true),
@@ -90,6 +78,10 @@ const SUBCLASS_FEATURE_CUNNING_STRIKES: SUBCLASS_FEATURE_CUNNING_STRIKE[] = [
         workflow.item.flags['chris-premades']?.info?.identifier ===
           'ac55ePsiBladeItem',
       ),
+  },
+  {
+    identifier: 'ac55ePanache',
+    preCheck: () => Promise.resolve(true),
   },
 ] as const;
 
@@ -119,18 +111,6 @@ const pre = (feat: Item<'feat'>, token: Token, workflow: Workflow): boolean => {
   if (!qualifiesForSneakAttack(sneakAttack, token, workflow)) return false;
   return true;
 };
-
-type PromptFunction = ({
-  trigger,
-  workflow,
-  ditem,
-  deviousExploits,
-}: {
-  trigger: Trigger;
-  workflow: Workflow;
-  ditem?: DItem;
-  deviousExploits: Record<string, ExploitData>;
-}) => Promise<void>;
 
 const prompt: PromptFunction = async ({
   trigger,
@@ -217,6 +197,9 @@ const prompt: PromptFunction = async ({
     case 'ac55eEmpoweredBlades':
       await handleMindRend({ trigger, workflow, selectedFeature, target });
       break;
+    case 'ac55ePanache':
+      await handlePanache({ trigger, workflow, selectedFeature, target });
+      break;
     default:
       // Use devious exploit
       await deviousExploits[
@@ -242,6 +225,7 @@ const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
       case 'deadly-blades':
       case 'supreme-sneak':
       case 'insightful-strike':
+      case 'panache':
         sneakAttackDiceCost = 1;
         break;
       case 'empowered-blades':
