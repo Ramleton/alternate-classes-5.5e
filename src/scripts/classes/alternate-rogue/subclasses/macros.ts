@@ -5,6 +5,7 @@ import burglar from './burglar/macros.js';
 import investigator from './investigator/macros.js';
 import mastermind from './mastermind/macros.js';
 import phantom from './phantom/macros.js';
+import psiknife from './psiknife/macros.js';
 
 const macros: CPRMacro[] = [
   ...assassin,
@@ -12,6 +13,7 @@ const macros: CPRMacro[] = [
   ...investigator,
   ...mastermind,
   ...phantom,
+  ...psiknife,
 ];
 
 export default macros;

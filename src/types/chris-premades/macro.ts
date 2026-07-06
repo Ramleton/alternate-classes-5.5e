@@ -418,7 +418,7 @@ export interface D20Roll {
     reliableTalent: boolean;
     rollMode: 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll';
     rollType: 'skill' | 'check' | 'damage' | 'heal';
-    target: unknown | undefined;
+    target: number | undefined;
   };
   terms: unknown[];
   _dice: unknown[];
