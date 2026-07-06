@@ -1,7 +1,7 @@
 import CPRMacro from 'chris-premades/macro.js';
-import psiblade from './psiblade.js';
+import psiBlade from './psiBlade.js';
 import psionicAwakening from './psionicAwakening.js';
 
-const macros: CPRMacro[] = [psiblade, psionicAwakening];
+const macros: CPRMacro[] = [psiBlade, psionicAwakening];
 
 export default macros;

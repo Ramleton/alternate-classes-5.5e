@@ -1,3 +1,4 @@
+import { DamageType } from 'types/damage.js';
 import Activity from './Activity.js';
 import ItemUses from './ItemUses.js';
 
@@ -8,11 +9,11 @@ interface ItemSource {
   [key: string]: unknown;
 }
 
-interface WeaponDamagePart {
+export interface WeaponDamagePart {
   number: number | null;
   denomination: number | null;
   bonus: string;
-  types: string[];
+  types: Set<DamageType>;
   custom: {
     enabled: boolean;
     formula?: string;
