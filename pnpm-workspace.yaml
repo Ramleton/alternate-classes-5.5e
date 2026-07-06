@@ -2,6 +2,6 @@ packages:
   - .
 
 onlyBuiltDependencies:
-  - '@league-of-foundry-developers/foundry-vtt-types'
+  - '@league-of-foundry-developers/foundry-vtt-types@https://codeload.github.com/League-of-Foundry-Developers/foundry-vtt-types/tar.gz/c9ce292722dac0d4135a513b0df090054ca270ea'
   - '@google/genai'
   - protobufjs
