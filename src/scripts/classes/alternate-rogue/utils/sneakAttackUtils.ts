@@ -96,5 +96,20 @@ export const qualifiesForSneakAttack = (
   if (predictiveFightingEffect) {
     return !!nearbyEnemies && !hadDisadvantage;
   }
-  return (hadAdvantage || !!nearbyEnemies) && !hadDisadvantage;
+  const relentlessSwagger = itemUtils.getItemByIdentifier(
+    sneakAttack.actor!,
+    'ac55eRelentlessSwagger',
+  ) as Item<'feat'> | undefined;
+  const nearbyUser = tokenUtils.findNearby(token, 5, 'any', {
+    includeIncapacitated: true,
+    includeToken: false,
+  }).length;
+  const swashbucklerSneakAttackApplies =
+    relentlessSwagger &&
+    distanceToTarget <= 5 &&
+    nearbyUser <= 1 &&
+    !hadDisadvantage;
+  const sneakAttackApplies =
+    (hadAdvantage || !!nearbyEnemies) && !hadDisadvantage;
+  return sneakAttackApplies || swashbucklerSneakAttackApplies;
 };
