@@ -1,0 +1,85 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    branches: '**'
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history needed for git diff
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run AI code review
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: pnpm tsx src/scripts/aiCodeReviewer.ts
+
+      - name: Post review to PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reviewFile = 'review_summary.md';
+
+            if (!fs.existsSync(reviewFile)) {
+              console.log('No review file generated.');
+              return;
+            }
+
+            const review = fs.readFileSync(reviewFile, 'utf-8');
+
+            // Find existing review comment to update it (avoid spam)
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.data.find(comment =>
+              comment.body.includes('🤖 AI Code Review Summary')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: review,
+              });
+              console.log('Updated existing review comment.');
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: review,
+              });
+              console.log('Created new review comment.');
+            }

@@ -60,21 +60,33 @@ jobs:
                [Summarize or paste the core bullet points from the Release Notes here]
                Keep the previous version history below it intact.
             4. Go to the very bottom footer and update the variables exactly to:
-               **Current Module Version:** ${process.env.VERSION_TAG}  
+               **Current Module Version:** ${process.env.VERSION_TAG}
                **Latest Release Date:** ${process.env.CURRENT_DATE}
+            5. Locate any GitHub download links pointing to the module manifest file in the installation instructions. Specifically look for URLs resembling:
+               https://github.com/Ramleton/alternate-classes-5.5e/releases/download/latest/module.json
+               Update the "latest" portion of the path to match the current release version tag exactly:
+               https://github.com/Ramleton/alternate-classes-5.5e/releases/download/${process.env.VERSION_TAG}/module.json
+            6. Locate the "Requirements" or "Dependencies" section in the README. Read the "compatibility.verified" or "compatibility.minimum" core version from the module.json text. 
+               CRITICAL LIVE RESEARCH TASK: Use Google Search to look up the latest stable, official release versions of the modules listed in "relationships.requires" and "relationships.recommends" that are fully compatible with that specific Foundry VTT core version. 
+               NOTE ON PACKAGES: Be aware that modules like midi-qol, dae, and times-up have migrated from GitHub over to GitLab (gitlab.com/tposney). Ensure your search grounding references their official GitLab releases/tags or official Foundry package listings to get the correct version strings. Update the requirements markdown layout with those exact live version numbers.
             
             CRITICAL RULES:
-            - Do not alter or delete the Installation steps, Requirements list, Technology Stack, Project Structure, or Credits sections. Keep them exactly as they are written.
+            - Do not alter or delete the Installation steps, Technology Stack, Project Structure, or Credits sections. Keep them exactly as they are written.
             - Output ONLY the full, updated raw markdown content. 
             - Do not include any chat commentary, introduction, or wrap the final output in backticks.`;
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
             
+            const payload = {
+              contents: [{ parts: [{ text: prompt }] }],
+              tools: [{ googleSearch: {} }]
+            };
+            
             try {
               const response = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                body: JSON.stringify(payload)
               });
               
               const data = await response.json();
