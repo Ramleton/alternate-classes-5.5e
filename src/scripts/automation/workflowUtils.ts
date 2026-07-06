@@ -14,5 +14,7 @@ export const setWorkflowProperty = (
   key: string,
   value: unknown,
 ) => {
+  if (!workflow['alternate-classes-55e'][actor.id!])
+    workflow['alternate-classes-55e'][actor.id!] = {};
   workflow['alternate-classes-55e'][actor.id!][key] = value;
 };

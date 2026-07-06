@@ -6,7 +6,10 @@ const sentientStrike: MidiMacroFunction = async ({
   workflow,
 }) => {
   const feat = entity as Item<'feat'>;
-  if (feat.flags['chris-premades']?.info?.identifier !== 'ac55ePsiBladeItem')
+  if (
+    workflow.item.flags['chris-premades']?.info?.identifier !==
+    'ac55ePsiBladeItem'
+  )
     return;
   if (!workflow.targets.size) return;
   const target = workflow.targets.first() as Token;
@@ -15,7 +18,7 @@ const sentientStrike: MidiMacroFunction = async ({
   const exploitDie = getAlternateMartialExploitDie(feat);
   if (!exploitDie) return;
   const {
-    utils: { rollUtils, dialogUtils, itemUtils, socketUtils },
+    utils: { dialogUtils, itemUtils, socketUtils, workflowUtils },
   } = chrisPremades;
   const psiPoints = itemUtils.getItemByIdentifier(
     feat.actor!,
@@ -28,11 +31,7 @@ const sentientStrike: MidiMacroFunction = async ({
     { userId: socketUtils.firstOwner(feat.actor!, true) },
   );
   if (!selection) return;
-  await rollUtils.addToRoll(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    workflow.attackRoll! as any,
-    `1d${exploitDie.faces}`,
-  );
+  await workflowUtils.bonusAttack(workflow, `1d${exploitDie.faces}`);
 };
 
 const macro: CPRMacro = {
