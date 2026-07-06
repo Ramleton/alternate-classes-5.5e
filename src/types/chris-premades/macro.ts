@@ -418,7 +418,7 @@ export interface D20Roll {
     reliableTalent: boolean;
     rollMode: 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll';
     rollType: 'skill' | 'check' | 'damage' | 'heal';
-    target: unknown | undefined;
+    target: number | undefined;
   };
   terms: unknown[];
   _dice: unknown[];
@@ -572,19 +572,23 @@ export interface DItem {
   wasHit: boolean;
 }
 
-export type MacroFunction = (__0: {
+export interface MacroFunctionArgs {
   trigger: Trigger;
   ditem?: DItem;
   options?: {
     _movement?: Record<string, Record<string, unknown>>;
   };
-}) => Promise<unknown>;
+}
 
-export type MidiMacroFunction = (__0: {
-  trigger: Trigger;
+export type MacroFunction = (__0: MacroFunctionArgs) => Promise<unknown>;
+
+export interface MidiMacroFunctionArgs extends MacroFunctionArgs {
   workflow: Workflow;
-  ditem?: DItem;
-}) => Promise<unknown>;
+}
+
+export type MidiMacroFunction = (
+  __0: MidiMacroFunctionArgs,
+) => Promise<unknown>;
 
 interface SharedMacroEventDetails {
   distance?: number;
@@ -597,7 +601,7 @@ export interface MacroEventDetails extends SharedMacroEventDetails {
   macro: MacroFunction;
 }
 
-interface MidiMacroEventDetails extends SharedMacroEventDetails {
+export interface MidiMacroEventDetails extends SharedMacroEventDetails {
   pass: MidiQOLEvent;
   macro: MidiMacroFunction;
 }

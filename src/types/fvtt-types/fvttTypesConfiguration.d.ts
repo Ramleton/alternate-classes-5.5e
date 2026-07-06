@@ -1,9 +1,10 @@
 import CharacterSystemData from './CharacterSystemData.js';
 import ClassSystemData from './ClassSystemData.js';
+import ConsumableSystemData from './ConsumableSystemData.js';
 import EquipmentSystemData from './EquipmentSystemData.js';
 import FeatSystemData from './FeatSystemData.js';
 import WeaponSystemData from './WeaponSystemData.js';
-export { };
+export {};
 
 declare module 'fvtt-types/configuration' {
   interface ConfiguredActor<SubType extends Actor.SubType> {
@@ -18,6 +19,7 @@ declare module 'fvtt-types/configuration' {
       weapon: typeof WeaponSystemData;
       class: typeof ClassSystemData;
       equipment: typeof EquipmentSystemData;
+      consumable: typeof ConsumableSystemData;
     };
   }
 }

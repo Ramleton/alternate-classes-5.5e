@@ -24,7 +24,8 @@ interface WeaponDamagePart {
   };
 }
 
-export default class WeaponSystemData extends foundry.abstract.TypeDataModel<
+export default class ConsumableSystemData extends foundry.abstract
+  .TypeDataModel<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,17 +64,15 @@ export default class WeaponSystemData extends foundry.abstract.TypeDataModel<
   };
 
   declare type: {
-    value: string;
-    baseItem: string;
+    label: 'Trinket' | unknown;
+    value: 'trinket' | unknown;
+    subtype: string;
   };
 
   declare properties: Set<string>;
   declare proficient: boolean | null;
-  declare activities: Activity[];
-  declare ammunition: Record<string, unknown>;
-  declare mastery: string;
+  declare activities: Record<string, Activity>;
   declare identifier: string;
-  declare crew: { value: unknown[] };
   declare attuned: boolean;
   declare equipped: boolean;
 

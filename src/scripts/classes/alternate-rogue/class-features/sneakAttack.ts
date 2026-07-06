@@ -1,31 +1,31 @@
+import {
+  getWorkflowProperty,
+  setWorkflowProperty,
+} from 'automation/workflowUtils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { DamageType } from 'types/damage.js';
 import {
   getSneakAttack,
   qualifiesForSneakAttack,
 } from '../utils/sneakAttackUtils.js';
 
-const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
+const prompt: MidiMacroFunction = async ({
+  trigger: { entity, token },
+  workflow,
+}) => {
   if (!workflow.hitTargets.size) return;
   const feat = entity as Item<'feat'>;
   if (!feat.system.uses?.value) return;
-  const useSneakAttack =
-    feat.actor!.flags['alternate-classes-55e']?.macros?.['sneak-attack'];
-  if (useSneakAttack) return;
-  if (!qualifiesForSneakAttack(feat, workflow)) return;
+  if (!qualifiesForSneakAttack(feat, token, workflow)) return;
   const {
-    utils: { genericUtils, socketUtils },
+    utils: { socketUtils },
   } = chrisPremades;
   const userId = socketUtils.firstOwner(feat.actor, true);
   const selection = await chrisPremades.utils.dialogUtils.confirmUseItem(feat, {
     userId,
   });
   if (!selection) return;
-  await genericUtils.setFlag(
-    feat.actor!,
-    'alternate-classes-55e',
-    'macros.sneak-attack',
-    workflow.item.system.identifier,
-  );
+  setWorkflowProperty(workflow, feat.actor!, 'sneakAttack', 1);
 };
 
 const damageBonus: MidiMacroFunction = async ({
@@ -33,39 +33,43 @@ const damageBonus: MidiMacroFunction = async ({
   workflow,
 }) => {
   const feat = entity as Item<'feat'>;
-  const useSneakAttack =
-    feat.actor!.flags['alternate-classes-55e']?.macros?.['sneak-attack'];
-  if (!useSneakAttack || workflow.item.system.identifier !== useSneakAttack)
-    return;
-  const cunningStrikeCost: number =
-    feat.actor!.flags['alternate-classes-55e']?.macros?.['cunning-strike'] ?? 0;
-  const ruthless = feat.actor!.flags['alternate-classes-55e']?.macros?.ruthless
-    ? 2
-    : 0;
+  const useSneakAttack = getWorkflowProperty(
+    workflow,
+    feat.actor!,
+    'sneakAttack',
+  );
+  if (!useSneakAttack) return;
+  const sneakAttackReduction =
+    (getWorkflowProperty(
+      workflow,
+      feat.actor!,
+      'sneakAttackReduction',
+    ) as number) ?? 0;
   const {
-    utils: { genericUtils, workflowUtils },
+    utils: { effectUtils, genericUtils, workflowUtils },
   } = chrisPremades;
-  await genericUtils.unsetFlag(
-    feat.actor!,
-    'alternate-classes-55e',
-    'macros.sneak-attack',
-  );
-  // Cunning Strike => Sneak Attack, unset it once Sneak Attack finishes
-  await genericUtils.unsetFlag(
-    feat.actor!,
-    'alternate-classes-55e',
-    'macros.cunning-strike',
-  );
-  // Ruthless => Sneak Attack, unset it once Sneak Attack finishes
-  await genericUtils.unsetFlag(
-    feat.actor!,
-    'alternate-classes-55e',
-    'macros.ruthless',
+  const targetActor = workflow.targets.first()!.actor!;
+  const predictiveFightingTarget = effectUtils.getEffectByIdentifier(
+    targetActor,
+    'ac55ePredictiveFightingTarget',
   );
   const sneakAttack = getSneakAttack(feat.actor!);
-  const sneakAttackDice = sneakAttack.number! - cunningStrikeCost - ruthless;
-  const formula = `${sneakAttackDice}${sneakAttack.die}`;
-  await workflowUtils.bonusDamage(workflow, formula);
+  const sneakAttackDice = sneakAttack.number! - sneakAttackReduction;
+  let formula = `${sneakAttackDice}${sneakAttack.die}`;
+  // Alternate Rogue - Investigator - Exploit Weakness
+  if (
+    feat.actor!.classes['alternate-rogue'].system.levels >= 17 &&
+    predictiveFightingTarget &&
+    predictiveFightingTarget.origin!.includes(feat.actor!.id!)
+  ) {
+    formula = `${sneakAttackDice}d8`;
+  }
+  const dmgType = getWorkflowProperty(
+    workflow,
+    feat.actor!,
+    'sneakAttackDamageType',
+  ) as DamageType | undefined;
+  await workflowUtils.bonusDamage(workflow, formula, { damageType: dmgType });
   await genericUtils.update(feat, {
     'system.uses.spent': feat.system.uses!.spent + 1,
   });

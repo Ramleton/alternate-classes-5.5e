@@ -2,6 +2,7 @@ import {
   EffectChange,
   EffectData,
   EffectDuration,
+  EffectFlags,
   OverTimeEffectData,
   Status,
 } from '../../types/effects.js';
@@ -75,9 +76,11 @@ interface SourceTargetInterdependentEffectData {
   target: Token;
   duration?: EffectDuration;
   sourceChanges?: EffectChange[];
+  sourceFlags?: EffectFlags;
   sourceStatuses?: Status[];
   sourceMacros?: { type: string; macros: string[] }[];
   targetChanges?: EffectChange[];
+  targetFlags?: EffectFlags;
   targetStatuses?: Status[];
   targetMacros?: { type: string; macros: string[] }[];
   concentration?: boolean;
@@ -93,9 +96,11 @@ export const applySourceTargetInterdependentEffects: SourceTargetInterdependentE
     target,
     duration = {},
     sourceChanges = [],
+    sourceFlags = { dae: { stackable: 'noneName' } },
     sourceStatuses = [],
     sourceMacros = [],
     targetChanges = [],
+    targetFlags = {},
     targetStatuses = [],
     targetMacros = [],
     concentration = false,
@@ -109,11 +114,7 @@ export const applySourceTargetInterdependentEffects: SourceTargetInterdependentE
       icon: feat.img!,
       duration,
       origin: feat.actor!.uuid!,
-      flags: {
-        dae: {
-          stackable: 'noneName',
-        },
-      },
+      flags: sourceFlags,
       changes: sourceChanges,
       statuses: sourceStatuses,
     };
@@ -132,7 +133,7 @@ export const applySourceTargetInterdependentEffects: SourceTargetInterdependentE
       icon: feat.img!,
       duration,
       origin: sourceEffect.uuid!,
-      flags: {},
+      flags: targetFlags,
       changes: targetChanges,
       statuses: targetStatuses,
     };
