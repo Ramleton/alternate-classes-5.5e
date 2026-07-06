@@ -25,6 +25,9 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
+      - name: Check pnpm config
+        run: pnpm config list
+
       - name: Install dependencies
         run: pnpm install
 
