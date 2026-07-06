@@ -1,4 +1,0 @@
-onlyBuiltDependencies:
-  - @league-of-foundry-developers/foundry-vtt-types
-  - @google/genai
-  - protobufjs
