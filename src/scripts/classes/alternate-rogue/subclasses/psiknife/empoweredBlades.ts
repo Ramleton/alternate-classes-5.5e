@@ -1,5 +1,43 @@
-import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { runActivity } from 'automation/utils.js';
+import CPRMacro, {
+  MidiMacroFunction,
+  MidiMacroFunctionArgs,
+} from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { reduceSneakAttack } from '../../utils/sneakAttackUtils.js';
+
+interface handleMindRendArgs extends MidiMacroFunctionArgs {
+  selectedFeature: Item<'feat'>;
+  target: Token;
+}
+
+type HandleMindRendFunction = (args: handleMindRendArgs) => Promise<unknown>;
+
+export const handleMindRend: HandleMindRendFunction = async ({
+  trigger: { entity },
+  workflow,
+  selectedFeature,
+  target,
+}) => {
+  const {
+    utils: { dialogUtils, itemUtils, socketUtils },
+  } = chrisPremades;
+  const feat = entity as Item<'feat'>;
+  const mentalScourge = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eMentalScourge',
+  ) as Item<'feat'> | undefined;
+  if (!mentalScourge)
+    return await runActivity(selectedFeature, 'save', [target]);
+  const selection = await dialogUtils.confirm(
+    'Mental Scourge',
+    'Reduce Sneak Attack damage by another 2 dice to empower Mind Rend?',
+    { userId: socketUtils.firstOwner(feat.actor!, true) },
+  );
+  if (!selection) return await runActivity(selectedFeature, 'save', [target]);
+  reduceSneakAttack(workflow, feat.actor!, 2);
+  await runActivity(mentalScourge, 'save', [target]);
+};
 
 const sentientStrike: MidiMacroFunction = async ({
   trigger: { entity },

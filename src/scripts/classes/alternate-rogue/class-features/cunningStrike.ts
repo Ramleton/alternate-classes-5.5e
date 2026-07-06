@@ -12,11 +12,16 @@ import {
   getWorkflowProperty,
   setWorkflowProperty,
 } from 'automation/workflowUtils.js';
-import CPRMacro, { DItem, Trigger } from 'chris-premades/macro.js';
+import CPRMacro, {
+  DItem,
+  MidiMacroFunctionArgs,
+  Trigger,
+} from 'chris-premades/macro.js';
 import { genericARCWorkflow } from 'exploits/handling/genericARCExploit.js';
 import { useWorkflow } from 'exploits/handling/genericUseExploit.js';
 import { AutoExploitWorkflow } from 'exploits/types/autoExploitTypes.js';
 import { getAltMartialExploitsRemaining } from 'exploits/utils.js';
+import { handleMindRend } from '../subclasses/psiknife/empoweredBlades.js';
 import {
   qualifiesForSneakAttack,
   reduceSneakAttack,
@@ -60,11 +65,32 @@ const ARC_DEVIOUS_EXPLOITS: Record<string, ExploitData> = {
   ),
 };
 
-const SUBCLASS_FEATURE_IDENTIFIERS = [
-  'ac55eDeadlyBlades',
-  'ac55eSupremeSneak',
-  'ac55eInsightfulStrike',
-  'ac55eEmpoweredBlades',
+interface SUBCLASS_FEATURE_CUNNING_STRIKE {
+  identifier: string;
+  preCheck: (args: MidiMacroFunctionArgs) => Promise<boolean>;
+}
+
+const SUBCLASS_FEATURE_CUNNING_STRIKES: SUBCLASS_FEATURE_CUNNING_STRIKE[] = [
+  {
+    identifier: 'ac55eDeadlyBlades',
+    preCheck: () => Promise.resolve(true),
+  },
+  {
+    identifier: 'ac55eSupremeSneak',
+    preCheck: () => Promise.resolve(true),
+  },
+  {
+    identifier: 'ac55eInsightfulStrike',
+    preCheck: () => Promise.resolve(true),
+  },
+  {
+    identifier: 'ac55eEmpoweredBlades',
+    preCheck: ({ workflow }) =>
+      Promise.resolve(
+        workflow.item.flags['chris-premades']?.info?.identifier ===
+          'ac55ePsiBladeItem',
+      ),
+  },
 ] as const;
 
 const checkExploitUsable = (
@@ -132,12 +158,18 @@ const prompt: PromptFunction = async ({
     .map((i) => i as Item<'feat'>)
     .filter((i) => i.system.type.subtype === 'deviousExploit');
   const usableFeatures: Item<'feat'>[] = usableDeviousExploits;
-  for (const identifier of SUBCLASS_FEATURE_IDENTIFIERS) {
+  for (const subclassFeatureStrike of SUBCLASS_FEATURE_CUNNING_STRIKES) {
     const subclassFeature = itemUtils.getItemByIdentifier(
       feat.actor!,
-      identifier,
+      subclassFeatureStrike.identifier,
     ) as Item<'feat'> | undefined;
-    if (subclassFeature) usableFeatures.push(subclassFeature);
+    if (subclassFeature) {
+      const usable = await subclassFeatureStrike.preCheck({
+        trigger,
+        workflow,
+      });
+      if (usable) usableFeatures.push(subclassFeature);
+    }
   }
   if (!usableFeatures.length) return;
   const userId = socketUtils.firstOwner(feat.actor!, true);
@@ -175,13 +207,15 @@ const prompt: PromptFunction = async ({
   const target = workflow.hitTargets.first() as Token;
   switch (selectedFeature.flags['chris-premades']?.info?.identifier) {
     case 'ac55eDeadlyBlades':
-    case 'ac55eEmpoweredBlades':
       await runActivity(selectedFeature, 'save', [target]);
       break;
     case 'ac55eSupremeSneak':
       break;
     case 'ac55eInsightfulStrike':
       await infoCheckWorkflow({ trigger, workflow });
+      break;
+    case 'ac55eEmpoweredBlades':
+      await handleMindRend({ trigger, workflow, selectedFeature, target });
       break;
     default:
       // Use devious exploit
