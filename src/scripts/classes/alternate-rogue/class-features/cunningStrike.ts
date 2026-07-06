@@ -64,6 +64,7 @@ const SUBCLASS_FEATURE_IDENTIFIERS = [
   'ac55eDeadlyBlades',
   'ac55eSupremeSneak',
   'ac55eInsightfulStrike',
+  'ac55eEmpoweredBlades',
 ] as const;
 
 const checkExploitUsable = (
@@ -174,6 +175,7 @@ const prompt: PromptFunction = async ({
   const target = workflow.hitTargets.first() as Token;
   switch (selectedFeature.flags['chris-premades']?.info?.identifier) {
     case 'ac55eDeadlyBlades':
+    case 'ac55eEmpoweredBlades':
       await runActivity(selectedFeature, 'save', [target]);
       break;
     case 'ac55eSupremeSneak':
@@ -207,6 +209,9 @@ const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
       case 'supreme-sneak':
       case 'insightful-strike':
         sneakAttackDiceCost = 1;
+        break;
+      case 'empowered-blades':
+        sneakAttackDiceCost = 2;
         break;
     }
   }
