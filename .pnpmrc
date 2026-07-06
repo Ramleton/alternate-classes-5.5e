@@ -1,0 +1,2 @@
+# Allow build scripts for git-hosted dependencies
+script-shell=/bin/bash

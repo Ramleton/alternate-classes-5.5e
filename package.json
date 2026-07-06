@@ -47,6 +47,10 @@
       "dnd5e@*": {},
       "fvtt-types@*": {},
       "sequencer@*": {}
-    }
+    },
+    "ignoredBuiltDependencies": [
+      "@google/genai",
+      "protobufjs"
+    ]
   }
 }
