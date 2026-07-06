@@ -32,12 +32,22 @@ export const qualifiesForSneakAttack = (
   token: Token,
   workflow: Workflow,
 ): boolean => {
-  if (!sneakAttack.system.uses?.value) return false;
+  const {
+    utils: { effectUtils, itemUtils, tokenUtils, workflowUtils },
+  } = chrisPremades;
+  const twinStrike = itemUtils.getItemByIdentifier(
+    sneakAttack.actor!,
+    'ac55eTwinStrike',
+  );
+  if (!twinStrike && !sneakAttack.system.uses?.value) return false;
+  const target = workflow.targets.first() as Token;
+  if (
+    twinStrike &&
+    effectUtils.getEffectByIdentifier(target.actor!, 'ac55eSneakAttacked')
+  )
+    return false;
   if (getWorkflowProperty(workflow, sneakAttack.actor!, 'sneakAttack'))
     return false;
-  const {
-    utils: { effectUtils, tokenUtils, workflowUtils },
-  } = chrisPremades;
   const actionType = workflowUtils.getActionType(workflow);
   // If the attack is not a finesse or ranged weapon attack, don't prompt
   if (
@@ -48,7 +58,6 @@ export const qualifiesForSneakAttack = (
     actionType !== 'rwak'
   )
     return false;
-  const target = workflow.targets.first() as Token;
   /**
    * Alternate Rogue - Mastermind - Potent Insight
    *
