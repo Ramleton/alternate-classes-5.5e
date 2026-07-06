@@ -1,2 +1,4 @@
-# Allow build scripts for git-hosted dependencies
-script-shell=/bin/bash
+onlyBuiltDependencies:
+  - @league-of-foundry-developers/foundry-vtt-types
+  - @google/genai
+  - protobufjs
