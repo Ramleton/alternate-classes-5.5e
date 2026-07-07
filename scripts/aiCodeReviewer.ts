@@ -59,6 +59,20 @@ async function runReview() {
         - Check if '.flags["chris-premades"]' or '.flags["alternate-classes-55e"]' properties are traversed without safe navigation operators ('?.'), which crashes the workflow if an item or actor lacks those flags.
         - Verify 'getActivityData()' calls are awaited and type-cast correctly (e.g., 'as HealActivity'). Missing 'await' leaves a Promise object instead of resolved activity.
 
+      6. Effect & Feature Registration:
+        - Flag missing 'effectUtils.getEffectByIdentifier()' guards. If an effect is required but missing, the macro should return gracefully instead of attempting mutations on 'undefined'.
+        - Ensure macro registration uniqueness. If a feature macro is registered multiple times (e.g., in both 'early' and 'during' hooks), flag potential double-execution.
+
+      7. Trigger & Target Data Integrity:
+        - When passing 'trigger' or 'entity' down to nested macro calls, verify that 'trigger.entity' is updated to reflect the current context (e.g., if evaluating a sub-feature, 'trigger.entity' should point to the sub-feature item, not the parent).
+        - Check that 'trigger.token' remains valid after async operations; tokens can be deleted in real-time combat.
+
+      8. Code Style & Organization Consistency:
+        - Analyze the git diff against the broader file structure. If this PR introduces macros in a folder with established patterns, flag style deviations.
+        - Prefer inline function logic (single macro function) over excessive modular decomposition, as it improves readability and is easier to follow. Avoid splitting simple logic across multiple helper functions ('pre', 'during', 'post') unless the logic becomes complex or reused.
+        - Ensure consistent import ordering, destructuring patterns, and variable naming across files in the same directory.
+        - If a new file's code organization is significantly different from its peers, suggest bringing it in line with the established pattern (unless there's a clear reason for the deviation).
+
       Provide your response in a highly readable, constructive markdown code-review format with clear "Issue", "Severity" (high/medium/low), and "Suggested Fix" blocks. Be specific: cite line numbers or patterns from the diff.
     `;
 
@@ -71,12 +85,20 @@ async function runReview() {
       config: { systemInstruction },
     });
 
-    const reviewContent = response.text;
+    let reviewContent = response.text;
+
+    // Check for empty response
+    if (!reviewContent || reviewContent.trim().length === 0)
+      throw new Error('Gemini returned empty review.');
+
+    // Clean up Markdown formatting: ensure code blocks start at line beginning
+    reviewContent = reviewContent.replace(/\n\s+```/g, '\n```');
+    reviewContent = reviewContent.replace(/```\s*\n/g, '```\n');
 
     // 4. Write the results out to a markdown file for the GitHub runner to grab
     fs.writeFileSync(
       'review_summary.md',
-      `### 🤖 AI Code Review Summary\n\n${reviewContent}`,
+      `### AI Code Review Summary\n\n${reviewContent}`,
     );
     console.log('Review completed successfully!');
   } catch (error) {
