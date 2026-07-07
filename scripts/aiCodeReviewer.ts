@@ -23,48 +23,73 @@ async function runReview() {
       return;
     }
 
-    // 2b. Extract folders from changed files and include sibling files for context
-    const changedFiles = diff.match(/^diff --git a\/(.+?)\s/gm) || [];
-    const folders = new Set<string>();
-    const siblingContext: Record<string, string> = {};
+    // 2b. Get sibling files in the same folders as changed files
+    let siblingFilesContext = '';
+    const processedFiles = new Set<string>();
 
-    for (const fileMatch of changedFiles) {
-      const filePath = fileMatch.match(/a\/(.+?)\s/)?.[1];
-      if (filePath && filePath.endsWith('.ts')) {
-        const folderPath = filePath.substring(0, filePath.lastIndexOf('/'));
-        folders.add(folderPath);
-      }
-    }
+    try {
+      // Get directories of changed files
+      const changedFilesOutput = execSync(
+        `git diff origin/${baseBranch}...HEAD --name-only -- '*.ts'`,
+      )
+        .toString()
+        .trim();
 
-    // Read sibling files in the same folders
-    for (const folder of folders) {
-      try {
-        const files = fs
-          .readdirSync(folder)
-          .filter((f) => f.endsWith('.ts') && !f.startsWith('.'))
-          .sort();
+      if (changedFilesOutput) {
+        const changedDirs = new Set(
+          changedFilesOutput
+            .split('\n')
+            .map((f) => f.substring(0, f.lastIndexOf('/')))
+            .filter(Boolean),
+        );
 
-        for (const file of files) {
-          const filePath = `${folder}/${file}`;
+        console.log(
+          `Found ${changedDirs.size} directories with changes:`,
+          Array.from(changedDirs),
+        );
+
+        // For each directory, get all TypeScript files
+        for (const dir of changedDirs) {
           try {
-            const content = fs.readFileSync(filePath, 'utf-8');
-            siblingContext[filePath] = content;
+            const siblingFiles = fs
+              .readdirSync(dir)
+              .filter((f) => f.endsWith('.ts') && !f.startsWith('.'))
+              .sort();
+
+            for (const file of siblingFiles) {
+              const filePath = `${dir}/${file}`;
+
+              // Skip if already processed
+              if (processedFiles.has(filePath)) {
+                continue;
+              }
+              processedFiles.add(filePath);
+
+              try {
+                const content = fs.readFileSync(filePath, 'utf-8');
+                siblingFilesContext += `\n--- ${filePath} ---\n${content}`;
+              } catch {
+                // Skip if can't read
+              }
+            }
           } catch {
-            // File read failed, skip
+            // Skip if directory doesn't exist
           }
         }
-      } catch {
-        // Folder doesn't exist or can't be read, skip
+
+        console.log(
+          `Including ${processedFiles.size} sibling files for comparison:`,
+          Array.from(processedFiles),
+        );
       }
+    } catch {
+      // If sibling retrieval fails, continue without it
+      console.log('Warning: Could not retrieve sibling files for comparison.');
     }
 
     const contextualDiff =
-      Object.keys(siblingContext).length > 0
-        ? `### Related Files in Same Folders (for duplication detection):\n${Object.entries(
-            siblingContext,
-          )
-            .map(([path, content]) => `\n--- ${path} ---\n${content}`)
-            .join('\n')}\n\n### Changed Files (Git Diff):\n${diff}`
+      siblingFilesContext.length > 0
+        ? `## Related Files in Same Folders (for duplication detection):\n${siblingFilesContext}\n\n## Changed Files (Git Diff):\n${diff}`
         : diff;
 
     // 3. Craft your tailored macro-review prompt instructions
