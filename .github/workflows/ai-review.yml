@@ -35,7 +35,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: pnpm tsx scripts/aiCodeReviewer.ts
+        run: npx tsx src/scripts/aiCodeReviewer.ts
 
       - name: Post review to PR
         if: always()
@@ -60,7 +60,7 @@ jobs:
             });
 
             const botComment = comments.data.find(comment =>
-              comment.body.includes('🤖 AI Code Review Summary')
+              comment.body.includes('AI Code Review Summary')
             );
 
             if (botComment) {
