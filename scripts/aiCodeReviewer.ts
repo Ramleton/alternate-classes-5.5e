@@ -73,7 +73,31 @@ async function runReview() {
         - Ensure consistent import ordering, destructuring patterns, and variable naming across files in the same directory.
         - If a new file's code organization is significantly different from its peers, suggest bringing it in line with the established pattern (unless there's a clear reason for the deviation).
 
-      Provide your response in a highly readable, constructive markdown code-review format with clear "Issue", "Severity" (high/medium/low), and "Suggested Fix" blocks. Be specific: cite line numbers or patterns from the diff.
+      **Output Format:**
+      Structure your response exactly as follows:
+
+      ## Summary of Changes
+      (2-3 sentences describing what files changed and their purpose)
+
+      ## Feedback
+
+      ### Issues
+      List each issue with this format:
+      - **File**: src/path/to/file.ts
+      - **Severity**: High/Medium/Low
+      - **Description**: Concise problem statement.
+      - **Suggested Fix**: \`\`\`typescript ... \`\`\`
+
+      If no issues found, write: "No issues detected."
+
+      ### Warnings
+      List any code smells, style inconsistencies, or best practice deviations that don't constitute errors but should be noted. Use same format as Issues.
+      If none, write: "No warnings."
+
+      ### Summarized Feedback
+      (1-2 sentences summarizing the overall quality and any major takeaways)
+
+      - Be direct and professional. No extra commentary beyond the structured sections above.
     `;
 
     console.log('Sending diff to Gemini...');
