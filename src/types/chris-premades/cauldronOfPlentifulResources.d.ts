@@ -895,7 +895,10 @@ export default interface CauldronOfPlentifulResources {
       getHiddenActivities(item: Item.Implementation): string[];
       getSpellActivities(item: Item.Implementation): string[];
       getActivity(item: Item.Implementation, type: string): any;
-      getEffectByIdentifier(item: Item.Implementation, identifier: string): any;
+      getEffectByIdentifier(
+        item: Item.Implementation,
+        identifier: string,
+      ): ActiveEffect | undefined;
       cloneItem(
         item: Item.Implementation,
         updates?: object,
