@@ -134,6 +134,14 @@ async function runReview() {
       6. Comments & Documentation:
         - Flag non-obvious logic that should have inline comments.
         - Suggest removing redundant or outdated comments.
+      
+      7. Design Patterns & Architectural Opportunities:
+        - Identify repeated object creation or initialization patterns that could benefit from Factory pattern (especially common in this codebase).
+        - Flag chains of conditional logic that could use Strategy pattern for cleaner implementation.
+        - Suggest Template Method pattern where similar workflows are repeated with minor variations.
+        - Identify cases where Builder pattern could simplify complex object construction.
+        - Look for opportunities to extract shared behavior into base classes or mixins.
+        - Suggest applying established patterns from the codebase (e.g., if sibling files use Factory pattern, new code should too).
 
       **Output Format:**
       Structure your response exactly as follows:
