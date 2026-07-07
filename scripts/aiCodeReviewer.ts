@@ -144,15 +144,21 @@ async function runReview() {
       ## Feedback
 
       ### Issues
-      List each significant improvement opportunity:
+
       - **File**: src/path/to/file.ts
       - **Description**: Concise problem statement.
       - **Suggested Fix**: Code block with the refactored version.
 
-      If no issues found, write: "No issues detected."
+      ---
+
+      - **File**: src/path/to/another/file.ts
+      - **Description**: Concise problem statement.
+      - **Suggested Fix**: Code block with the refactored version.
+
+      (Repeat with '---' divider between each issue. If no issues found, write: "No issues detected.")
 
       ### Warnings
-      List minor improvements, style inconsistencies, or best practice suggestions. Use same format as Issues.
+      List minor improvements, style inconsistencies, or best practice suggestions. Use same format as Issues with '---' dividers between each warning.
       If none, write: "No warnings."
 
       ### Summarized Feedback
