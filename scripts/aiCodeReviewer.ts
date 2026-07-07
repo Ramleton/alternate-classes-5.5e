@@ -1,16 +1,40 @@
 import { GoogleGenAI } from '@google/genai';
 import { execSync } from 'child_process';
 import fs from 'fs';
+import path from 'path';
 
-// 1. Initialize Gemini Client (Reads automatically from GEMINI_API_KEY env)
 const ai = new GoogleGenAI({});
+
+/**
+ * Recursively scans directories to find type definitions (.d.ts or types.ts files)
+ */
+function gatherTypeContext(dir: string, fileList: string[] = []): string[] {
+  if (!fs.existsSync(dir)) return fileList;
+
+  const files = fs.readdirSync(dir);
+  for (const file of files) {
+    const filePath = path.join(dir, file);
+    const stat = fs.statSync(filePath);
+
+    if (stat.isDirectory()) {
+      // Avoid traversing massive dependency folders
+      if (file !== 'node_modules' && file !== '.git') {
+        gatherTypeContext(filePath, fileList);
+      }
+    } else if (
+      file.endsWith('.d.ts') ||
+      file.toLowerCase().includes('types.ts')
+    ) {
+      fileList.push(filePath);
+    }
+  }
+  return fileList;
+}
 
 async function runReview() {
   try {
     console.log('Analyzing Pull Request diff...');
 
-    // 2. Fetch the git diff of changed files (excluding package files or lockfiles)
-    // We target changes between the current branch and the PR base target branch
     const baseBranch = process.env.GITHUB_BASE_REF || 'main';
     const diff = execSync(
       `git diff origin/${baseBranch}...HEAD -- . ':!package-lock.json' ':!package.json'`,
@@ -23,6 +47,30 @@ async function runReview() {
       return;
     }
 
+    // --- NEW: Gather Typings Context ---
+    console.log('Gathering codebase type definitions for context...');
+    const typeFiles: string[] = [];
+
+    // Scan common type directories throughout the repository
+    const targetDirs = ['types', 'src/types', 'src'];
+    targetDirs.forEach((dir) =>
+      gatherTypeContext(path.resolve(dir), typeFiles),
+    );
+
+    let compressedTypesContext = '';
+    for (const filePath of typeFiles) {
+      const relativePath = path.relative(process.cwd(), filePath);
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      // Basic minification to save prompt tokens while keeping structural interfaces
+      const sanitizedContent = content
+        .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '') // Strip comments
+        .replace(/\s+/g, ' ') // Collapse whitespace
+        .trim();
+
+      compressedTypesContext += `\n// File: ${relativePath}\n${sanitizedContent}\n`;
+    }
+
     // 3. Craft your tailored macro-review prompt instructions
     const systemInstruction = `
       You are an elite TypeScript/JavaScript code reviewer specializing in Foundry VTT system macros (dnd5e, midi-qol, chris-premades framework).
@@ -33,6 +81,14 @@ async function runReview() {
       - CPR (chris-premades) macro framework for workflow automation
       - Midi-qol activity data mutations and synthetic workflow generation
       - Custom FoundryVTT effects and flags under 'alternate-classes-55e' namespace
+
+      REFERENCE ARCHITECTURE & TYPESYSTEM:
+      You have been provided with the structural interfaces and ambient type declarations of this repository below. 
+      Use these definitions to evaluate if properties, signatures, and object mutations inside the git diff align with our strict typesystem, paying special attention to how 'CharacterData', 'NPCData', and 'Actor5e' map fields like '.system.details'.
+      
+      --- START TYPE SYSTEM CONTEXT ---
+      ${compressedTypesContext || '// No explicit type definitions found on disk.'}
+      --- END TYPE SYSTEM CONTEXT ---
 
       Look explicitly for these system pitfalls:
 
@@ -55,7 +111,7 @@ async function runReview() {
         - Ensure activity data (HealActivity, DamageActivity, etc.) passed to synthetic rolls is properly typed and immutable for that branch; mutations should not propagate upward.
 
       5. Missing Type Guards and Unsafe Property Chains:
-        - Guard against accessing '.cr' or '.level' on 'actor.system.details' without explicitly handling actor type branching. Require discriminator check ('actor.type === "character"').
+        - Guard against accessing '.cr' or '.level' on 'actor.system.details' without explicitly handling actor type branching. Require discriminator check ('actor.type === "character"'). Refer to the provided structural types to ensure type guards map cleanly.
         - Check if '.flags["chris-premades"]' or '.flags["alternate-classes-55e"]' properties are traversed without safe navigation operators ('?.'), which crashes the workflow if an item or actor lacks those flags.
         - Verify 'getActivityData()' calls are awaited and type-cast correctly (e.g., 'as HealActivity'). Missing 'await' leaves a Promise object instead of resolved activity.
 
@@ -92,7 +148,7 @@ async function runReview() {
 
       ### Warnings
       List any code smells, style inconsistencies, or best practice deviations that don't constitute errors but should be noted. Use same format as Issues.
-      If none, write: "No warnings."
+      if none, write: "No warnings."
 
       ### Summarized Feedback
       (1-2 sentences summarizing the overall quality and any major takeaways)
@@ -100,9 +156,9 @@ async function runReview() {
       - Be direct and professional. No extra commentary beyond the structured sections above.
     `;
 
-    console.log('Sending diff to Gemini...');
+    console.log('Sending diff and context schema to Gemini...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash', // Lightning-fast and highly competent code model
+      model: 'gemini-2.5-flash',
       contents: [
         { role: 'user', parts: [{ text: `Review this git diff:\n\n${diff}` }] },
       ],
@@ -111,15 +167,12 @@ async function runReview() {
 
     let reviewContent = response.text;
 
-    // Check for empty response
     if (!reviewContent || reviewContent.trim().length === 0)
       throw new Error('Gemini returned empty review.');
 
-    // Clean up Markdown formatting: ensure code blocks start at line beginning
     reviewContent = reviewContent.replace(/\n\s+```/g, '\n```');
     reviewContent = reviewContent.replace(/```\s*\n/g, '```\n');
 
-    // 4. Write the results out to a markdown file for the GitHub runner to grab
     fs.writeFileSync(
       'review_summary.md',
       `### AI Code Review Summary\n\n${reviewContent}`,
