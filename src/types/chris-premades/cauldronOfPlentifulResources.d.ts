@@ -1254,7 +1254,7 @@ export default interface CauldronOfPlentifulResources {
           byIdentifier?: boolean;
           bySystemIdentifier?: boolean;
         },
-      );
+      ): Promise<Item>;
       getActorFromCompendium(
         key: string,
         name: string,
