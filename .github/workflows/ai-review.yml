@@ -35,7 +35,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: npx tsx src/scripts/aiCodeReviewer.ts
+        run: npx tsx scripts/aiCodeReviewer.ts
 
       - name: Post review to PR
         if: always()
