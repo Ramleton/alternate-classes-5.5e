@@ -25,21 +25,24 @@ async function runReview() {
 
     // 2b. Get sibling files in the same folders as changed files
     let siblingFilesContext = '';
-    const processedFiles = new Set<string>();
+    const processedFiles: Set<string> = new Set<string>();
 
     try {
       // Get directories of changed files
-      const changedFilesOutput = execSync(
+      const changedFilesOutput: string = execSync(
         `git diff origin/${baseBranch}...HEAD --name-only -- '*.ts'`,
       )
         .toString()
         .trim();
 
       if (changedFilesOutput) {
-        const changedDirs = new Set(
+        const changedDirs = new Set<string>(
           changedFilesOutput
             .split('\n')
-            .map((f) => f.substring(0, f.lastIndexOf('/')))
+            .map((f: string) => {
+              const lastSlash = f.lastIndexOf('/');
+              return lastSlash > -1 ? f.substring(0, lastSlash) : f;
+            })
             .filter(Boolean),
         );
 
@@ -51,9 +54,9 @@ async function runReview() {
         // For each directory, get all TypeScript files
         for (const dir of changedDirs) {
           try {
-            const siblingFiles = fs
+            const siblingFiles: string[] = fs
               .readdirSync(dir)
-              .filter((f) => f.endsWith('.ts') && !f.startsWith('.'))
+              .filter((f: string) => f.endsWith('.ts') && !f.startsWith('.'))
               .sort();
 
             for (const file of siblingFiles) {
@@ -66,7 +69,7 @@ async function runReview() {
               processedFiles.add(filePath);
 
               try {
-                const content = fs.readFileSync(filePath, 'utf-8');
+                const content: string = fs.readFileSync(filePath, 'utf-8');
                 siblingFilesContext += `\n--- ${filePath} ---\n${content}`;
               } catch {
                 // Skip if can't read
@@ -87,16 +90,32 @@ async function runReview() {
       console.log('Warning: Could not retrieve sibling files for comparison.');
     }
 
-    const contextualDiff =
+    const contextualDiff: string =
       siblingFilesContext.length > 0
         ? `## Related Files in Same Folders (for duplication detection):\n${siblingFilesContext}\n\n## Changed Files (Git Diff):\n${diff}`
         : diff;
 
+    // Load pending issues from previous PRs to check if any are now relevant
+    let pendingIssuesContext = '';
+    const pendingFile = 'pending_code_issues.md';
+    try {
+      const pendingContent = fs.readFileSync(pendingFile, 'utf-8');
+      if (pendingContent.trim()) {
+        pendingIssuesContext = `\n\n## Pending Issues from Previous PRs (check if any are now relevant to this PR):\n${pendingContent}`;
+        console.log(
+          'Found pending issues from previous PRs—checking relevance.',
+        );
+      }
+    } catch {
+      // No pending issues file
+    }
+
+    const fullContext: string = contextualDiff + pendingIssuesContext;
+
     // 3. Craft your tailored macro-review prompt instructions
-    const systemInstruction = `
-      You are a code style and maintainability reviewer for TypeScript/JavaScript Foundry VTT macros.
+    const systemInstruction = `You are a code style and maintainability reviewer for TypeScript/JavaScript Foundry VTT macros.
       Your goal is to inspect the git diff for opportunities to improve code quality, consistency, and refactoring—NOT type safety or runtime errors (TypeScript handles those).
-      
+
       This codebase uses:
       - TypeScript with strict type checking (type safety is already handled by the compiler)
       - CPR (chris-premades) macro framework for workflow automation
@@ -106,44 +125,42 @@ async function runReview() {
       Focus on these areas:
 
       1. Code Duplication & DRY Principle:
-        - Compare changed files against their sibling files in the same folder (provided in the context).
-        - Flag repeated logic patterns that could be extracted into reusable utilities or helper functions.
-        - Identify similar conditionals, type checks, or error handling patterns that appear across multiple files in the same folder.
-        - Suggest extraction of commonly repeated patterns (e.g., "this validation logic appears in eloquentSpeech.ts, imposingPresence.ts, and roguishCharm.ts—extract to a shared utility").
+      - Compare changed files against their sibling files in the same folder (provided in the context).
+      - Flag repeated logic patterns that could be extracted into reusable utilities or helper functions.
+      - Identify similar conditionals, type checks, or error handling patterns that appear across multiple files in the same folder.
 
       2. Naming & Consistency:
-        - Compare naming patterns in the changed files against their siblings in the same folder.
-        - Flag inconsistent variable naming conventions (camelCase vs snake_case, abbreviations) between related files.
-        - Ensure function/constant names clearly express intent and match the patterns used by sibling files (e.g., all exploit macros should use 'bonus', 'use', etc. consistently).
-        - Verify consistent naming patterns across the folder (e.g., all exploit macros in 1st-degree/ follow the same naming convention).
+      - Compare naming patterns in the changed files against their siblings in the same folder.
+      - Flag inconsistent variable naming conventions (camelCase vs snake_case, abbreviations) between related files.
+      - Ensure function/constant names clearly express intent and match the patterns used by sibling files.
 
       3. Import Ordering & Organization:
-        - Ensure imports are ordered consistently: external libraries, then relative paths, then types.
-        - Flag missing or unused imports.
-        - Verify destructuring patterns are consistent (destructure early vs. destructure on-use).
+      - Ensure imports are ordered consistently: external libraries, then relative paths, then types.
+      - Flag missing or unused imports.
+      - Verify destructuring patterns are consistent.
 
       4. Code Style & Readability:
-        - Flag overly nested conditionals that could be flattened with early returns.
-        - Suggest breaking down long function bodies (>50 lines) into logical sub-sections or helper functions.
-        - Recommend extracting magic numbers or strings into named constants.
+      - Flag overly nested conditionals that could be flattened with early returns.
+      - Suggest breaking down long function bodies into logical sub-sections or helper functions.
+      - Recommend extracting magic numbers or strings into named constants.
 
       5. Logic Flow & Control Flow:
-        - Suggest simplifications in conditional chains (e.g., combining multiple 'if' checks into a single condition).
-        - Flag logic that could be inverted for clarity (e.g., "if (!condition) return; // do work" → "if (condition) { // do work }").
+      - Suggest simplifications in conditional chains.
+      - Flag logic that could be inverted for clarity.
 
       6. Comments & Documentation:
-        - Flag non-obvious logic that should have inline comments.
-        - Suggest removing redundant or outdated comments.
-      
-      7. Design Patterns & Architectural Opportunities:
-        - Identify repeated object creation or initialization patterns that could benefit from Factory pattern (especially common in this codebase).
-        - Flag chains of conditional logic that could use Strategy pattern for cleaner implementation.
-        - Suggest Template Method pattern where similar workflows are repeated with minor variations.
-        - Identify cases where Builder pattern could simplify complex object construction.
-        - Look for opportunities to extract shared behavior into base classes or mixins.
-        - Suggest applying established patterns from the codebase (e.g., if sibling files use Factory pattern, new code should too).
+      - Flag non-obvious logic that should have inline comments.
+      - Suggest removing redundant or outdated comments.
 
-      **Output Format:**
+      7. Design Patterns & Architectural Opportunities:
+      - Identify repeated object creation or initialization patterns that could benefit from Factory pattern (especially common in this codebase).
+      - Flag chains of conditional logic that could use Strategy pattern for cleaner implementation.
+      - Suggest Template Method pattern where similar workflows are repeated with minor variations.
+      - Identify cases where Builder pattern could simplify complex object construction.
+      - Look for opportunities to extract shared behavior into base classes or mixins.
+      - Suggest applying established patterns from the codebase (e.g., if sibling files use Factory pattern, new code should too).
+
+      Output Format:
       Structure your response exactly as follows:
 
       ## Summary of Changes
@@ -152,42 +169,67 @@ async function runReview() {
       ## Feedback
 
       ### Issues
-
-      - **File**: src/path/to/file.ts
-      - **Description**: Concise problem statement.
-      - **Suggested Fix**: Code block with the refactored version.
+      - File: src/path/to/file.ts
+      - Description: Concise problem statement.
+      - Suggested Fix: Code block with the refactored version.
 
       ---
 
-      - **File**: src/path/to/another/file.ts
-      - **Description**: Concise problem statement.
-      - **Suggested Fix**: Code block with the refactored version.
-
-      (Repeat with '---' divider between each issue. If no issues found, write: "No issues detected.")
+      (Repeat with --- divider between each issue. If no issues found, write: "No issues detected.")
 
       ### Warnings
-      List minor improvements, style inconsistencies, or best practice suggestions. Use same format as Issues with '---' dividers between each warning.
-      If none, write: "No warnings."
+      List minor improvements with same format. If none, write: "No warnings."
 
       ### Summarized Feedback
       (1-2 sentences summarizing overall code quality and maintainability)
 
-      - Be direct and professional. Do NOT include commentary outside the structured sections.
+      **IMPORTANT - PR Theme & Issue Relevance:**
+      Identify the primary theme of this PR based on the changed files (e.g., "Adding new exploit macros", "Refactoring damage calculations", "Improving documentation").
+
+      For each issue you find:
+      - Does it directly relate to the PR's theme?
+      - Or is it a separate concern that could wait for a more appropriate PR?
+
+      Output ONLY on-theme issues in the main ### Issues section.
+
+      If you identify off-theme issues that are still valuable (e.g., documentation gaps, style inconsistencies unrelated to this PR's changes), add a new section:
+
+      ## Off-Theme Issues for Future PRs
+      (These will be stored and reviewed when PRs addressing those themes are opened)
+
+      - File: src/path/to/file.ts
+      - Description: Problem statement.
+      - Suggested Fix: ...
+
+      ---
+
+      (The script will extract this section and save it for future PRs.)
+
+      **IMPORTANT - Final Validation:**
+      Before submitting, review each issue you identified:
+      - Is this actually a problem in the code, or is it already correctly implemented?
+      - Is this a genuine code quality issue, or just a description of working code?
+      - Would removing this issue make the review clearer and more actionable?
+      - Does the code already follow the pattern you're suggesting?
+
+      If the answer to any of the above is "yes, this is already correct", DELETE that issue from your output. Only include genuine, actionable improvements.
+
+      Be direct and professional. Do NOT include commentary outside the structured sections.
     `;
 
     console.log('Sending diff to Gemini...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash', // Lightning-fast and highly competent code model
+      model: 'gemini-2.5-flash',
       contents: [
         {
           role: 'user',
-          parts: [{ text: `Review this code:\n\n${contextualDiff}` }],
+          parts: [{ text: `Review this code:\n\n${fullContext}` }],
         },
       ],
       config: { systemInstruction },
     });
 
-    let reviewContent = response.text;
+    let reviewContent: string | undefined = response.text;
 
     // Check for empty response
     if (!reviewContent || reviewContent.trim().length === 0) {
@@ -198,6 +240,36 @@ async function runReview() {
     // Clean up Markdown formatting: ensure code blocks start at line beginning
     reviewContent = reviewContent.replace(/\n\s+```/g, '\n```');
     reviewContent = reviewContent.replace(/```\s*\n/g, '```\n');
+
+    // Extract off-theme issues if present (section added by Gemini)
+    const offThemeMatch = reviewContent.match(
+      /## Off-Theme Issues for Future PRs\n([\s\S]*?)(?=\n## |$)/,
+    );
+    let offThemeIssues = '';
+    if (offThemeMatch) {
+      offThemeIssues = offThemeMatch[1].trim();
+      // Remove off-theme section from the PR comment
+      reviewContent = reviewContent.replace(
+        /\n## Off-Theme Issues for Future PRs[\s\S]*?(?=\n## Summarized Feedback|$)/,
+        '',
+      );
+    }
+
+    // Save off-theme issues for next PR
+    if (offThemeIssues) {
+      const pendingFile = 'pending_code_issues.md';
+      try {
+        const existingPending = fs.readFileSync(pendingFile, 'utf-8');
+        fs.writeFileSync(
+          pendingFile,
+          [existingPending, offThemeIssues].filter(Boolean).join('\n\n---\n\n'),
+        );
+      } catch {
+        // No existing pending issues, just write new ones
+        fs.writeFileSync(pendingFile, offThemeIssues);
+      }
+      console.log('Stored off-theme issues for future PRs.');
+    }
 
     // 4. Write the results out to a markdown file for the GitHub runner to grab
     fs.writeFileSync(
