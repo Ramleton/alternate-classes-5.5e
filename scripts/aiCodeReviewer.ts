@@ -277,12 +277,36 @@ Be direct and professional. Do NOT include commentary outside the structured sec
     if (offThemeIssues) {
       try {
         const existingPending = fs.readFileSync(pendingFile, 'utf-8');
-        fs.writeFileSync(
-          pendingFile,
-          [existingPending, offThemeIssues].filter(Boolean).join('\n\n---\n\n'),
-        );
+
+        // Split both existing and new issues into individual blocks
+        const existingBlocks = existingPending
+          .split(/\n---\n/)
+          .map((b) => b.trim())
+          .filter(Boolean);
+
+        const newBlocks = offThemeIssues
+          .split(/\n---\n/)
+          .map((b) => b.trim())
+          .filter(Boolean);
+
+        // Deduplicate by using the File + Description as a key
+        const seen = new Set<string>();
+        const deduped: string[] = [];
+
+        for (const block of [...existingBlocks, ...newBlocks]) {
+          // Extract file + description lines as a stable identity key
+          const fileMatch = block.match(/- File: (.+)/);
+          const descMatch = block.match(/- Description: (.+)/);
+          const key = `${fileMatch?.[1] ?? ''} | ${descMatch?.[1] ?? ''}`;
+
+          if (!seen.has(key)) {
+            seen.add(key);
+            deduped.push(block);
+          }
+        }
+
+        fs.writeFileSync(pendingFile, deduped.join('\n\n---\n\n'));
       } catch {
-        // No existing pending issues, just write new ones
         fs.writeFileSync(pendingFile, offThemeIssues);
       }
       console.log('Stored off-theme issues for future PRs.');
