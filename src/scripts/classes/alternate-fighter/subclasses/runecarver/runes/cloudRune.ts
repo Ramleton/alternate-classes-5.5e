@@ -1,5 +1,6 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import { runActivity } from 'automation/utils.js';
+import { getTokensInMeleeWeaponReach } from 'automation/weaponUtils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { isRuneInvokable, postRune } from './runeUtils.js';
 
@@ -8,29 +9,21 @@ const pre = async (
   workflow: Workflow,
   nearbyTokens: Token[],
 ): Promise<boolean> => {
-  const { utils: {
-    constants,
-    dialogUtils,
-    tokenUtils,
-    socketUtils,
-  } } = chrisPremades;
+  const {
+    utils: { constants, dialogUtils, tokenUtils, socketUtils },
+  } = chrisPremades;
   if (!constants.attacks.includes(workflow.activity?.getActionType()))
     return false;
-  if (!workflow.targets.size)
-    return false;
+  if (!workflow.targets.size) return false;
   const target = workflow.targets.first()! as Token;
   if (target.actor!.uuid !== feat.actor!.uuid) {
     const distance = tokenUtils.getDistance(workflow.token!, target);
-    if (distance > 30)
-      return false;
-    if (!tokenUtils.canSee(workflow.token!, target))
-      return false;
+    if (distance > 30) return false;
+    if (!tokenUtils.canSee(workflow.token!, target)) return false;
   }
-  if (!nearbyTokens.length)
-    return false;
+  if (!nearbyTokens.length) return false;
   const res = isRuneInvokable(feat);
-  if (!res.usable)
-    return false;
+  if (!res.usable) return false;
   return await dialogUtils.confirm(
     feat.name,
     'A creature you can see is targeted by an attack. Invoke Cloud Rune?',
@@ -42,7 +35,9 @@ const during = async (
   workflow: Workflow,
   nearbyTokens: Token[],
 ) => {
-  const { utils: { dialogUtils, genericUtils, workflowUtils } } = chrisPremades;
+  const {
+    utils: { dialogUtils, genericUtils, workflowUtils },
+  } = chrisPremades;
   await genericUtils.setFlag(
     feat.actor!,
     'alternate-classes-55e',
@@ -55,11 +50,9 @@ const during = async (
     'Redirect attack to which token?',
     nearbyTokens,
   );
-  if (!newTarget)
-    return false;
+  if (!newTarget) return false;
   const newAttack = genericUtils.duplicate(workflow.activity);
-  if (!newAttack)
-    return false;
+  if (!newAttack) return false;
   await workflowUtils.syntheticActivityDataRoll(
     newAttack,
     workflow.item,
@@ -68,30 +61,21 @@ const during = async (
   );
   return true;
 };
-const workflow: MidiMacroFunction = async (
-  { trigger: { entity: item }, workflow },
-) => {
-  const attackReach = Math.max(
-    workflow.activity?.range?.reach || 0,
-    workflow.activity?.range?.value || 0,
-  );
-  if (!workflow.targets.size)
-    return false;
-  const target = workflow.targets.first()! as Token;
-  const { utils: { tokenUtils } } = chrisPremades;
-  const nearbyTokens = tokenUtils.findNearby(
-    workflow.token!,
-    attackReach,
-    'any',
-    { includeIncapacitated: true, includeToken: false },
-  ).filter(t => t.actor!.id !== target.actor!.id);
+const workflow: MidiMacroFunction = async ({
+  trigger: { entity: item },
+  workflow,
+}) => {
+  if (!workflow.targets.size) return false;
+  const nearbyTokens = getTokensInMeleeWeaponReach({
+    token: workflow.token!,
+    workflow,
+  }).filter((t) => t.actor!.id !== workflow.targets.first()!.actor!.id);
+  if (!nearbyTokens.length) return false;
   const feat = item as Item<'feat'>;
   const res1 = await pre(feat, workflow, nearbyTokens);
-  if (!res1)
-    return;
+  if (!res1) return;
   const res2 = await during(feat, workflow, nearbyTokens);
-  if (!res2)
-    return;
+  if (!res2) return;
   await postRune(feat);
 };
 const macro: CPRMacro = {

@@ -1,3 +1,5 @@
+import { Workflow } from '@midi-qol/types/module/Workflow.js';
+
 export const getMeleeWeapons = (actor: Actor5e): Item<'weapon'>[] => {
   const {
     utils: { constants },
@@ -21,6 +23,17 @@ export const getMeleeWeaponsInRange = (
   return getMeleeWeapons(source.actor!).filter(
     (i) => tokenUtils.getDistance(source, target) <= i.system.range!.reach!,
   );
+};
+
+export const getTokensInMeleeWeaponReach = ({ token, workflow }): Token[] => {
+  const {
+    utils: { tokenUtils },
+  } = chrisPremades;
+  const reach = (workflow.item as Item<'weapon'>).system.range.reach!;
+  return tokenUtils.findNearby(token, reach, 'any', {
+    includeIncapacitated: true,
+    includeToken: false,
+  });
 };
 
 export const getRangedWeapons = (actor: Actor5e): Item<'weapon'>[] => {
@@ -87,4 +100,65 @@ export const promptSelectWeapon = async (
     weapons,
   )) as Item<'weapon'> | undefined;
   return selectedWeapon;
+};
+
+export type ExploitPrerequisiteCheck = ({
+  feat,
+  token,
+  workflow,
+}: {
+  feat: Item<'feat'>;
+  token: Token;
+  workflow: Workflow;
+}) => boolean;
+
+export const attackHitCheck: ExploitPrerequisiteCheck = ({
+  workflow,
+}): boolean => {
+  return !!workflow.hitTargets.size;
+};
+
+export const isWeaponAttack: ExploitPrerequisiteCheck = ({
+  workflow,
+}): boolean => {
+  const {
+    utils: { constants, workflowUtils },
+  } = chrisPremades;
+  const actionType = workflowUtils.getActionType(workflow);
+  return constants.weaponAttacks.some((type) => type === actionType);
+};
+
+export const isMeleeWeaponAttack: ExploitPrerequisiteCheck = ({
+  workflow,
+}): boolean => {
+  const {
+    utils: { workflowUtils },
+  } = chrisPremades;
+  const actionType = workflowUtils.getActionType(workflow);
+  return actionType === 'mwak';
+};
+
+export const weaponAttackHitCheck: ExploitPrerequisiteCheck = (
+  data,
+): boolean => {
+  return attackHitCheck(data) && isWeaponAttack(data);
+};
+
+export const meleeWeaponAttackHitCheck: ExploitPrerequisiteCheck = (
+  data,
+): boolean => {
+  return attackHitCheck(data) && isMeleeWeaponAttack(data);
+};
+
+export const meleeWeaponAttackMissCheck: ExploitPrerequisiteCheck = (
+  data,
+): boolean => {
+  return !attackHitCheck(data) && isMeleeWeaponAttack(data);
+};
+
+export const meleeWeaponAttackRedirectCheck: ExploitPrerequisiteCheck = (
+  data,
+): boolean => {
+  if (!meleeWeaponAttackMissCheck(data)) return false;
+  return getTokensInMeleeWeaponReach(data).length < 2;
 };
