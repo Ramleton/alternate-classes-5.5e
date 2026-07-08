@@ -25,6 +25,17 @@ export const getMeleeWeaponsInRange = (
   );
 };
 
+export const getTokensInMeleeWeaponReach = ({ token, workflow }): Token[] => {
+  const {
+    utils: { tokenUtils },
+  } = chrisPremades;
+  const reach = (workflow.item as Item<'weapon'>).system.range.reach!;
+  return tokenUtils.findNearby(token, reach, 'any', {
+    includeIncapacitated: true,
+    includeToken: false,
+  });
+};
+
 export const getRangedWeapons = (actor: Actor5e): Item<'weapon'>[] => {
   const {
     utils: { constants },
@@ -149,15 +160,5 @@ export const meleeWeaponAttackRedirectCheck: ExploitPrerequisiteCheck = (
   data,
 ): boolean => {
   if (!meleeWeaponAttackMissCheck(data)) return false;
-  const {
-    utils: { tokenUtils },
-  } = chrisPremades;
-  const { token, workflow } = data;
-  const reach = (workflow.item as Item<'weapon'>).system.range.reach!;
-  return (
-    tokenUtils.findNearby(token, reach, 'any', {
-      includeIncapacitated: true,
-      includeToken: false,
-    }).length < 2
-  );
+  return getTokensInMeleeWeaponReach(data).length < 2;
 };
