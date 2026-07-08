@@ -54,7 +54,7 @@ jobs:
             TASK:
             Update the provided README.md strictly using these rules:
             1. Carefully read the "Recent Changes / Release Notes" above. Identify which alternate classes were explicitly worked on, automated, or implemented in this release.
-            2. Locate the "Supported Classes & Automation Status" table in the README. If your analysis of the Release Notes shows a class listed there has now been completed or automated, update that specific class’s row status from "❌ Upcoming" to "🔄 Implemented". Do not modify rows for classes not mentioned in the notes.
+            2. Locate the "Supported Classes & Automation Status" table in the README. If your analysis of the Release Notes shows a class listed there has now been completed or automated, update that specific class’s row status from "❌ Upcoming" to "✅ Implemented". Do not modify rows for classes not mentioned in the notes.
             3. Locate the "## Changelog" header. Insert a new subsection directly below it for the new release, formatted exactly like this:
                ### Version ${process.env.VERSION_TAG} (${process.env.CURRENT_DATE})
                [Summarize or paste the core bullet points from the Release Notes here]
