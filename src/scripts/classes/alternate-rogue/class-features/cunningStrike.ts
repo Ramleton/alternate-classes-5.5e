@@ -284,8 +284,7 @@ const spendUses = async (
     sneakAttackDiceCost = exploitOrFeature.sneakAttackDiceCost;
   } else {
     console.warn(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      `Cunning Strike: Sneak Attack Dice Cost not defined for ${'name' in exploitOrFeature ? exploitOrFeature.name : (exploitOrFeature as any).system.identifier}`,
+      `Cunning Strike: Sneak Attack Dice Cost not defined for ${exploitOrFeature.name}`,
     );
   }
   reduceSneakAttack(workflow, actor, sneakAttackDiceCost);
