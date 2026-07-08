@@ -107,8 +107,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -f pending_code_issues.md ]; then
+            # Save the file before switching branches
+            cp pending_code_issues.md /tmp/pending_code_issues.md
             git fetch origin ${{ github.base_ref }}
             git checkout ${{ github.base_ref }}
+            # Restore the file onto the base branch
+            cp /tmp/pending_code_issues.md pending_code_issues.md
             git add pending_code_issues.md
             git commit -m "chore: update pending code issues" || echo "No changes to commit"
             git push origin ${{ github.base_ref }}
