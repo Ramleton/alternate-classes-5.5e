@@ -640,10 +640,10 @@ export default interface CauldronOfPlentifulResources {
         },
       ): Promise<boolean>;
 
-      selectDocumentDialog(
+      selectDocumentDialog<T>(
         title: string,
         content: string,
-        documents: any,
+        documents: T[],
         options?: {
           displayTooltops?: boolean;
           sortAlphabetical?: boolean;
@@ -655,7 +655,7 @@ export default interface CauldronOfPlentifulResources {
           showUses?: boolean;
           displayReference?: boolean;
         },
-      ): Promise<object>;
+      ): Promise<T>;
 
       selectDocumentsDialog(
         title: string,
