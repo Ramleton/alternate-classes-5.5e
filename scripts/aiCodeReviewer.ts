@@ -2,15 +2,86 @@ import { GoogleGenAI } from '@google/genai';
 import { execSync } from 'child_process';
 import fs from 'fs';
 
-// 1. Initialize Gemini Client (Reads automatically from GEMINI_API_KEY env)
 const ai = new GoogleGenAI({});
+
+async function generateWithRetry(
+  config: Parameters<typeof ai.models.generateContent>[0],
+  maxRetries = 3,
+) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await ai.models.generateContent(config);
+    } catch (error: unknown) {
+      const isRateLimit =
+        typeof error === 'object' &&
+        error !== null &&
+        'status' in error &&
+        (error as { status: number }).status === 429;
+
+      if (isRateLimit && attempt < maxRetries - 1) {
+        const message = error instanceof Error ? error.message : String(error);
+        const retryMatch = message.match(/retry in (\d+(\.\d+)?)s/);
+        const waitMs = retryMatch ? parseFloat(retryMatch[1]) * 1000 : 60000;
+        console.log(
+          `Rate limited. Retrying in ${waitMs / 1000}s... (attempt ${attempt + 1}/${maxRetries})`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
+function extractImports(content: string): Set<string> {
+  const imports = new Set<string>();
+  const importRegex = /import\s+.*?\s+from\s+['"](.+?)['"]/g;
+  let match: RegExpExecArray | null;
+  while ((match = importRegex.exec(content)) !== null) {
+    imports.add(match[1]);
+  }
+  return imports;
+}
+
+function scoreRelatedness(
+  changedFileContent: string,
+  changedFilePath: string,
+  siblingContent: string,
+  siblingPath: string,
+): number {
+  let score = 0;
+
+  const changedImports = extractImports(changedFileContent);
+  const siblingImports = extractImports(siblingContent);
+
+  const changedBaseName = changedFilePath
+    .replace(/\.ts$/, '')
+    .split('/')
+    .pop()!;
+  const siblingBaseName = siblingPath.replace(/\.ts$/, '').split('/').pop()!;
+
+  // Direct reference: sibling imports the changed file, or vice versa
+  if ([...siblingImports].some((imp) => imp.includes(changedBaseName))) {
+    score += 10;
+  }
+  if ([...changedImports].some((imp) => imp.includes(siblingBaseName))) {
+    score += 10;
+  }
+
+  // Shared imports suggest similar responsibility
+  const sharedImports = [...changedImports].filter((imp) =>
+    siblingImports.has(imp),
+  );
+  score += sharedImports.length * 2;
+
+  return score;
+}
 
 async function runReview() {
   try {
     console.log('Analyzing Pull Request diff...');
 
-    // 2. Fetch the git diff of changed files (excluding package files or lockfiles)
-    // We target changes between the current branch and the PR base target branch
     const baseBranch: string = process.env.GITHUB_BASE_REF || 'main';
     const prTitle: string = process.env.PR_TITLE || 'Unknown';
     const prBranch: string = process.env.PR_BRANCH || 'unknown';
@@ -21,23 +92,33 @@ async function runReview() {
     console.log(`  Branch: ${prBranch}`);
     console.log(`  Base: ${baseBranch}`);
 
-    const diff = execSync(
+    const MAX_DIFF_CHARS = 50000;
+    const rawDiff = execSync(
       `git diff origin/${baseBranch}...HEAD -- . ':!package-lock.json' ':!package.json'`,
     )
       .toString()
       .trim();
 
-    if (!diff) {
+    if (!rawDiff) {
       console.log('No meaningful code changes detected.');
       return;
     }
 
-    // 2b. Get sibling files in the same folders as changed files
+    const diff = rawDiff.slice(0, MAX_DIFF_CHARS);
+    if (rawDiff.length > MAX_DIFF_CHARS) {
+      console.log(
+        `Warning: diff truncated from ${rawDiff.length} to ${MAX_DIFF_CHARS} chars.`,
+      );
+    }
+
+    // Get sibling files — scored by relatedness, only direct siblings of changed files
     let siblingFilesContext = '';
     const processedFiles: Set<string> = new Set<string>();
 
+    const MAX_SIBLINGS_PER_DIR = 5;
+    const MAX_SIBLING_FILE_CHARS = 3000;
+
     try {
-      // Get directories of changed files
       const changedFilesOutput: string = execSync(
         `git diff origin/${baseBranch}...HEAD --name-only -- '*.ts'`,
       )
@@ -45,47 +126,61 @@ async function runReview() {
         .trim();
 
       if (changedFilesOutput) {
-        const changedDirs = new Set<string>(
-          changedFilesOutput
-            .split('\n')
-            .map((f: string) => {
-              const lastSlash = f.lastIndexOf('/');
-              return lastSlash > -1 ? f.substring(0, lastSlash) : f;
-            })
-            .filter(Boolean),
-        );
+        const changedFiles = changedFilesOutput.split('\n').filter(Boolean);
 
-        console.log(
-          `Found ${changedDirs.size} directories with changes:`,
-          Array.from(changedDirs),
-        );
+        console.log(`Found ${changedFiles.length} changed files.`);
 
-        // For each directory, get all TypeScript files
-        for (const dir of changedDirs) {
+        for (const changedFile of changedFiles) {
+          const lastSlash = changedFile.lastIndexOf('/');
+          const dir = lastSlash > -1 ? changedFile.substring(0, lastSlash) : '';
+          if (!dir) continue;
+
+          let changedFileContent = '';
           try {
-            const siblingFiles: string[] = fs
+            changedFileContent = fs.readFileSync(changedFile, 'utf-8');
+          } catch {
+            continue;
+          }
+
+          try {
+            const siblingCandidates = fs
               .readdirSync(dir)
               .filter((f: string) => f.endsWith('.ts') && !f.startsWith('.'))
-              .sort();
+              .map((f: string) => `${dir}/${f}`)
+              .filter((f) => f !== changedFile && !processedFiles.has(f));
 
-            for (const file of siblingFiles) {
-              const filePath = `${dir}/${file}`;
+            const scored = siblingCandidates
+              .map((filePath) => {
+                try {
+                  const content = fs.readFileSync(filePath, 'utf-8');
+                  const score = scoreRelatedness(
+                    changedFileContent,
+                    changedFile,
+                    content,
+                    filePath,
+                  );
+                  return { filePath, content, score };
+                } catch {
+                  return null;
+                }
+              })
+              .filter(
+                (entry): entry is NonNullable<typeof entry> => entry !== null,
+              )
+              .sort((a, b) => b.score - a.score)
+              .slice(0, MAX_SIBLINGS_PER_DIR);
 
-              // Skip if already processed
-              if (processedFiles.has(filePath)) {
-                continue;
-              }
+            for (const { filePath, content, score } of scored) {
               processedFiles.add(filePath);
-
-              try {
-                const content: string = fs.readFileSync(filePath, 'utf-8');
-                siblingFilesContext += `\n--- ${filePath} ---\n${content}`;
-              } catch {
-                // Skip if can't read
-              }
+              const truncated =
+                content.length > MAX_SIBLING_FILE_CHARS
+                  ? content.slice(0, MAX_SIBLING_FILE_CHARS) +
+                    '\n... (truncated)'
+                  : content;
+              siblingFilesContext += `\n--- ${filePath} (relatedness: ${score}) ---\n${truncated}`;
             }
           } catch {
-            // Skip if directory doesn't exist
+            // Skip missing directories
           }
         }
 
@@ -95,7 +190,6 @@ async function runReview() {
         );
       }
     } catch {
-      // If sibling retrieval fails, continue without it
       console.log('Warning: Could not retrieve sibling files for comparison.');
     }
 
@@ -104,7 +198,6 @@ async function runReview() {
         ? `## Related Files in Same Folders (for duplication detection):\n${siblingFilesContext}\n\n## Changed Files (Git Diff):\n${diff}`
         : diff;
 
-    // Load pending issues from previous PRs to check if any are now relevant
     let pendingIssuesContext = '';
     const pendingFile = 'pending_code_issues.md';
     try {
@@ -116,12 +209,11 @@ async function runReview() {
         );
       }
     } catch {
-      // No pending issues file
+      // No pending issues file yet
     }
 
     const fullContext: string = contextualDiff + pendingIssuesContext;
 
-    // 3. Craft your tailored macro-review prompt instructions
     const systemInstruction = `You are a code style and maintainability reviewer for TypeScript/JavaScript Foundry VTT macros.
 Your goal is to inspect the git diff for opportunities to improve code quality, consistency, and refactoring—NOT type safety or runtime errors (TypeScript handles those).
 
@@ -236,7 +328,7 @@ If the answer to any of the above is "yes, this is already correct", DELETE that
 Be direct and professional. Do NOT include commentary outside the structured sections.`;
 
     console.log('Sending diff to Gemini...');
-    const response = await ai.models.generateContent({
+    const response = await generateWithRetry({
       model: 'gemini-2.5-flash',
       contents: [
         {
@@ -247,38 +339,32 @@ Be direct and professional. Do NOT include commentary outside the structured sec
       config: { systemInstruction },
     });
 
-    let reviewContent: string | undefined = response.text;
+    let reviewContent: string | undefined = response!.text;
 
-    // Check for empty response
     if (!reviewContent || reviewContent.trim().length === 0) {
       console.log('Gemini returned empty review.');
       return;
     }
 
-    // Clean up Markdown formatting: ensure code blocks start at line beginning
     reviewContent = reviewContent.replace(/\n\s+```/g, '\n```');
     reviewContent = reviewContent.replace(/```\s*\n/g, '```\n');
 
-    // Extract off-theme issues if present (section added by Gemini)
     const offThemeMatch = reviewContent.match(
       /## Off-Theme Issues for Future PRs\n([\s\S]*?)(?=\n## |$)/,
     );
     let offThemeIssues = '';
     if (offThemeMatch) {
       offThemeIssues = offThemeMatch[1].trim();
-      // Remove off-theme section from the PR comment
       reviewContent = reviewContent.replace(
         /\n## Off-Theme Issues for Future PRs[\s\S]*?(?=\n## Summarized Feedback|$)/,
         '',
       );
     }
 
-    // Save off-theme issues for next PR
     if (offThemeIssues) {
       try {
         const existingPending = fs.readFileSync(pendingFile, 'utf-8');
 
-        // Split both existing and new issues into individual blocks
         const existingBlocks = existingPending
           .split(/\n---\n/)
           .map((b) => b.trim())
@@ -289,12 +375,10 @@ Be direct and professional. Do NOT include commentary outside the structured sec
           .map((b) => b.trim())
           .filter(Boolean);
 
-        // Deduplicate by using the File + Description as a key
         const seen = new Set<string>();
         const deduped: string[] = [];
 
         for (const block of [...existingBlocks, ...newBlocks]) {
-          // Extract file + description lines as a stable identity key
           const fileMatch = block.match(/- File: (.+)/);
           const descMatch = block.match(/- Description: (.+)/);
           const key = `${fileMatch?.[1] ?? ''} | ${descMatch?.[1] ?? ''}`;
@@ -312,7 +396,6 @@ Be direct and professional. Do NOT include commentary outside the structured sec
       console.log('Stored off-theme issues for future PRs.');
     }
 
-    // 4. Write the results out to a markdown file for the GitHub runner to grab
     fs.writeFileSync(
       'review_summary.md',
       `### AI Code Review Summary\n\n${reviewContent}`,
