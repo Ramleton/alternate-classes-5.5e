@@ -32,29 +32,40 @@ import {
 const getExploitData = (
   prerequisiteCheck: ExploitPrerequisiteCheck,
   autoExploitType: AutoExploitType,
+  sneakAttackDiceCost: number,
 ): ExploitData => {
   let handler = genericARCWorkflow;
   if (autoExploitType === 'PAR') handler = useWorkflow;
   return {
     prerequisiteCheck,
     handler,
+    sneakAttackDiceCost,
   };
 };
 
 const PAR_DEVIOUS_EXPLOITS: Record<string, ExploitData> = {
-  ac55ePrecisionStrikeExploit: getExploitData(isWeaponAttack, 'PAR'),
+  ac55ePrecisionStrikeExploit: getExploitData(isWeaponAttack, 'PAR', 1),
 };
 
 const ARC_DEVIOUS_EXPLOITS: Record<string, ExploitData> = {
-  ac55eArrestingStrikeExploit: getExploitData(weaponAttackHitCheck, 'ARC'),
-  ac55eDisarmExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC'),
-  ac55eSweepingStrikeExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC'),
-  ac55eCripplingStrikeExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC'),
-  ac55eDirtyHitExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC'),
-  ac55eExposingStrikeExploit: getExploitData(weaponAttackHitCheck, 'ARC'),
+  ac55eArrestingStrikeExploit: getExploitData(weaponAttackHitCheck, 'ARC', 1),
+  ac55eDisarmExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC', 1),
+  ac55eSweepingStrikeExploit: getExploitData(
+    meleeWeaponAttackHitCheck,
+    'ARC',
+    1,
+  ),
+  ac55eCripplingStrikeExploit: getExploitData(
+    meleeWeaponAttackHitCheck,
+    'ARC',
+    2,
+  ),
+  ac55eDirtyHitExploit: getExploitData(meleeWeaponAttackHitCheck, 'ARC', 2),
+  ac55eExposingStrikeExploit: getExploitData(weaponAttackHitCheck, 'ARC', 2),
   ac55eGlancingBlowExploit: getExploitData(
     meleeWeaponAttackRedirectCheck,
     'ARC',
+    2,
   ),
 };
 
@@ -62,14 +73,26 @@ const SUBCLASS_FEATURE_CUNNING_STRIKES: SubclassFeatureCunningStrikeData[] = [
   {
     identifier: 'ac55eDeadlyBlades',
     preCheck: () => Promise.resolve(true),
+    handler: async ({ selectedFeature, target }) => {
+      await runActivity(selectedFeature, 'save', [target]);
+    },
+    sneakAttackDiceCost: 1,
   },
   {
     identifier: 'ac55eSupremeSneak',
     preCheck: () => Promise.resolve(true),
+    handler: async () => {
+      /* empty */
+    },
+    sneakAttackDiceCost: 1,
   },
   {
     identifier: 'ac55eInsightfulStrike',
     preCheck: () => Promise.resolve(true),
+    handler: async ({ trigger, workflow }) => {
+      await infoCheckWorkflow({ trigger, workflow });
+    },
+    sneakAttackDiceCost: 1,
   },
   {
     identifier: 'ac55eEmpoweredBlades',
@@ -78,10 +101,18 @@ const SUBCLASS_FEATURE_CUNNING_STRIKES: SubclassFeatureCunningStrikeData[] = [
         workflow.item.flags['chris-premades']?.info?.identifier ===
           'ac55ePsiBladeItem',
       ),
+    handler: async ({ trigger, workflow, selectedFeature, target }) => {
+      await handleMindRend({ trigger, workflow, selectedFeature, target });
+    },
+    sneakAttackDiceCost: 2,
   },
   {
     identifier: 'ac55ePanache',
     preCheck: () => Promise.resolve(true),
+    handler: async (data) => {
+      await handlePanache(data);
+    },
+    sneakAttackDiceCost: 1,
   },
 ] as const;
 
@@ -112,6 +143,12 @@ const pre = (feat: Item<'feat'>, token: Token, workflow: Workflow): boolean => {
   return true;
 };
 
+const isSubclassFeatureData = (
+  opt: Item<'feat'> | SubclassFeatureCunningStrikeData,
+): opt is SubclassFeatureCunningStrikeData => {
+  return 'sneakAttackDiceCost' in opt && 'preCheck' in opt;
+};
+
 const prompt: PromptFunction = async ({
   trigger,
   workflow,
@@ -137,7 +174,8 @@ const prompt: PromptFunction = async ({
     .filter(Boolean)
     .map((i) => i as Item<'feat'>)
     .filter((i) => i.system.type.subtype === 'deviousExploit');
-  const usableFeatures: Item<'feat'>[] = usableDeviousExploits;
+  const allUsableOptions: (Item<'feat'> | SubclassFeatureCunningStrikeData)[] =
+    [...usableDeviousExploits];
   for (const subclassFeatureStrike of SUBCLASS_FEATURE_CUNNING_STRIKES) {
     const subclassFeature = itemUtils.getItemByIdentifier(
       feat.actor!,
@@ -148,10 +186,10 @@ const prompt: PromptFunction = async ({
         trigger,
         workflow,
       });
-      if (usable) usableFeatures.push(subclassFeature);
+      if (usable) allUsableOptions.push(subclassFeatureStrike);
     }
   }
-  if (!usableFeatures.length) return;
+  if (!allUsableOptions.length) return;
   const userId = socketUtils.firstOwner(feat.actor!, true);
   let message: string;
   switch (deviousExploits) {
@@ -163,13 +201,19 @@ const prompt: PromptFunction = async ({
   }
   const selection = await dialogUtils.confirm(feat.name, message, { userId });
   if (!selection) return;
-  let selectedFeature: Item<'feat'>;
-  if (usableFeatures.length === 1) {
-    selectedFeature = usableFeatures[0];
+  let selectedOption:
+    Item<'feat'> | SubclassFeatureCunningStrikeData | undefined;
+  if (allUsableOptions.length === 1) {
+    selectedOption = allUsableOptions[0];
   } else {
-    const buttons: [string, Item<'feat'>][] = usableFeatures.map((i) => [
-      i.name,
-      i.flags['chris-premades'].info.identifier,
+    const buttons: [string, string][] = allUsableOptions.map((opt) => [
+      'name' in opt
+        ? opt.name
+        : itemUtils.getItemByIdentifier(feat.actor!, opt.identifier)?.name ||
+          opt.identifier,
+      'identifier' in opt
+        ? opt.identifier
+        : opt.flags['chris-premades'].info.identifier,
     ]);
     const selectedId = await dialogUtils.buttonDialog(
       feat.name,
@@ -177,63 +221,74 @@ const prompt: PromptFunction = async ({
       buttons,
       { userId },
     );
-    selectedFeature = usableFeatures.find(
-      (i) => i.flags['chris-premades'].info.identifier === selectedId,
-    )!;
-    if (!selectedFeature) return;
+    selectedOption = allUsableOptions.find(
+      (opt) =>
+        ('identifier' in opt
+          ? opt.identifier
+          : opt.flags['chris-premades'].info.identifier) === selectedId,
+    );
+    if (!selectedOption) return;
   }
+
+  const featureItem = isSubclassFeatureData(selectedOption)
+    ? (itemUtils.getItemByIdentifier(
+        feat.actor!,
+        selectedOption.identifier,
+      ) as Item<'feat'>)
+    : selectedOption;
   // Using Cunning Strike means using Sneak Attack by default
-  await spendUses(selectedFeature, workflow);
+  await spendUses(featureItem, feat.actor!, workflow);
   const target = workflow.hitTargets.first() as Token;
-  switch (selectedFeature.flags['chris-premades']?.info?.identifier) {
-    case 'ac55eDeadlyBlades':
-      await runActivity(selectedFeature, 'save', [target]);
-      break;
-    case 'ac55eSupremeSneak':
-      break;
-    case 'ac55eInsightfulStrike':
-      await infoCheckWorkflow({ trigger, workflow });
-      break;
-    case 'ac55eEmpoweredBlades':
-      await handleMindRend({ trigger, workflow, selectedFeature, target });
-      break;
-    case 'ac55ePanache':
-      await handlePanache({ trigger, workflow, selectedFeature, target });
-      break;
-    default:
-      // Use devious exploit
-      await deviousExploits[
-        selectedFeature.flags['chris-premades'].info.identifier
-      ].handler({
-        trigger: { ...trigger, entity: selectedFeature },
-        workflow,
-        ditem: undefined,
-        pre: async (_) => true,
-        post: async (_) => Promise.resolve(),
-      });
+  if (isSubclassFeatureData(selectedOption)) {
+    await selectedOption.handler({
+      trigger: { ...trigger, entity: featureItem },
+      workflow,
+      ditem: undefined,
+      selectedFeature: featureItem,
+      target,
+    });
+    return;
   }
+
+  const exploitIdentifier = featureItem.flags['chris-premades'].info.identifier;
+  const exploitData = deviousExploits[exploitIdentifier];
+  if (!exploitData) {
+    console.error(
+      `Cunning Strike: No exploit data found for identifier ${exploitIdentifier}`,
+    );
+    return;
+  }
+  await exploitData.handler({
+    trigger: { ...trigger, entity: featureItem },
+    workflow,
+    ditem: undefined,
+    pre: async (_) => true,
+    post: async (_) => Promise.resolve(),
+  });
 };
 
-const spendUses = async (exploit: Item<'feat'>, workflow: Workflow) => {
-  setWorkflowProperty(workflow, exploit.actor!, 'sneakAttack', 1);
+const spendUses = async (
+  exploitOrFeature: Item<'feat'> | SubclassFeatureCunningStrikeData,
+  actor: Actor5e,
+  workflow: Workflow,
+) => {
+  setWorkflowProperty(workflow, actor, 'sneakAttack', 1);
   let sneakAttackDiceCost = 0;
-  if (exploit.system.type.subtype === 'deviousExploit') {
-    const prerequisiteLevel = exploit.system.prerequisites?.level ?? 1;
+  if (
+    'system' in exploitOrFeature &&
+    exploitOrFeature.system.type.subtype === 'deviousExploit'
+  ) {
+    const prerequisiteLevel = exploitOrFeature.system.prerequisites?.level ?? 1;
     sneakAttackDiceCost = 1 + Math.floor((prerequisiteLevel - 1) / 4);
+  } else if ('sneakAttackDiceCost' in exploitOrFeature) {
+    sneakAttackDiceCost = exploitOrFeature.sneakAttackDiceCost;
   } else {
-    switch (exploit.system.identifier) {
-      case 'deadly-blades':
-      case 'supreme-sneak':
-      case 'insightful-strike':
-      case 'panache':
-        sneakAttackDiceCost = 1;
-        break;
-      case 'empowered-blades':
-        sneakAttackDiceCost = 2;
-        break;
-    }
+    console.warn(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      `Cunning Strike: Sneak Attack Dice Cost not defined for ${'name' in exploitOrFeature ? exploitOrFeature.name : (exploitOrFeature as any).system.identifier}`,
+    );
   }
-  reduceSneakAttack(workflow, exploit.actor!, sneakAttackDiceCost);
+  reduceSneakAttack(workflow, actor, sneakAttackDiceCost);
 };
 
 const macro: CPRMacro = {

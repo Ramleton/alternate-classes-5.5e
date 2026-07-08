@@ -9,6 +9,7 @@ export type AutoExploitType = 'ARC' | 'PAR';
 export interface ExploitData {
   prerequisiteCheck: ExploitPrerequisiteCheck;
   handler: ExploitHandler;
+  sneakAttackDiceCost: number;
 }
 
 interface PromptFunctionArgs extends MidiMacroFunctionArgs {
@@ -20,6 +21,8 @@ export type PromptFunction = (args: PromptFunctionArgs) => Promise<void>;
 export interface SubclassFeatureCunningStrikeData {
   identifier: string;
   preCheck: (args: MidiMacroFunctionArgs) => Promise<boolean>;
+  handler: CunningStrikeSubclassFeatureHandler;
+  sneakAttackDiceCost: number;
 }
 
 export interface CunningStrikeSubclassFeatureArgs extends MidiMacroFunctionArgs {

@@ -27,7 +27,7 @@ const autoCritical: MidiMacroFunction = async ({
   const isTargetSurprised = target.actor!.statuses.has('surprised');
   if (!isTargetIncapacitated && !isTargetSurprised) return;
   workflow.isCritical = true;
-  // ? WIP: Update Chat Card with Critical Hit
+  // TODO: Update Chat Card with Critical Hit
   // // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // const chatMessage = (game.messages as any).get(
   //   workflow.itemCardId,
