@@ -3,6 +3,8 @@ import { runActivity } from 'automation/utils.js';
 import { getWorkflowProperty } from 'automation/workflowUtils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 
+const GRAVE_BOLT_TEMPLATE_DISTANCE = 30;
+
 const forceSave: MidiMacroFunction = async ({
   trigger: { entity, token },
   workflow,
@@ -64,7 +66,7 @@ const forceSave: MidiMacroFunction = async ({
     const templateData = {
       user: game.user,
       t: 'circle' as const,
-      distance: 30,
+      distance: GRAVE_BOLT_TEMPLATE_DISTANCE,
       direction: 0,
       angle: 0,
       width: 0,

@@ -2,6 +2,8 @@ import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { CharacterDetails } from 'fvtt-types/ConfiguredActor.js';
 import { EffectData } from 'types/effects.js';
 
+const UNCANNY_DODGE_TELEPORT_DISTANCE_MULTIPLIER = 0.5;
+
 const prompt: MidiMacroFunction = async ({
   trigger: { entity, token },
   workflow,
@@ -46,7 +48,7 @@ const prompt: MidiMacroFunction = async ({
   if ((feat.actor!.system.details as CharacterDetails).level < 14) return;
   const speed = feat.actor!.system.attributes.movement.speed;
   await Teleport.target([token], token, {
-    range: Math.floor(speed / 2),
+    range: Math.floor(speed * UNCANNY_DODGE_TELEPORT_DISTANCE_MULTIPLIER),
   });
 };
 
