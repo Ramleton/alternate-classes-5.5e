@@ -169,6 +169,7 @@ async function runReview() {
       ## Feedback
 
       ### Issues
+
       - File: src/path/to/file.ts
       - Description: Concise problem statement.
       - Suggested Fix: Code block with the refactored version.
