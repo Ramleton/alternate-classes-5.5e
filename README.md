@@ -20,7 +20,7 @@ This module adds comprehensive D&D 5e alternate class and subclass options with 
 | **Monk**      |  🔄 Implemented   |
 | **Paladin**   |  🔄 Implemented   |
 | **Ranger**    |  🔄 Implemented   |
-| **Rogue**     |  🛠️ In Progress  |
+| **Rogue**     |  🛠️ In Progress   |
 | **Sorcerer**  |    ❌ Upcoming    |
 | **Warlock**   |    ❌ Upcoming    |
 | **Wizard**    |    ❌ Upcoming    |
@@ -49,7 +49,7 @@ This module adds comprehensive D&D 5e alternate class and subclass options with 
 ## Technology Stack
 
 - **Language** — TypeScript with strict mode enabled
-- **Build Tool** — Vite 5.x for optimized bundling
+- **Build Tool** — Vite 8.0.16^ for optimized bundling
 - **Package Manager** — pnpm with lockfile for reproducible builds
 - **Linting** — ESLint with custom async safety rules
 - **Type Definitions** — Ambient module declarations for FoundryVTT and third-party modules
@@ -71,29 +71,6 @@ packs/                # FoundryVTT compendiums (JSON)
 lang/                 # Localization files
 assets/               # Icons, artwork, HTML, and CSS
 module.json           # Module initialization and hooks
-```
-
-## Featured Implementations
-
-### Avatar of Dread (Paladin Subclass)
-
-Implements a custom Paladin subclass with automated effects including:
-
-- **Dread Aura** — Automated damage and save mechanics
-- **Necrotic Synergy** — Divine Smite integration with healing (half necrotic damage dealt heals the caster)
-- **Avatar Form** — Transformative ability with AC and damage bonuses
-
-Example: Avatar of Dread uses macro framework to automatically apply conditional bonuses and trigger dependent effects in a single workflow:
-
-```typescript
-const necroticHeal: MidiMacroFunction = async ({
-  trigger: { entity, token },
-  workflow,
-  ditem,
-}) => {
-  // Automatically heals avatar for half necrotic damage on Divine Smite
-  // Prevents macro stacking and double-damage application
-};
 ```
 
 ## Changelog
