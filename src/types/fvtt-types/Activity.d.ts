@@ -61,6 +61,7 @@ interface BaseActivity {
   img: string;
   sort: number;
   name: string;
+  activities: Activity[];
   activation: {
     type: string;
     override: boolean;

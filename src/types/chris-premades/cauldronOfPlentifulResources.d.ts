@@ -640,10 +640,10 @@ export default interface CauldronOfPlentifulResources {
         },
       ): Promise<boolean>;
 
-      selectDocumentDialog(
+      selectDocumentDialog<T>(
         title: string,
         content: string,
-        documents: any,
+        documents: T[],
         options?: {
           displayTooltops?: boolean;
           sortAlphabetical?: boolean;
@@ -655,7 +655,7 @@ export default interface CauldronOfPlentifulResources {
           showUses?: boolean;
           displayReference?: boolean;
         },
-      ): Promise<object>;
+      ): Promise<T>;
 
       selectDocumentsDialog(
         title: string,
@@ -833,7 +833,7 @@ export default interface CauldronOfPlentifulResources {
           identifier?: string;
           castData?: object;
         },
-      );
+      ): Promise<Item[]>;
       getItemDescription(name: string): string;
       isSpellFeature(item: Item.Implementation): boolean;
       getConfig(item: Item.Implementation, key: string): any;
@@ -895,7 +895,10 @@ export default interface CauldronOfPlentifulResources {
       getHiddenActivities(item: Item.Implementation): string[];
       getSpellActivities(item: Item.Implementation): string[];
       getActivity(item: Item.Implementation, type: string): any;
-      getEffectByIdentifier(item: Item.Implementation, identifier: string): any;
+      getEffectByIdentifier(
+        item: Item.Implementation,
+        identifier: string,
+      ): ActiveEffect | undefined;
       cloneItem(
         item: Item.Implementation,
         updates?: object,
@@ -1254,7 +1257,7 @@ export default interface CauldronOfPlentifulResources {
           byIdentifier?: boolean;
           bySystemIdentifier?: boolean;
         },
-      );
+      ): Promise<Item>;
       getActorFromCompendium(
         key: string,
         name: string,
@@ -1322,7 +1325,7 @@ export default interface CauldronOfPlentifulResources {
       placeTemplate(
         templateData: any,
         returnTokens?: boolean,
-      ): Template | { template: Template; tokens: Token[] };
+      ): Promise<Template | { template: Template; tokens: Set<Token> }>;
       rayIntersectsTemplate(templateDoc: any, ray: any): boolean;
       getIntersections(
         templateObj: any,

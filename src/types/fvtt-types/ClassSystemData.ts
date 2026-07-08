@@ -1,6 +1,7 @@
-export default class ClassSystemData extends
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-  foundry.abstract.DataModel<any, any> {
+export default class ClassSystemData
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  extends foundry.abstract.DataModel<any, any>
+{
   declare advancement: Record<string, unknown>;
   declare description: { chat: string; value: string };
   declare hd: {
@@ -19,7 +20,7 @@ export default class ClassSystemData extends
     value: Set<'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha'>;
   };
 
-  declare properties: Set<unknown>;
+  declare properties: Set<string>;
   declare source: {
     book: string;
     bookPlaceholder: string;
@@ -56,4 +57,3 @@ export default class ClassSystemData extends
   declare subclass: Item | null;
   [key: string]: unknown;
 }
-

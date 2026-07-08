@@ -32,13 +32,17 @@ export interface EffectDuration {
 }
 
 type DAESpecialDuration =
+  | 'isAttacked'
   | 'isDamaged'
   | 'turnStartSource'
   | 'turnEndSource'
   | 'turnStartTarget'
   | 'turnEndTarget'
   | '1Reaction'
-  | '1Attack';
+  | '1Attack'
+  | 'isSave'
+  | 'longRest'
+  | 'shortRest';
 
 export interface EffectFlags {
   'alternate-classes-55e'?: {

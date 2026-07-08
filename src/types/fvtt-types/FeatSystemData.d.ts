@@ -26,7 +26,7 @@ export class FeatSystemData extends foundry.abstract.DataModel<any, any> {
     level: number | null;
   };
 
-  properties: string[];
+  properties: Set<string>;
   requirements: string;
   type: {
     value: string;

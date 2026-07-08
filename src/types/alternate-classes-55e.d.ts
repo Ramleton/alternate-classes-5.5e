@@ -5,7 +5,10 @@ interface Die {
   formula: string;
 }
 
-type TotalMulticlassingLevel = 3
+type TotalMulticlassingLevel =
+  | 1
+  | 2
+  | 3
   | 4
   | 5
   | 6
@@ -59,18 +62,18 @@ interface ExploitsToDegrees {
   // 1st Degree Exploits
   'arresting-strike': 1;
   'brace-up': 1;
-  'disarm': 1;
+  disarm: 1;
   'feat-of-strength': 1;
-  'feint': 1;
+  feint: 1;
   'first-aid': 1;
   'heroic-fortitude': 1;
-  'hurl': 1;
+  hurl: 1;
   'imposing-presence': 1;
   'mighty-leap': 1;
   'mighty-thrust': 1;
-  'parry': 1;
+  parry: 1;
   'precision-strike': 1;
-  'riposte': 1;
+  riposte: 1;
   'ruthless-strike': 1;
   'shield-impact': 1;
   'skilled-rider': 1;
@@ -84,9 +87,9 @@ interface ExploitsToDegrees {
   'honor-duel': 2;
   'martial-focus': 2;
   'menacing-shout': 2;
-  'redirect': 2;
+  redirect: 2;
   'rending-strike': 2;
-  'volley': 2;
+  volley: 2;
   'whirlwind-strike': 2;
   // 3rd Degree Exploits
   'disorienting-blow': 3;
@@ -100,7 +103,7 @@ interface ExploitsToDegrees {
   'fluid-movements': 4;
   'quick-draw': 4;
   'staggering-blow': 4;
-  'unbreakable': 4;
+  unbreakable: 4;
   // 5th Degree Exploits
   'steel-wind-slash': 5;
   'storm-of-arrows': 5;
@@ -118,13 +121,9 @@ interface MacroPassToExploit {
 
 export interface AlternateClasses55e {
   api: {
-    isMartialArtsAttack(
-      { workflow }: { workflow: Workflow },
-    ): boolean;
+    isMartialArtsAttack({ workflow }: { workflow: Workflow }): boolean;
 
-    isMartialArtsAttack(
-      { workflow }: { workflow: Workflow },
-    ): boolean;
+    isMartialArtsAttack({ workflow }: { workflow: Workflow }): boolean;
 
     alternateMartialExploitMulticlassingTable: ExploitMulticlassingTable;
 
@@ -135,16 +134,14 @@ export interface AlternateClasses55e {
     exploitTypes: ['martialExploit', 'savageExploit', 'deviousExploit'];
 
     alternateMartialExploitMulticlassingValues(
-      totalLevel: number
+      totalLevel: number,
     ): ExploitMulticlassingRow;
 
     getAltMartialExploitDieForMulticlassLevel(totalLevel: number): Die;
 
     getAltMartialMCTotalLevel(actor: Actor): number;
 
-    getAltMartialMCExploitsRemaining(
-      totalLevel: number
-    ): number;
+    getAltMartialMCExploitsRemaining(totalLevel: number): number;
 
     getAltMartialExploitsRemaining(item: Item): number;
 
@@ -156,9 +153,7 @@ export interface AlternateClasses55e {
 
     spendAlternateMartialExploitUses(uses: number, actor: Actor): Promise<void>;
 
-    getAlternateMartialExploitDie(item: Item): Die;
-
-    getAlternateMartialExploitDieWithActor(actor: Actor): Die;
+    getAlternateMartialExploitDie(entity: Item | Actor5e): Die;
   };
 }
 
