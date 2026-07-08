@@ -27,50 +27,76 @@ export const reduceSneakAttack = (
   );
 };
 
+const isFinesseOrRangedAttack = (workflow: Workflow): boolean => {
+  const {
+    utils: { workflowUtils },
+  } = chrisPremades;
+  const actionType = workflowUtils.getActionType(workflow);
+  return (
+    (actionType === 'mwak' &&
+      (workflow.item as Item<'weapon'>).system.properties.has('fin')) ||
+    actionType === 'rwak'
+  );
+};
+
+/**
+ * Alternate Rogue - Scout - Twin Strike
+ *
+ * When you take the Attack action, you can make one weapon attack as a bonus
+ * action on that same turn. You can also apply your Sneak Attack bonus to this
+ * attack, even if you have already used it on this turn, so long as these
+ * attacks do not target the same creature.
+ */
+const isTwinStrikeBlocking = (
+  sneakAttack: Item<'feat'>,
+  target: Token,
+): boolean => {
+  const {
+    utils: { effectUtils, itemUtils },
+  } = chrisPremades;
+  const twinStrike = itemUtils.getItemByIdentifier(
+    sneakAttack.actor!,
+    'ac55eTwinStrike',
+  );
+  return !!(
+    twinStrike &&
+    effectUtils.getEffectByIdentifier(target.actor!, 'ac55eSneakAttacked')
+  );
+};
+
+/**
+ * Alternate Rogue - Mastermind - Potent Insight
+ *
+ * When you use the Help action to aid an ally in attacking a creature and
+ * their attack hits, you can use your reaction to add your Sneak Attack bonus
+ * to its damage roll. However, if you do so, you cannot use Sneak Attack on
+ * your next turn.
+ */
+const isPotentSightBlocking = (sneakAttack: Item<'feat'>): boolean => {
+  const {
+    utils: { effectUtils },
+  } = chrisPremades;
+  const potentInsightEffect = effectUtils.getEffectByIdentifier(
+    sneakAttack.actor!,
+    'ac55ePotentInsightEffect',
+  );
+  return !!potentInsightEffect;
+};
+
 export const qualifiesForSneakAttack = (
   sneakAttack: Item<'feat'>,
   token: Token,
   workflow: Workflow,
 ): boolean => {
   const {
-    utils: { effectUtils, itemUtils, tokenUtils, workflowUtils },
+    utils: { effectUtils, itemUtils, tokenUtils },
   } = chrisPremades;
-  const twinStrike = itemUtils.getItemByIdentifier(
-    sneakAttack.actor!,
-    'ac55eTwinStrike',
-  );
-  if (!twinStrike && !sneakAttack.system.uses?.value) return false;
-  const target = workflow.targets.first() as Token;
-  if (
-    twinStrike &&
-    effectUtils.getEffectByIdentifier(target.actor!, 'ac55eSneakAttacked')
-  )
-    return false;
+  if (isTwinStrikeBlocking(sneakAttack, token)) return false;
   if (getWorkflowProperty(workflow, sneakAttack.actor!, 'sneakAttack'))
     return false;
-  const actionType = workflowUtils.getActionType(workflow);
-  // If the attack is not a finesse or ranged weapon attack, don't prompt
-  if (
-    !(
-      actionType === 'mwak' &&
-      (workflow.item as Item<'weapon'>).system.properties.has('fin')
-    ) &&
-    actionType !== 'rwak'
-  )
-    return false;
-  /**
-   * Alternate Rogue - Mastermind - Potent Insight
-   *
-   * When you use the Help action to aid an ally in attacking a creature and
-   * their attack hits, you can use your reaction to add your Sneak Attack bonus
-   * to its damage roll. However, if you do so, you cannot use Sneak Attack on
-   * your next turn.
-   */
-  const potentInsightEffect = effectUtils.getEffectByIdentifier(
-    sneakAttack.actor!,
-    'ac55ePotentInsightEffect',
-  );
-  if (potentInsightEffect) return false;
+  if (!isFinesseOrRangedAttack(workflow)) return false;
+  if (isPotentSightBlocking(sneakAttack)) return false;
+  const target = workflow.targets[0];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const attackRollOptions = workflow.attackRoll!.options as any;
   const hadAdvantage = attackRollOptions.attributions?.some(
