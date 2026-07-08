@@ -21,6 +21,7 @@ import { handlePanache } from '../subclasses/swashbuckler/panache.js';
 import {
   AutoExploitType,
   ExploitData,
+  GetUsableOptionsFunction,
   PromptFunction,
   SubclassFeatureCunningStrikeData,
 } from '../types/cunningStrike.js';
@@ -149,17 +150,16 @@ const isSubclassFeatureData = (
   return 'sneakAttackDiceCost' in opt && 'preCheck' in opt;
 };
 
-const prompt: PromptFunction = async ({
+const getUsableOptions: GetUsableOptionsFunction = async ({
   trigger,
   workflow,
   deviousExploits,
-}) => {
-  const { entity, token } = trigger;
-  const feat = entity as Item<'feat'>;
-  if (!pre(feat, token, workflow)) return;
+}): Promise<(Item<'feat'> | SubclassFeatureCunningStrikeData)[]> => {
   const {
-    utils: { dialogUtils, itemUtils, socketUtils },
+    utils: { itemUtils },
   } = chrisPremades;
+  const feat = trigger.entity as Item<'feat'>;
+  const token = trigger.token;
   // Check for usable devious exploits
   const usableDeviousExploits = Object.keys(deviousExploits)
     .filter((i) =>
@@ -189,6 +189,25 @@ const prompt: PromptFunction = async ({
       if (usable) allUsableOptions.push(subclassFeatureStrike);
     }
   }
+  return allUsableOptions;
+};
+
+const prompt: PromptFunction = async ({
+  trigger,
+  workflow,
+  deviousExploits,
+}) => {
+  const { entity, token } = trigger;
+  const feat = entity as Item<'feat'>;
+  if (!pre(feat, token, workflow)) return;
+  const {
+    utils: { dialogUtils, itemUtils, socketUtils },
+  } = chrisPremades;
+  const allUsableOptions = await getUsableOptions({
+    trigger,
+    workflow,
+    deviousExploits,
+  });
   if (!allUsableOptions.length) return;
   const userId = socketUtils.firstOwner(feat.actor!, true);
   let message: string;

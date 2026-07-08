@@ -12,6 +12,14 @@ export interface ExploitData {
   sneakAttackDiceCost: number;
 }
 
+interface GetUsableOptionsFunctionArgs extends MidiMacroFunctionArgs {
+  deviousExploits: Record<string, ExploitData>;
+}
+
+export type GetUsableOptionsFunction = (
+  args: GetUsableOptionsFunctionArgs,
+) => Promise<(Item<'feat'> | SubclassFeatureCunningStrikeData)[]>;
+
 interface PromptFunctionArgs extends MidiMacroFunctionArgs {
   deviousExploits: Record<string, ExploitData>;
 }
