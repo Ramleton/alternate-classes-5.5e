@@ -36,8 +36,8 @@ jobs:
           export CURRENT_DATE=$(date +"%B %Y")
 
           # 1. Carve out the table and changelog into a template using perl
-          perl -0777 -pe 's/\| Class .*?\|.*?\n\n/{{TABLE_CONTENT}}\n\n/s' README.md > template.md
-          perl -0777 -pe 's/(## Changelog\n\n)(.*?)(?=\n\n##|$)/$1{{CHANGELOG_CONTENT}}\n\n$3/s' template.md > template_final.md
+          perl -0777 -pe 's/\| Class .*?\n\n/{{TABLE_CONTENT}}\n\n/s' README.md > template.md
+          perl -0777 -pe 's/## Changelog\s+.*?(?=\n\n##|$)/## Changelog\n\n{{CHANGELOG_CONTENT}}\n\n/s' template.md > template_final.md
 
           export README_TEMPLATE=$(cat template_final.md)
 
