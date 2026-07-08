@@ -11,7 +11,16 @@ async function runReview() {
 
     // 2. Fetch the git diff of changed files (excluding package files or lockfiles)
     // We target changes between the current branch and the PR base target branch
-    const baseBranch = process.env.GITHUB_BASE_REF || 'main';
+    const baseBranch: string = process.env.GITHUB_BASE_REF || 'main';
+    const prTitle: string = process.env.PR_TITLE || 'Unknown';
+    const prBranch: string = process.env.PR_BRANCH || 'unknown';
+    const prBody: string = process.env.PR_BODY || '';
+
+    console.log(`PR Theme Context:`);
+    console.log(`  Title: ${prTitle}`);
+    console.log(`  Branch: ${prBranch}`);
+    console.log(`  Base: ${baseBranch}`);
+
     const diff = execSync(
       `git diff origin/${baseBranch}...HEAD -- . ':!package-lock.json' ':!package.json'`,
     )
@@ -114,108 +123,117 @@ async function runReview() {
 
     // 3. Craft your tailored macro-review prompt instructions
     const systemInstruction = `You are a code style and maintainability reviewer for TypeScript/JavaScript Foundry VTT macros.
-      Your goal is to inspect the git diff for opportunities to improve code quality, consistency, and refactoring—NOT type safety or runtime errors (TypeScript handles those).
+Your goal is to inspect the git diff for opportunities to improve code quality, consistency, and refactoring—NOT type safety or runtime errors (TypeScript handles those).
 
-      This codebase uses:
-      - TypeScript with strict type checking (type safety is already handled by the compiler)
-      - CPR (chris-premades) macro framework for workflow automation
-      - Inline function style (prefer single macro function over excessive helper decomposition)
-      - Consistent naming and import patterns
+PR Context (use this to determine relevance of issues):
+- PR Title: ${prTitle}
+- Branch Name: ${prBranch}
+- PR Description: ${prBody || '(none provided)'}
 
-      Focus on these areas:
+This codebase uses:
+- TypeScript with strict type checking (type safety is already handled by the compiler)
+- CPR (chris-premades) macro framework for workflow automation
+- Inline function style (prefer single macro function over excessive helper decomposition)
+- Consistent naming and import patterns
 
-      1. Code Duplication & DRY Principle:
-      - Compare changed files against their sibling files in the same folder (provided in the context).
-      - Flag repeated logic patterns that could be extracted into reusable utilities or helper functions.
-      - Identify similar conditionals, type checks, or error handling patterns that appear across multiple files in the same folder.
+Focus on these areas:
 
-      2. Naming & Consistency:
-      - Compare naming patterns in the changed files against their siblings in the same folder.
-      - Flag inconsistent variable naming conventions (camelCase vs snake_case, abbreviations) between related files.
-      - Ensure function/constant names clearly express intent and match the patterns used by sibling files.
+1. Code Duplication & DRY Principle:
+- Compare changed files against their sibling files in the same folder (provided in the context).
+- Flag repeated logic patterns that could be extracted into reusable utilities or helper functions.
+- Identify similar conditionals, type checks, or error handling patterns that appear across multiple files in the same folder.
 
-      3. Import Ordering & Organization:
-      - Ensure imports are ordered consistently: external libraries, then relative paths, then types.
-      - Flag missing or unused imports.
-      - Verify destructuring patterns are consistent.
+2. Naming & Consistency:
+- Compare naming patterns in the changed files against their siblings in the same folder.
+- Flag inconsistent variable naming conventions (camelCase vs snake_case, abbreviations) between related files.
+- Ensure function/constant names clearly express intent and match the patterns used by sibling files.
 
-      4. Code Style & Readability:
-      - Flag overly nested conditionals that could be flattened with early returns.
-      - Suggest breaking down long function bodies into logical sub-sections or helper functions.
-      - Recommend extracting magic numbers or strings into named constants.
+3. Import Ordering & Organization:
+- Ensure imports are ordered consistently: external libraries, then relative paths, then types.
+- Flag missing or unused imports.
+- Verify destructuring patterns are consistent.
 
-      5. Logic Flow & Control Flow:
-      - Suggest simplifications in conditional chains.
-      - Flag logic that could be inverted for clarity.
+4. Code Style & Readability:
+- Flag overly nested conditionals that could be flattened with early returns.
+- Suggest breaking down long function bodies into logical sub-sections or helper functions.
+- Recommend extracting magic numbers or strings into named constants.
 
-      6. Comments & Documentation:
-      - Flag non-obvious logic that should have inline comments.
-      - Suggest removing redundant or outdated comments.
+5. Logic Flow & Control Flow:
+- Suggest simplifications in conditional chains.
+- Flag logic that could be inverted for clarity.
 
-      7. Design Patterns & Architectural Opportunities:
-      - Identify repeated object creation or initialization patterns that could benefit from Factory pattern (especially common in this codebase).
-      - Flag chains of conditional logic that could use Strategy pattern for cleaner implementation.
-      - Suggest Template Method pattern where similar workflows are repeated with minor variations.
-      - Identify cases where Builder pattern could simplify complex object construction.
-      - Look for opportunities to extract shared behavior into base classes or mixins.
-      - Suggest applying established patterns from the codebase (e.g., if sibling files use Factory pattern, new code should too).
+6. Comments & Documentation:
+- Flag non-obvious logic that should have inline comments.
+- Suggest removing redundant or outdated comments.
 
-      Output Format:
-      Structure your response exactly as follows:
+7. Design Patterns & Architectural Opportunities:
+- Identify repeated object creation or initialization patterns that could benefit from Factory pattern (especially common in this codebase).
+- Flag chains of conditional logic that could use Strategy pattern for cleaner implementation.
+- Suggest Template Method pattern where similar workflows are repeated with minor variations.
+- Identify cases where Builder pattern could simplify complex object construction.
+- Look for opportunities to extract shared behavior into base classes or mixins.
+- Suggest applying established patterns from the codebase (e.g., if sibling files use Factory pattern, new code should too).
 
-      ## Summary of Changes
-      (2-3 sentences describing what files changed and their purpose)
+Output Format:
+Structure your response exactly as follows:
 
-      ## Feedback
+## Summary of Changes
+(2-3 sentences describing what files changed and their purpose)
 
-      ### Issues
-      - File: src/path/to/file.ts
-      - Description: Concise problem statement.
-      - Suggested Fix: Code block with the refactored version.
+## Feedback
 
-      ---
+### Issues
 
-      (Repeat with --- divider between each issue. If no issues found, write: "No issues detected.")
+- File: src/path/to/file.ts
+- Description: Concise problem statement.
+- Suggested Fix: Code block with the refactored version.
 
-      ### Warnings
-      List minor improvements with same format. If none, write: "No warnings."
+---
 
-      ### Summarized Feedback
-      (1-2 sentences summarizing overall code quality and maintainability)
+(Repeat with --- divider between each issue. If no issues found, write: "No issues detected.")
 
-      **IMPORTANT - PR Theme & Issue Relevance:**
-      Identify the primary theme of this PR based on the changed files (e.g., "Adding new exploit macros", "Refactoring damage calculations", "Improving documentation").
+### Warnings
+List minor improvements with same format. If none, write: "No warnings."
 
-      For each issue you find:
-      - Does it directly relate to the PR's theme?
-      - Or is it a separate concern that could wait for a more appropriate PR?
+### Summarized Feedback
+(1-2 sentences summarizing overall code quality and maintainability)
 
-      Output ONLY on-theme issues in the main ### Issues section.
+**IMPORTANT - PR Theme & Issue Relevance:**
+Determine the PR's primary theme based on:
+1. PR title (most explicit signal of intent)
+2. Branch name (e.g., feature/*, bugfix/*, docs/*)
+3. PR description content
+4. Files changed in the diff
 
-      If you identify off-theme issues that are still valuable (e.g., documentation gaps, style inconsistencies unrelated to this PR's changes), add a new section:
+For each issue you find:
+- Does it directly relate to the theme identified above?
+- Or is it a separate concern that could wait for a more appropriate PR?
 
-      ## Off-Theme Issues for Future PRs
-      (These will be stored and reviewed when PRs addressing those themes are opened)
+Output ONLY on-theme issues in the main ### Issues section.
 
-      - File: src/path/to/file.ts
-      - Description: Problem statement.
-      - Suggested Fix: ...
+If you identify off-theme issues that are still valuable (e.g., style inconsistencies unrelated to this PR's changes), add a new section:
 
-      ---
+## Off-Theme Issues for Future PRs
+(These will be stored and reviewed when PRs addressing those themes are opened)
 
-      (The script will extract this section and save it for future PRs.)
+- File: src/path/to/file.ts
+- Description: Problem statement.
+- Suggested Fix: ...
 
-      **IMPORTANT - Final Validation:**
-      Before submitting, review each issue you identified:
-      - Is this actually a problem in the code, or is it already correctly implemented?
-      - Is this a genuine code quality issue, or just a description of working code?
-      - Would removing this issue make the review clearer and more actionable?
-      - Does the code already follow the pattern you're suggesting?
+---
 
-      If the answer to any of the above is "yes, this is already correct", DELETE that issue from your output. Only include genuine, actionable improvements.
+(The script will extract this section and save it for future PRs.)
 
-      Be direct and professional. Do NOT include commentary outside the structured sections.
-    `;
+**IMPORTANT - Final Validation:**
+Before submitting, review each issue you identified:
+- Is this actually a problem in the code, or is it already correctly implemented?
+- Is this a genuine code quality issue, or just a description of working code?
+- Would removing this issue make the review clearer and more actionable?
+- Does the code already follow the pattern you're suggesting?
+
+If the answer to any of the above is "yes, this is already correct", DELETE that issue from your output. Only include genuine, actionable improvements.
+
+Be direct and professional. Do NOT include commentary outside the structured sections.`;
 
     console.log('Sending diff to Gemini...');
     const response = await ai.models.generateContent({
@@ -257,7 +275,6 @@ async function runReview() {
 
     // Save off-theme issues for next PR
     if (offThemeIssues) {
-      const pendingFile = 'pending_code_issues.md';
       try {
         const existingPending = fs.readFileSync(pendingFile, 'utf-8');
         fs.writeFileSync(
