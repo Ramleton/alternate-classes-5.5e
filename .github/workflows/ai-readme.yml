@@ -3,6 +3,14 @@ name: Gemini AI README Updater
 on:
   release:
     types: [published, edited]
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version Tag (e.g., 1.2.4)'
+        required: true
+      release_body:
+        description: 'Changelog / Release Notes summary text'
+        required: true
 
 jobs:
   build-readme:
@@ -10,15 +18,17 @@ jobs:
     permissions:
       contents: write
 
+    # Environment variables defined here are accessible by ALL steps in this job
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      VERSION_INPUT: ${{ github.event.release.tag_name || github.event.inputs.version_tag }}
+      RELEASE_INPUT: ${{ github.event.release.body || github.event.inputs.release_body }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Generate New README via Gemini API
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          VERSION_INPUT: ${{ github.event.release.tag_name }}
-          RELEASE_INPUT: ${{ github.event.release.body }}
         run: |
           # Export system context to environment
           export MODULE_JSON=$(cat module.json 2>/dev/null || echo "No module.json file found.")
@@ -75,34 +85,67 @@ jobs:
             - Output ONLY the full, updated raw markdown content. 
             - Do not include any chat commentary, introduction, or wrap the final output in backticks.`;
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
             
             const payload = {
               contents: [{ parts: [{ text: prompt }] }],
               tools: [{ googleSearch: {} }]
             };
             
-            try {
-              const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-              });
-              
-              const data = await response.json();
-              const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-              
-              if (!textOutput) {
-                console.error("API Response Error: Missing text payload.", JSON.stringify(data));
-                process.exit(1);
+            const maxRetries = 3;
+            let textOutput = null;
+
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+              try {
+                const response = await fetch(url, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+
+                if (response.status === 429) {
+                  if (attempt === maxRetries) {
+                    console.error("API Error: Exceeded maximum rate limit retries.", JSON.stringify(data));
+                    process.exit(1);
+                  }
+                  
+                  const errorMsg = data?.error?.message || "";
+                  const retryMatch = errorMsg.match(/retry in (\d+(\.\d+)?)s/);
+                  // Grab recommended wait window from message, or fall back to an exponential backoff
+                  const waitMs = retryMatch ? parseFloat(retryMatch[1]) * 1000 : Math.pow(2, attempt) * 15000;
+                  
+                  console.warn(`Rate limit hit (429). Sleeping for ${waitMs / 1000}s before retry attempt ${attempt}/${maxRetries}...`);
+                  await new Promise(res => setTimeout(res, waitMs));
+                  continue;
+                }
+
+                if (!response.ok) {
+                  console.error(`API Request Failure (Status ${response.status}):`, JSON.stringify(data));
+                  process.exit(1);
+                }
+
+                textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                break; // Break loop on successful generation path
+                
+              } catch (err) {
+                if (attempt === maxRetries) {
+                  console.error("Network framework connection execution failure:", err);
+                  process.exit(1);
+                }
+                console.warn(`Network glitch encountered. Retrying in 10s...`);
+                await new Promise(res => setTimeout(res, 10000));
               }
-              
-              require("fs").writeFileSync("README.md", textOutput.trim());
-              console.log("README.md updated successfully via Node.js fetch engine.");
-            } catch (err) {
-              console.error("Network or API execution failure:", err);
+            }
+            
+            if (!textOutput) {
+              console.error("API Response Error: Missing text payload structure.");
               process.exit(1);
             }
+            
+            require("fs").writeFileSync("README.md", textOutput.trim());
+            console.log("README.md updated successfully via Node.js fetch engine.");
           }
           run();
           '
@@ -114,7 +157,7 @@ jobs:
 
           if ! git diff --exit-code README.md; then
             git add README.md
-            git commit -m "docs: AI rewrite of README.md for v${{ github.event.release.tag_name }} [skip ci]"
+            git commit -m "docs: AI rewrite of README.md for v${{ env.VERSION_INPUT }} [skip ci]"
             git push origin HEAD:${{ github.event.repository.default_branch }}
           else
             echo "No semantic layout modifications detected. Skipping commit."
