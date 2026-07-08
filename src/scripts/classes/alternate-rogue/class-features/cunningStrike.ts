@@ -290,6 +290,12 @@ const prompt: PromptFunction = async ({
   });
 };
 
+export const calcDeviousExploitSneakAttackCost = (
+  prerequisiteLevel: number,
+): number => {
+  return 1 + Math.floor((prerequisiteLevel - 1) / 4);
+};
+
 const spendUses = async (
   exploitOrFeature: Item<'feat'> | SubclassFeatureCunningStrikeData,
   actor: Actor5e,
@@ -302,7 +308,7 @@ const spendUses = async (
     exploitOrFeature.system.type.subtype === 'deviousExploit'
   ) {
     const prerequisiteLevel = exploitOrFeature.system.prerequisites?.level ?? 1;
-    sneakAttackDiceCost = 1 + Math.floor((prerequisiteLevel - 1) / 4);
+    sneakAttackDiceCost = calcDeviousExploitSneakAttackCost(prerequisiteLevel);
   } else if ('sneakAttackDiceCost' in exploitOrFeature) {
     sneakAttackDiceCost = exploitOrFeature.sneakAttackDiceCost;
   } else {
