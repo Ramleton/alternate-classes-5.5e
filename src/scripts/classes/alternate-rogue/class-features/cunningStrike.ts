@@ -272,8 +272,12 @@ const prompt: PromptFunction = async ({
   const exploitIdentifier = featureItem.flags['chris-premades'].info.identifier;
   const exploitData = deviousExploits[exploitIdentifier];
   if (!exploitData) {
-    console.error(
-      `Cunning Strike: No exploit data found for identifier ${exploitIdentifier}`,
+    const {
+      utils: { genericUtils },
+    } = chrisPremades;
+    genericUtils.notify(
+      `Cunning Strike: Exploit data not defined for ${exploitIdentifier}`,
+      'warn',
     );
     return;
   }
@@ -302,8 +306,12 @@ const spendUses = async (
   } else if ('sneakAttackDiceCost' in exploitOrFeature) {
     sneakAttackDiceCost = exploitOrFeature.sneakAttackDiceCost;
   } else {
-    console.warn(
+    const {
+      utils: { genericUtils },
+    } = chrisPremades;
+    genericUtils.notify(
       `Cunning Strike: Sneak Attack Dice Cost not defined for ${exploitOrFeature.name}`,
+      'warn',
     );
   }
   reduceSneakAttack(workflow, actor, sneakAttackDiceCost);
