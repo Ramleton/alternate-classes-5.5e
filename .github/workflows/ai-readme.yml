@@ -30,125 +30,64 @@ jobs:
 
       - name: Generate New README via Gemini API
         run: |
-          # Export system context to environment
-          export MODULE_JSON=$(cat module.json 2>/dev/null || echo "No module.json file found.")
-          export CURRENT_README=$(cat README.md 2>/dev/null || echo "No README.md found.")
-          export VERSION_TAG="v$VERSION_INPUT"
-          export CURRENT_DATE=$(date +"%B %Y")
-
           node -e '
+          const fs = require("fs");
+          const readme = fs.readFileSync("README.md", "utf8");
+          const apiKey = process.env.GEMINI_API_KEY;
+
           async function run() {
-            const apiKey = process.env.GEMINI_API_KEY;
-            if (!apiKey) {
-              console.error("Error: GEMINI_API_KEY secret is missing or empty.");
-              process.exit(1);
-            }
+            const prompt = `You are a technical documentation assistant. Update the README.md file provided below.
+            
+            CURRENT README CONTENT:
+            ${readme}
 
-            const prompt = `You are an expert technical documentation assistant updating the README.md for a Foundry VTT module called "Alternate Classes 5.5e".
-            
-            Here is the existing README.md:
-            """
-            ${process.env.CURRENT_README}
-            """
-            
-            Here is the new module.json configuration:
-            """
-            ${process.env.MODULE_JSON}
-            """
-            
-            Recent Changes / Release Notes (READ THIS CAREFULLY TO IDENTIFY WORK DONE):
-            """
+            RELEASE NOTES:
             ${process.env.RELEASE_INPUT}
-            """
 
-            TASK:
-            Update the provided README.md strictly using these rules:
-            1. Carefully read the "Recent Changes / Release Notes" above. Identify which alternate classes were explicitly worked on, automated, or implemented in this release.
-            2. Locate the "Supported Classes & Automation Status" table in the README. If your analysis of the Release Notes shows a class listed there has now been completed or automated, update that specific class’s row status from "❌ Upcoming" to "✅ Implemented". Do not modify rows for classes not mentioned in the notes.
-            3. Locate the "## Changelog" header. Insert a new subsection directly below it for the new release, formatted exactly like this:
-               ### Version ${process.env.VERSION_TAG} (${process.env.CURRENT_DATE})
-               [Summarize or paste the core bullet points from the Release Notes here]
-               Keep the previous version history below it intact.
-            4. Go to the very bottom footer and update the variables exactly to:
-               **Current Module Version:** ${process.env.VERSION_TAG}
-               **Latest Release Date:** ${process.env.CURRENT_DATE}
-            5. Locate any GitHub download links pointing to the module manifest file in the installation instructions. Specifically look for URLs resembling:
-               https://github.com/Ramleton/alternate-classes-5.5e/releases/download/latest/module.json
-               Update the "latest" portion of the path to match the current release version tag exactly:
-               https://github.com/Ramleton/alternate-classes-5.5e/releases/download/${process.env.VERSION_TAG}/module.json
-            6. Locate the "Requirements" or "Dependencies" section in the README. Read the "compatibility.verified" or "compatibility.minimum" core version from the module.json text. 
-               CRITICAL LIVE RESEARCH TASK: Use Google Search to look up the latest stable, official release versions of the modules listed in "relationships.requires" and "relationships.recommends" that are fully compatible with that specific Foundry VTT core version. 
-               NOTE ON PACKAGES: Be aware that modules like midi-qol, dae, and times-up have migrated from GitHub over to GitLab (gitlab.com/tposney). Ensure your search grounding references their official GitLab releases/tags or official Foundry package listings to get the correct version strings. Update the requirements markdown layout with those exact live version numbers.
+            TASKS:
+            1. Update the "Supported Classes & Automation Status" table. Based on the Release Notes, update mentioned classes to "✅ Implemented". Keep all other rows EXACTLY as they are.
+            2. Add a new entry to the "Changelog" section at the top of the list for version ${process.env.VERSION_INPUT} (${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}) with the bullet points from the Release Notes.
+            3. Update the footer: **Current Module Version:** v${process.env.VERSION_INPUT} and **Latest Release Date:** ${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}.
+            4. Update the manifest URL in the Installation section to use the version: v${process.env.VERSION_INPUT}.
             
-            CRITICAL RULES:
-            - Do not alter or delete the Installation steps, Technology Stack, Project Structure, or Credits sections. Keep them exactly as they are written.
-            - Output ONLY the full, updated raw markdown content. 
-            - Do not include any chat commentary, introduction, or wrap the final output in backticks.`;
+            STRICT RULES:
+            - Output the COMPLETE README file from start to finish.
+            - DO NOT truncate the file.
+            - DO NOT remove sections like Technology Stack, Project Structure, or Credits.
+            - Output ONLY the final markdown content. No conversational text.`;
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
             
-            const payload = {
-              contents: [{ parts: [{ text: prompt }] }],
-              tools: [{ googleSearch: {} }]
-            };
-            
-            const maxRetries = 3;
-            let textOutput = null;
+            const data = await response.json();
+            const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-            for (let attempt = 1; attempt <= maxRetries; attempt++) {
-              try {
-                const response = await fetch(url, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payload)
-                });
-                
-                const data = await response.json();
-
-                if (response.status === 429) {
-                  if (attempt === maxRetries) {
-                    console.error("API Error: Exceeded maximum rate limit retries.", JSON.stringify(data));
-                    process.exit(1);
-                  }
-                  
-                  const errorMsg = data?.error?.message || "";
-                  const retryMatch = errorMsg.match(/retry in (\d+(\.\d+)?)s/);
-                  // Grab recommended wait window from message, or fall back to an exponential backoff
-                  const waitMs = retryMatch ? parseFloat(retryMatch[1]) * 1000 : Math.pow(2, attempt) * 15000;
-                  
-                  console.warn(`Rate limit hit (429). Sleeping for ${waitMs / 1000}s before retry attempt ${attempt}/${maxRetries}...`);
-                  await new Promise(res => setTimeout(res, waitMs));
-                  continue;
-                }
-
-                if (!response.ok) {
-                  console.error(`API Request Failure (Status ${response.status}):`, JSON.stringify(data));
-                  process.exit(1);
-                }
-
-                textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-                break; // Break loop on successful generation path
-                
-              } catch (err) {
-                if (attempt === maxRetries) {
-                  console.error("Network framework connection execution failure:", err);
-                  process.exit(1);
-                }
-                console.warn(`Network glitch encountered. Retrying in 10s...`);
-                await new Promise(res => setTimeout(res, 10000));
-              }
-            }
-            
             if (!textOutput) {
-              console.error("API Response Error: Missing text payload structure.");
+              console.error("Failed to generate content");
               process.exit(1);
             }
-            
-            require("fs").writeFileSync("README.md", textOutput.trim());
-            console.log("README.md updated successfully via Node.js fetch engine.");
+
+            fs.writeFileSync("README.md", textOutput.trim());
+            console.log("README.md updated successfully.");
           }
           run();
           '
+
+      - name: Validate README Formatting
+        run: |
+          # Check for key markers that should exist in a valid README
+          if ! grep -q "| Class " README.md; then
+            echo "Error: The table is missing or corrupted!"
+            exit 1
+          fi
+          if ! grep -q "## Changelog" README.md; then
+            echo "Error: The Changelog header is missing!"
+            exit 1
+          fi
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
@@ -166,7 +105,7 @@ jobs:
           if ! git diff --exit-code README.md; then
             git add README.md
             git commit -m "docs: AI rewrite of README.md for v${{ env.VERSION_INPUT }} [skip ci]"
-            git push origin HEAD:${{ github.event.repository.default_branch }}
+            git push origin ${{ github.ref_name }}
           else
             echo "No semantic layout modifications detected. Skipping commit."
           fi
