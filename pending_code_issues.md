@@ -47,3 +47,17 @@
     }
     const rune = (await dialogUtils.selectDocumentDialog(
 ```
+
+---
+
+- File: src/hooks/alternateMartialLevelUpdate.ts
+- Description: The explicit `as any` assertion for the hook name `dnd5e.advancementManagerComplete` is technically functional but is a type escape hatch. While Foundry's type definitions for hooks can sometimes be incomplete, it's generally preferable to avoid `as any` where possible for clearer type inference and to leverage TypeScript fully.
+- Suggested Fix: Explore if a more precise type assertion or a way to extend the `Hooks` interface with this specific hook can be done within the project's ambient types, or simply add a comment explaining why `as any` is necessary.
+```typescript
+Hooks.on(
+  'dnd5e.advancementManagerComplete', // If type definitions are updated to include this string literal
+  async ({ actor }: { actor: Actor5e }) => {
+    // ...
+  },
+);
+```
