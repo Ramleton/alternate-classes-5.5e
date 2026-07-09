@@ -39,9 +39,12 @@ Hooks.on(
       },
       0,
     );
+    const prevSpent =
+      actor.flags['alternate-classes-55e']?.exploitData?.spent ?? 0;
     await genericUtils.setFlag(actor, 'alternate-classes-55e', 'exploitData', {
       dice: getAlternateMartialExploitDice(multiclassLevel),
       die: getAlternateMartialExploitDie(multiclassLevel),
+      spent: prevSpent,
     });
     console.log(
       `[Alternate Classes 5.5e]: Successfully updated ${actor.name}'s Exploit Data`,
