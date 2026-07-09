@@ -91,12 +91,13 @@ export const qualifiesForSneakAttack = (
   const {
     utils: { effectUtils, itemUtils, tokenUtils },
   } = chrisPremades;
+  if (!workflow.targets.size) return false;
   if (isTwinStrikeBlocking(sneakAttack, token)) return false;
   if (getWorkflowProperty(workflow, sneakAttack.actor!, 'sneakAttack'))
     return false;
   if (!isFinesseOrRangedAttack(workflow)) return false;
   if (isPotentSightBlocking(sneakAttack)) return false;
-  const target = workflow.targets[0];
+  const target = workflow.targets.first() as Token;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const attackRollOptions = workflow.attackRoll!.options as any;
   const hadAdvantage = attackRollOptions.attributions?.some(
