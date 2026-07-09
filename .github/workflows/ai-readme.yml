@@ -48,7 +48,9 @@ jobs:
             1. Update the "Supported Classes & Automation Status" table. Based on the Release Notes, update mentioned classes to "✅ Implemented". Keep all other rows EXACTLY as they are.
             2. Add a new entry to the "Changelog" section at the top of the list for version ${process.env.VERSION_INPUT} (${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}) with the bullet points from the Release Notes.
             3. Update the footer: **Current Module Version:** v${process.env.VERSION_INPUT} and **Latest Release Date:** ${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}.
-            4. Update the manifest URL in the Installation section to use the version: ${process.env.VERSION_INPUT}.
+            4. Locate the installation instructions and ensure the module manifest URL is exactly: 
+              https://github.com/Ramleton/alternate-classes-5.5e/releases/download/${process.env.VERSION_INPUT.replace(/^v/, '')}/module.json
+              (Ensure there is no "v" prefix in the version segment of that URL).
             
             STRICT RULES:
             - Output the COMPLETE README file from start to finish.
