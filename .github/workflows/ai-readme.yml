@@ -30,51 +30,52 @@ jobs:
 
       - name: Generate New README via Gemini API
         run: |
-          # 1. We don't delete anything, we pass the current file content to Node
-          export CURRENT_README=$(cat README.md)
-
           node -e '
           const fs = require("fs");
           const readme = fs.readFileSync("README.md", "utf8");
-          const releaseNotes = process.env.RELEASE_INPUT;
-          const version = process.env.VERSION_INPUT;
-          const date = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+          const apiKey = process.env.GEMINI_API_KEY;
 
           async function run() {
-            const prompt = `
-            You are a technical documentation assistant. You are responsible for updating the README.md file provided below.
+            const prompt = `You are a technical documentation assistant. Update the README.md file provided below.
             
             CURRENT README CONTENT:
             ${readme}
 
             RELEASE NOTES:
-            ${releaseNotes}
+            ${process.env.RELEASE_INPUT}
 
             TASKS:
-            1. Update the "Supported Classes & Automation Status" table. Based on the Release Notes, find the classes mentioned and update their status to "✅ Implemented". Keep all other rows EXACTLY as they are.
-            2. Add a new entry to the "Changelog" section at the top of the list for version ${version} (${date}) with the bullet points from the Release Notes. Do not delete older changelog entries.
-            3. Update the footer: **Current Module Version:** v${version} and **Latest Release Date:** ${date}.
-            4. Update the manifest URL in the Installation section to use the version: v${version}.
-            5. In the "Requirements" section, keep the requirements as they are.
+            1. Update the "Supported Classes & Automation Status" table. Based on the Release Notes, update mentioned classes to "✅ Implemented". Keep all other rows EXACTLY as they are.
+            2. Add a new entry to the "Changelog" section at the top of the list for version ${process.env.VERSION_INPUT} (${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}) with the bullet points from the Release Notes.
+            3. Update the footer: **Current Module Version:** v${process.env.VERSION_INPUT} and **Latest Release Date:** ${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}.
+            4. Update the manifest URL in the Installation section to use the version: v${process.env.VERSION_INPUT}.
             
             STRICT RULES:
             - Output the COMPLETE README file from start to finish.
             - DO NOT truncate the file.
             - DO NOT remove sections like Technology Stack, Project Structure, or Credits.
-            - If you are unsure about a section, leave it exactly as it was.
-            - Output ONLY the final markdown content. No conversational text.
-            `;
+            - Output ONLY the final markdown content. No conversational text.`;
 
-            // ... (keep your existing fetch/retry/write logic here) ...
-            // Just ensure you use:
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+            
+            const data = await response.json();
+            const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (!textOutput) {
+              console.error("Failed to generate content");
+              process.exit(1);
+            }
+
             fs.writeFileSync("README.md", textOutput.trim());
+            console.log("README.md updated successfully.");
           }
           run();
           '
-
-          echo "--- FINAL README.MD CONTENT ---"
-          cat README.md
-          echo "--- END FINAL README.MD CONTENT ---"
 
       - name: Validate README Formatting
         run: |
