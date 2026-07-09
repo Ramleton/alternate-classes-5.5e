@@ -1,12 +1,13 @@
 import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
-import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { getAltMartialExploitDie } from 'exploits/utils.js';
 import { postRune as post, preRune as pre } from './runeUtils.js';
 
 const during = async (feat: Item<'feat'>): Promise<boolean> => {
-  const exploitDie = getAlternateMartialExploitDie(feat);
-  if (!exploitDie)
-    return false;
-  const { utils: { effectUtils, genericUtils } } = chrisPremades;
+  const exploitDie = getAltMartialExploitDie(feat);
+  if (!exploitDie) return false;
+  const {
+    utils: { effectUtils, genericUtils },
+  } = chrisPremades;
   await genericUtils.setFlag(
     feat.actor!,
     'alternate-classes-55e',
@@ -39,16 +40,12 @@ const during = async (feat: Item<'feat'>): Promise<boolean> => {
   });
   return true;
 };
-const workflow: MacroFunction = async (
-  { trigger: { entity: item } },
-) => {
+const workflow: MacroFunction = async ({ trigger: { entity: item } }) => {
   const feat = item as Item<'feat'>;
   const res1 = await pre(feat);
-  if (!res1)
-    return;
+  if (!res1) return;
   const res2 = await during(feat);
-  if (!res2)
-    return;
+  if (!res2) return;
   await post(feat);
 };
 const macro: CPRMacro = {

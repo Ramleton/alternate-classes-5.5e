@@ -1,6 +1,6 @@
 import { runActivity } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { getAltMartialExploitDie } from 'exploits/utils.js';
 import { CunningStrikeSubclassFeatureHandler } from '../../types/cunningStrike.js';
 import { reduceSneakAttack } from '../../utils/sneakAttackUtils.js';
 
@@ -44,7 +44,7 @@ const sentientStrike: MidiMacroFunction = async ({
   const target = workflow.targets.first() as Token;
   if (workflow.attackRoll!.total! >= target.actor!.system.attributes.ac.value)
     return;
-  const exploitDie = getAlternateMartialExploitDie(feat);
+  const exploitDie = getAltMartialExploitDie(feat);
   if (!exploitDie) return;
   const {
     utils: { dialogUtils, itemUtils, socketUtils, workflowUtils },

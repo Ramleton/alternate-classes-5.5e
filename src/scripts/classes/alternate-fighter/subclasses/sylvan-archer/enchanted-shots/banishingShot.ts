@@ -1,5 +1,5 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { getAltMartialExploitDie } from 'exploits/utils.js';
 import { SaveActivity } from 'fvtt-types/Activity.js';
 import { post, pre } from '../enchantedShotSave.js';
 
@@ -7,21 +7,20 @@ const during = async (
   item: Item<'feat'>,
   targets: Token[],
 ): Promise<number> => {
-  const { utils: {
-    activityUtils,
-    genericUtils,
-    itemUtils,
-    effectUtils,
-    workflowUtils,
-  } }
-    = chrisPremades;
-  const exploitDie = getAlternateMartialExploitDie(item);
+  const {
+    utils: {
+      activityUtils,
+      genericUtils,
+      itemUtils,
+      effectUtils,
+      workflowUtils,
+    },
+  } = chrisPremades;
+  const exploitDie = getAltMartialExploitDie(item);
   if (!exploitDie) return 0;
-  const activity = activityUtils.getActivityByIdentifier(
-    item,
-    'save',
-    { strict: true },
-  );
+  const activity = activityUtils.getActivityByIdentifier(item, 'save', {
+    strict: true,
+  });
   if (!activity) return 0;
   const saveActivityData: SaveActivity = genericUtils.duplicate(activity);
   saveActivityData.damage.parts = [];
@@ -30,8 +29,7 @@ const during = async (
     item.actor!,
     'ac55eSylvanShot',
   );
-  if (sylvanShot)
-    saveActivityData.damage.onSave = 'half';
+  if (sylvanShot) saveActivityData.damage.onSave = 'half';
   const saveWorkflow = await workflowUtils.syntheticActivityDataRoll(
     saveActivityData,
     item,
@@ -45,7 +43,7 @@ const during = async (
     origin: item.uuid,
     duration: { seconds: 60 },
     flags: {
-      'dae': {
+      dae: {
         stackable: 'noneName',
       },
       'chris-premades': {

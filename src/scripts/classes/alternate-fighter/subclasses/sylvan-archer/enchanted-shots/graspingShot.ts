@@ -1,18 +1,20 @@
-import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { getAltMartialExploitDie } from 'exploits/utils.js';
 import { HandleEnchantedShot } from '../handle.js';
 
 const handleGraspingShot: HandleEnchantedShot = async ({
   item,
   saveWorkflow,
 }) => {
-  const { utils: { effectUtils } } = chrisPremades;
+  const {
+    utils: { effectUtils },
+  } = chrisPremades;
   const targetEffectData = {
     name: `${item.name}: Grasped`,
     icon: item.img,
     origin: item.uuid,
     duration: { seconds: 60 },
     flags: {
-      'dae': {
+      dae: {
         stackable: 'noneName',
       },
       'alternate-classes-55e': {
@@ -20,7 +22,7 @@ const handleGraspingShot: HandleEnchantedShot = async ({
           enchantedShot: {
             graspingShot: {
               moved: false,
-              exploitDie: getAlternateMartialExploitDie(item),
+              exploitDie: getAltMartialExploitDie(item),
               originActor: item.actor,
             },
           },

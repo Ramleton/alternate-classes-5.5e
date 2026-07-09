@@ -1,21 +1,22 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { getAltMartialExploitDie } from 'exploits/utils.js';
 
-const workflow: MidiMacroFunction = async (
-  { trigger: { entity: item, token } },
-) => {
+const workflow: MidiMacroFunction = async ({
+  trigger: { entity: item, token },
+}) => {
   const feat = item as Item<'feat'>;
-  const exploitDie = getAlternateMartialExploitDie(feat);
-  if (!exploitDie)
-    return false;
-  const { utils: {
-    activityUtils,
-    effectUtils,
-    dialogUtils,
-    genericUtils,
-    itemUtils,
-    workflowUtils,
-  } } = chrisPremades;
+  const exploitDie = getAltMartialExploitDie(feat);
+  if (!exploitDie) return false;
+  const {
+    utils: {
+      activityUtils,
+      effectUtils,
+      dialogUtils,
+      genericUtils,
+      itemUtils,
+      workflowUtils,
+    },
+  } = chrisPremades;
   const legendaryRuneLord = itemUtils.getItemByIdentifier(
     feat.actor!,
     'ac55eLegendaryRuneLord',
@@ -24,13 +25,10 @@ const workflow: MidiMacroFunction = async (
     feat.actor!,
     'ac55eFrostRune',
   );
-  const hillRune = itemUtils.getItemByIdentifier(
-    feat.actor!,
-    'ac55eHillRune',
-  );
-  const activatableRunes: Item[] = [frostRune, hillRune].filter(i => !!i);
+  const hillRune = itemUtils.getItemByIdentifier(feat.actor!, 'ac55eHillRune');
+  const activatableRunes: Item[] = [frostRune, hillRune].filter((i) => !!i);
 
-  const options: [string, string][] = activatableRunes.map(rune => [
+  const options: [string, string][] = activatableRunes.map((rune) => [
     rune.name,
     rune.system.identifier,
   ]);
@@ -63,9 +61,10 @@ const workflow: MidiMacroFunction = async (
     origin: feat.uuid,
     duration: { seconds: 60 },
     flags: {
-      'dae': {
+      dae: {
         // eslint-disable-next-line @stylistic/max-len
-        enableCondition: '!effects.some(e => e.name.toLowerCase() === \'incapacitated\')',
+        enableCondition:
+          "!effects.some(e => e.name.toLowerCase() === 'incapacitated')",
         stackable: 'noneName',
       },
       'chris-premades': {
@@ -129,11 +128,9 @@ const workflow: MidiMacroFunction = async (
       activity.consumption.spellSlot = false;
     }
   }
-  await itemUtils.createItems(
-    feat.actor!,
-    [duplicateItem],
-    { parentEntity: effect },
-  );
+  await itemUtils.createItems(feat.actor!, [duplicateItem], {
+    parentEntity: effect,
+  });
   return true;
 };
 

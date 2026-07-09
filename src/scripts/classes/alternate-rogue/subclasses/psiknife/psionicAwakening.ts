@@ -2,7 +2,7 @@ import CPRMacro, {
   MacroFunction,
   MacroFunctionArgs,
 } from 'chris-premades/macro.js';
-import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { getAltMartialExploitDie } from 'exploits/utils.js';
 
 const bonus: MacroFunction = async ({
   trigger: { entity, roll },
@@ -10,7 +10,7 @@ const bonus: MacroFunction = async ({
   if (!roll.options.target) return;
   if (roll.total > roll.options.target) return;
   const feat = entity as Item<'feat'>;
-  const exploitDie = getAlternateMartialExploitDie(feat);
+  const exploitDie = getAltMartialExploitDie(feat);
   if (!exploitDie) return;
   const {
     utils: { dialogUtils, rollUtils, socketUtils },

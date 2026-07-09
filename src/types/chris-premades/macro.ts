@@ -9,6 +9,7 @@ import {
   CombatEvent,
   D20Event,
   EffectEvent,
+  ItemEvent,
   MacroEvent,
   MidiQOLEvent,
   MovementEvent,
@@ -614,6 +615,10 @@ interface CPRMacroEventDetails extends SharedMacroEventDetails {
   macro: MacroFunction;
 }
 
+interface ItemMacroEventDetails extends CPRMacroEventDetails {
+  pass: ItemEvent;
+}
+
 interface EffectMacroEventDetails extends CPRMacroEventDetails {
   pass: EffectEvent;
 }
@@ -648,6 +653,7 @@ export default interface CPRMacro {
     actor?: MidiMacroEventDetails[];
     item?: MidiItemMacroEventDetails[];
   };
+  item?: ItemMacroEventDetails[];
   effect?: EffectMacroEventDetails[];
   aura?: AuraMacroEventDetails[];
   combat?: CombatMacroEventDetails[];

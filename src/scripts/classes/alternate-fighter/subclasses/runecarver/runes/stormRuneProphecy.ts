@@ -4,7 +4,7 @@ import CPRMacro, {
   MacroFunction,
   MidiMacroFunction,
 } from 'chris-premades/macro.js';
-import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { getAltMartialExploitDie } from 'exploits/utils.js';
 
 const pre = async (actor: Actor5e, sourceActor: Actor5e) => {
   const {
@@ -18,7 +18,7 @@ const pre = async (actor: Actor5e, sourceActor: Actor5e) => {
   );
 };
 const determineBonus = async (actor: Actor5e) => {
-  const exploitDie = getAlternateMartialExploitDie(actor);
+  const exploitDie = getAltMartialExploitDie(actor);
   if (!exploitDie) return '';
   const options: [string, string][] = [
     ['Add', 'add'],

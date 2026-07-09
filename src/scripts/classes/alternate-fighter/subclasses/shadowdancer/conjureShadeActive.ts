@@ -1,18 +1,20 @@
 import { getActivityData } from 'automation/utils.js';
-import CPRMacro, { MacroFunction, MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import CPRMacro, {
+  MacroFunction,
+  MidiMacroFunction,
+} from 'chris-premades/macro.js';
+import { getAltMartialExploitDie } from 'exploits/utils.js';
 import { HealActivity } from 'fvtt-types/Activity.js';
 
-const turnEnd: MacroFunction = async (
-  { trigger: { entity: effect, token } },
-) => {
-  const sceneShades = effect
-    .flags['chris-premades']
-    .summons
-    .ids[effect.name]
-    .map(i => token.scene.tokens.get(i)?.object)
-    .filter(i => i);
-  const { utils: { effectUtils, genericUtils, tokenUtils } } = chrisPremades;
+const turnEnd: MacroFunction = async ({
+  trigger: { entity: effect, token },
+}) => {
+  const sceneShades = effect.flags['chris-premades'].summons.ids[effect.name]
+    .map((i) => token.scene.tokens.get(i)?.object)
+    .filter((i) => i);
+  const {
+    utils: { effectUtils, genericUtils, tokenUtils },
+  } = chrisPremades;
   if (!sceneShades.length) {
     await genericUtils.remove(effect);
     return;
@@ -35,47 +37,34 @@ const turnEnd: MacroFunction = async (
         i.actor,
         'ac55eSummonedEffect',
       );
-      if (tokenEffect)
-        await genericUtils.remove(tokenEffect);
+      if (tokenEffect) await genericUtils.remove(tokenEffect);
       shadesLeft -= 1;
     }
   }
-  if (!shadesLeft)
-    await genericUtils.remove(effect);
+  if (!shadesLeft) await genericUtils.remove(effect);
 };
 const targetApplyDamage: MacroFunction = async ({ trigger, ditem }) => {
-  const effect = await fromUuid(trigger
-    .entity
-    ?.flags?.['chris-premades']
-    ?.parentEntityUuid);
-  if (!effect)
-    return;
+  const effect = await fromUuid(
+    trigger.entity?.flags?.['chris-premades']?.parentEntityUuid,
+  );
+  if (!effect) return;
   const originActor = effect.parent;
-  if (!originActor)
-    return;
+  if (!originActor) return;
   const {
     Summons,
-    utils: {
-      itemUtils,
-      workflowUtils,
-    },
+    utils: { itemUtils, workflowUtils },
   } = chrisPremades;
   const originItem = itemUtils.getItemByIdentifier(
     originActor,
     'ac55eRestorativeShadows',
   );
-  if (!originItem)
-    return;
+  if (!originItem) return;
   const feat = originItem as Item<'feat'>;
-  const exploitDie = getAlternateMartialExploitDie(feat);
-  if (!exploitDie)
-    return;
-  const healActivityData = await getActivityData(
-    feat,
-    'heal',
-  ) as HealActivity | undefined;
-  if (!healActivityData)
-    return;
+  const exploitDie = getAltMartialExploitDie(feat);
+  if (!exploitDie) return;
+  const healActivityData = (await getActivityData(feat, 'heal')) as
+    HealActivity | undefined;
+  if (!healActivityData) return;
   healActivityData.healing.custom.formula = `2d${exploitDie.faces}`;
   await workflowUtils.syntheticActivityDataRoll(
     healActivityData,
@@ -85,11 +74,12 @@ const targetApplyDamage: MacroFunction = async ({ trigger, ditem }) => {
   );
   await Summons.dismissIfDead({ trigger, ditem });
 };
-const darkSacrifice: MidiMacroFunction = async (
-  { trigger, workflow, ditem },
-) => {
-  if (!ditem)
-    return;
+const darkSacrifice: MidiMacroFunction = async ({
+  trigger,
+  workflow,
+  ditem,
+}) => {
+  if (!ditem) return;
   const {
     Summons,
     utils: {
@@ -102,43 +92,34 @@ const darkSacrifice: MidiMacroFunction = async (
       workflowUtils,
     },
   } = chrisPremades;
-  if (!constants.attacks.includes(workflow.activity.getActionType()))
-    return;
+  if (!constants.attacks.includes(workflow.activity.getActionType())) return;
   const token = trigger.token;
   const sourceToken = trigger.sourceToken!;
   const targetToken = workflow.hitTargets.first()! as Token;
-  if (token.id === targetToken.id)
-    return;
-  if (token.id === sourceToken.id)
-    return;
+  if (token.id === targetToken.id) return;
+  if (token.id === sourceToken.id) return;
   const distance = tokenUtils.getDistance(token, targetToken);
-  if (distance > 10)
-    return;
+  if (distance > 10) return;
 
-  const effect = await fromUuid(trigger
-    .entity
-    ?.flags?.['chris-premades']
-    ?.parentEntityUuid);
-  if (!effect)
-    return;
+  const effect = await fromUuid(
+    trigger.entity?.flags?.['chris-premades']?.parentEntityUuid,
+  );
+  if (!effect) return;
   const originActor = effect.parent as Actor5e;
-  if (!originActor)
-    return;
-  if (actorUtils.hasUsedReaction(originActor))
-    return;
+  if (!originActor) return;
+  if (actorUtils.hasUsedReaction(originActor)) return;
   const darkSacrifice = itemUtils.getItemByIdentifier(
     originActor,
     'ac55eDarkSacrifice',
   );
-  if (!darkSacrifice)
-    return;
+  if (!darkSacrifice) return;
   const fighterLevels = originActor.classes['alternate-fighter'].system.levels;
   const selection = await dialogUtils.confirm(
     'Dark Sacrifice',
     'A creature within 10 feet of a Shade is hit, sacrifice it?',
-    { userId: socketUtils.firstOwner(token.actor, true) });
-  if (!selection)
-    return;
+    { userId: socketUtils.firstOwner(token.actor, true) },
+  );
+  if (!selection) return;
   workflowUtils.modifyDamageAppliedFlat(ditem, -fighterLevels);
   await actorUtils.setReactionUsed(originActor);
   await Summons.dismiss({ trigger });
