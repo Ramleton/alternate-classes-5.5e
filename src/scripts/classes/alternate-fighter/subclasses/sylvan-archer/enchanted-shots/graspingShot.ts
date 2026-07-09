@@ -1,4 +1,4 @@
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { HandleEnchantedShot } from '../handle.js';
 
 const handleGraspingShot: HandleEnchantedShot = async ({
@@ -22,7 +22,7 @@ const handleGraspingShot: HandleEnchantedShot = async ({
           enchantedShot: {
             graspingShot: {
               moved: false,
-              exploitDie: getAltMartialExploitDie(item),
+              exploitDie: getAlternateMartialExploitDie(item.actor!),
               originActor: item.actor,
             },
           },

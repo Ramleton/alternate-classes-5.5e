@@ -1,14 +1,16 @@
 import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 
 const bonus: MacroFunction = async ({ trigger: { entity, roll, skillId } }) => {
   if (!['acr', 'ath', 'prf'].some((id) => id === skillId)) return;
   const {
     utils: { rollUtils },
   } = chrisPremades;
-  const exploitDie = getAltMartialExploitDie(entity as Item<'feat'>);
+  const exploitDie = getAlternateMartialExploitDie(
+    (entity as Item<'feat'>).actor!,
+  );
   if (!exploitDie) return;
-  return await rollUtils.addToRoll(roll, `1d${exploitDie.faces}`);
+  return await rollUtils.addToRoll(roll, `1d${exploitDie}`);
 };
 
 const macro: CPRMacro = {

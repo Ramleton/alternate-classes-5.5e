@@ -3,11 +3,9 @@ import CPRMacro, {
   MacroFunction,
   MidiMacroFunction,
 } from 'chris-premades/macro.js';
-import {
-  getAltMartialExploitDie,
-  spendAlternateMartialExploitUses,
-} from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { getExploitUsesRemaining } from 'exploits/utils/exploitUtils.js';
+import { spendAlternateMartialExploitUses } from 'exploits/utils/spendExploitUtils.js';
 
 const autoCritical: MidiMacroFunction = async ({
   trigger: { entity },
@@ -69,9 +67,9 @@ const prompt: MacroFunction = async ({ trigger: { entity, token } }) => {
   );
   if (!selection) return;
   await spendAlternateMartialExploitUses(1, feat);
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
-  const formula = `1d${exploitDie.faces}`;
+  const formula = `1d${exploitDie}`;
   const roll = await rollUtils.rollDice(formula, {
     entity: feat.actor!,
     chatMessage: true,

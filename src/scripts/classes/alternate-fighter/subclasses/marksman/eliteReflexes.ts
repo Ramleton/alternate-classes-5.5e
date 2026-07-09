@@ -1,13 +1,13 @@
 import CPRMacro, { D20Roll, MacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 
 const checkRest = async (item: Item<'feat'>, roll: D20Roll) => {
-  const exploitDie = getAltMartialExploitDie(item);
+  const exploitDie = getAlternateMartialExploitDie(item.actor!);
   if (!exploitDie) return 0;
   const {
     utils: { rollUtils },
   } = chrisPremades;
-  return await rollUtils.addToRoll(roll, `1d${exploitDie.faces}`);
+  return await rollUtils.addToRoll(roll, `1d${exploitDie}`);
 };
 const saveBonus: MacroFunction = async ({
   trigger: { entity: item, roll, saveId },

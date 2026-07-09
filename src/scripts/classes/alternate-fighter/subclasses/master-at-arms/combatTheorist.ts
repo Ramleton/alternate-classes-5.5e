@@ -1,12 +1,14 @@
 import CPRMacro, { D20Roll, MacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 
 const skillBonus: MacroFunction = async ({
   trigger: { entity: item, roll, skillId },
 }): Promise<D20Roll | undefined> => {
   if (skillId !== 'his') return;
   if (roll.data.abilityId !== 'int') return;
-  const exploitDie = getAltMartialExploitDie(item as Item<'feat'>);
+  const exploitDie = getAlternateMartialExploitDie(
+    (item as Item<'feat'>).actor!,
+  );
   if (!exploitDie) return;
   const {
     utils: { dialogUtils, rollUtils, socketUtils },
@@ -18,7 +20,7 @@ const skillBonus: MacroFunction = async ({
     { userId: socketUtils.firstOwner(item, true) },
   );
   if (!selection) return;
-  return await rollUtils.addToRoll(roll, `1d${exploitDie.faces}`);
+  return await rollUtils.addToRoll(roll, `1d${exploitDie}`);
 };
 const macro: CPRMacro = {
   identifier: 'ac55eCombatTheorist',

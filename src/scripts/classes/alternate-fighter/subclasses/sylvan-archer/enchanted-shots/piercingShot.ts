@@ -1,6 +1,6 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { SaveActivity } from 'fvtt-types/Activity.js';
 import { post, pre } from '../enchantedShotSave.js';
 
@@ -22,7 +22,7 @@ const during = async (
     },
   } = chrisPremades;
   if (!token) return 0;
-  const exploitDie = getAltMartialExploitDie(item);
+  const exploitDie = getAlternateMartialExploitDie(item.actor!);
   if (!exploitDie) return 0;
   const activity = activityUtils.getActivityByIdentifier(item, 'save', {
     strict: true,
@@ -67,7 +67,7 @@ const during = async (
       ?.legendarySylvanArcher;
   const exploitDice = usedLegendarySylvanArchery ? 3 : 2;
   saveActivityData.damage.parts[0].custom.enabled = true;
-  saveActivityData.damage.parts[0].custom.formula = `${exploitDice}d${exploitDie.faces}`;
+  saveActivityData.damage.parts[0].custom.formula = `${exploitDice}d${exploitDie}`;
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
     item.actor!,

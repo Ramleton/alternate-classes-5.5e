@@ -1,5 +1,7 @@
-import { spendAlternateMartialExploitUses } from 'exploits/utils.js';
-import { getExploitUsesRemaining } from 'exploits/utils/exploitUtils.js';
+import {
+  getExploitUsesRemaining,
+  spendExploitUses,
+} from 'exploits/utils/exploitUtils.js';
 
 interface RuneInvokable {
   usable: boolean;
@@ -88,7 +90,7 @@ export const postRune = async (feat: Item<'feat'>) => {
       `macros.runeCarver.elderInsight.${rune}`,
       1,
     );
-    await spendAlternateMartialExploitUses(1, feat);
+    await spendExploitUses(feat, 1);
   } else {
     await genericUtils.update(feat, {
       'system.uses.spent': feat.system.uses!.spent + 1,

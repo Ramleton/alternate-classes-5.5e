@@ -1,8 +1,6 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
-import {
-  getAltMartialExploitDie,
-  spendAlternateMartialExploitUses,
-} from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
+import { spendExploitUses } from 'exploits/utils/exploitUtils.js';
 import { SaveActivity } from 'fvtt-types/Activity.js';
 import CPRMacro, {
   MidiMacroFunction,
@@ -112,7 +110,7 @@ const during = async (
     utils: { activityUtils, genericUtils, itemUtils, workflowUtils },
   } = chrisPremades;
   if (!workflow.token) return 0;
-  const exploitDie = getAltMartialExploitDie(item);
+  const exploitDie = getAlternateMartialExploitDie(item.actor!);
   if (!exploitDie) return 0;
   const activity = activityUtils.getActivityByIdentifier(item, 'save', {
     strict: true,
@@ -125,7 +123,7 @@ const during = async (
   const exploitDice = usedLegendarySylvanArchery ? 3 : 2;
   if (saveActivityData.damage.parts.length) {
     saveActivityData.damage.parts[0].custom.enabled = true;
-    saveActivityData.damage.parts[0].custom.formula = `${exploitDice}d${exploitDie.faces}`;
+    saveActivityData.damage.parts[0].custom.formula = `${exploitDice}d${exploitDie}`;
   }
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
@@ -149,7 +147,7 @@ export const post = async (item: Item<'feat'>, uses: number) => {
   const {
     utils: { genericUtils },
   } = chrisPremades;
-  await spendAlternateMartialExploitUses(uses, item);
+  await spendExploitUses(item, uses);
   await genericUtils.unsetFlag(
     item.actor!,
     'alternate-classes-55e',

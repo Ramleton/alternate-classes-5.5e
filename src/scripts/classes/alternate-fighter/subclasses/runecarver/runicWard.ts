@@ -1,6 +1,6 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { isRuneInvokable, postRune } from './runes/runeUtils.js';
 
 interface RunicWardReq {
@@ -9,7 +9,7 @@ interface RunicWardReq {
 }
 
 export const pre = async (
-  feat: Item,
+  feat: Item<'feat'>,
   workflow: Workflow,
 ): Promise<RunicWardReq> => {
   const {
@@ -25,7 +25,7 @@ export const pre = async (
   const {
     utils: { dialogUtils },
   } = chrisPremades;
-  if (!feat.system.uses.value) {
+  if (!feat.system.uses?.value) {
     const {
       utils: { itemUtils },
     } = chrisPremades;
@@ -46,7 +46,6 @@ export const pre = async (
       .map((rune) => rune as Item<'feat'>);
     const rune = (await dialogUtils.selectDocumentDialog(
       feat.name,
-      // eslint-disable-next-line @stylistic/max-len
       'A creature was attacked within range of your Runic Ward, but you are out of uses. Invoke a rune to ward the target?',
       usableRunes,
     )) as Item<'feat'> | undefined;
@@ -54,7 +53,7 @@ export const pre = async (
   }
   const res = await dialogUtils.confirm(
     feat.name,
-    // eslint-disable-next-line @stylistic/max-len
+
     'A creature was attacked within range of your Runic Ward. Ward the target of the attack?',
   );
   return { useItem: res };
@@ -64,19 +63,20 @@ const during = async (
   feat: Item<'feat'>,
   workflow: Workflow,
 ): Promise<number> => {
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return 0;
   const target = workflow.hitTargets.first()! as Token;
   const acBonus = feat.actor!.system.abilities.con.mod;
   const targetAC = target.actor!.system.attributes.ac.value + acBonus;
-  // eslint-disable-next-line @stylistic/max-len
+
   const successMessage = `<strong>${feat.name}</strong> — AC increased to <strong>${targetAC}</strong> (from ${feat.actor!.system.attributes.ac.value}) — Attack misses (${workflow.attackTotal} vs ${targetAC})`;
-  // eslint-disable-next-line @stylistic/max-len
+
   const failureMessage = `<strong>${feat.name}</strong> — Attack still hits (${workflow.attackTotal} vs ${targetAC})`;
 
   if (workflow.attackTotal < targetAC) workflow.aborted = true;
   await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ actor: feat.actor }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    speaker: ChatMessage.getSpeaker({ actor: feat.actor as any }),
     content: workflow.attackTotal < targetAC ? successMessage : failureMessage,
   });
   return 1;

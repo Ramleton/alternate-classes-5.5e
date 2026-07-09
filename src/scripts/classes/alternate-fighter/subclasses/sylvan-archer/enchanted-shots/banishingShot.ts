@@ -1,5 +1,5 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { SaveActivity } from 'fvtt-types/Activity.js';
 import { post, pre } from '../enchantedShotSave.js';
 
@@ -16,7 +16,7 @@ const during = async (
       workflowUtils,
     },
   } = chrisPremades;
-  const exploitDie = getAltMartialExploitDie(item);
+  const exploitDie = getAlternateMartialExploitDie(item.actor!);
   if (!exploitDie) return 0;
   const activity = activityUtils.getActivityByIdentifier(item, 'save', {
     strict: true,

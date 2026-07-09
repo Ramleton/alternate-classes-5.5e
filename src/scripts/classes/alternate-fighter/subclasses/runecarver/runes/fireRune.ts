@@ -1,7 +1,7 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import { runActivity } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { generateOverTimeEffectChange } from '../../../../../automation/effectUtils.js';
 import { isRuneInvokable, postRune as post } from './runeUtils.js';
 
@@ -20,12 +20,12 @@ const pre = async (feat: Item<'feat'>, workflow: Workflow) => {
   );
 };
 const during = async (feat: Item<'feat'>, workflow: Workflow) => {
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return false;
   const target = workflow.hitTargets.first()! as Token;
   const invokeWorkflow = await runActivity(feat, 'invoke', [target]);
   if (!invokeWorkflow?.failedSaves?.size) return true;
-  const dmgFormula = `2d${exploitDie.faces}`;
+  const dmgFormula = `2d${exploitDie}`;
   const {
     utils: { effectUtils, genericUtils },
   } = chrisPremades;

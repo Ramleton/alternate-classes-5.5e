@@ -1,11 +1,11 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 
 const workflow: MidiMacroFunction = async ({
   trigger: { entity: item, token },
 }) => {
   const feat = item as Item<'feat'>;
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return false;
   const {
     utils: {
@@ -53,7 +53,7 @@ const workflow: MidiMacroFunction = async ({
       await workflowUtils.syntheticActivityRoll(invokeActivity, [token]);
     }
   }
-  const formula = `1d${exploitDie.faces}`;
+  const formula = `1d${exploitDie}`;
   const newSize = legendaryRuneLord ? 'huge' : 'lg';
   const runicMightEffectData = {
     name: 'Runic Might',
@@ -62,7 +62,6 @@ const workflow: MidiMacroFunction = async ({
     duration: { seconds: 60 },
     flags: {
       dae: {
-        // eslint-disable-next-line @stylistic/max-len
         enableCondition:
           "!effects.some(e => e.name.toLowerCase() === 'incapacitated')",
         stackable: 'noneName',

@@ -1,12 +1,12 @@
 import CPRMacro, { D20Roll, MacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 
 const skillBonus: MacroFunction = async ({
   trigger: { entity: item, roll, skillId },
 }): Promise<D20Roll | undefined> => {
   if (!['his', 'ins', 'prf', 'per'].includes(skillId)) return;
   const feat = item as Item<'feat'>;
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
   const {
     utils: { itemUtils, rollUtils },
@@ -31,7 +31,7 @@ const skillBonus: MacroFunction = async ({
   if (skillId === 'ins' && !exiledCourtierInsight) return;
   if (skillId === 'prf' && !exiledCourtierPerformance) return;
   if (skillId === 'per' && !exiledCourtierPersuasion) return;
-  return await rollUtils.addToRoll(roll, `1d${exploitDie.faces}`);
+  return await rollUtils.addToRoll(roll, `1d${exploitDie}`);
 };
 const macro: CPRMacro = {
   identifier: 'ac55eLordlyBearing',

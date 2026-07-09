@@ -3,7 +3,7 @@ import CPRMacro, {
   MacroFunction,
   MidiMacroFunction,
 } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { HealActivity } from 'fvtt-types/Activity.js';
 
 const turnEnd: MacroFunction = async ({
@@ -60,12 +60,12 @@ const targetApplyDamage: MacroFunction = async ({ trigger, ditem }) => {
   );
   if (!originItem) return;
   const feat = originItem as Item<'feat'>;
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
   const healActivityData = (await getActivityData(feat, 'heal')) as
     HealActivity | undefined;
   if (!healActivityData) return;
-  healActivityData.healing.custom.formula = `2d${exploitDie.faces}`;
+  healActivityData.healing.custom.formula = `2d${exploitDie}`;
   await workflowUtils.syntheticActivityDataRoll(
     healActivityData,
     originItem,

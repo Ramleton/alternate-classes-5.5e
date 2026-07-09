@@ -1,6 +1,6 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { EffectChange } from '../../../../../../types/effects.js';
 import { postRune, preRune } from './runeUtils.js';
 
@@ -15,9 +15,9 @@ const during = async (
   feat: Item<'feat'>,
   workflow: Workflow,
 ): Promise<boolean> => {
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return false;
-  const bonusFormula = `1d${exploitDie.faces}`;
+  const bonusFormula = `1d${exploitDie}`;
   const {
     utils: { effectUtils, genericUtils },
   } = chrisPremades;

@@ -1,6 +1,6 @@
 import { runActivity } from 'automation/utils.js';
 import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { generateOverTimeEffectChange } from '../../../../../automation/effectUtils.js';
 import { isRuneInvokable, postRune } from './runeUtils.js';
 
@@ -13,13 +13,12 @@ const pre = async (feat: Item<'feat'>, target: Token | undefined) => {
   } = chrisPremades;
   return await dialogUtils.confirm(
     feat.name,
-    // eslint-disable-next-line @stylistic/max-len
     `${target.actor!.name} ended their turn within 30 feet of you, invoke Stone Rune?`,
     { userId: socketUtils.firstOwner(feat.actor, true) },
   );
 };
 const during = async (feat: Item<'feat'>, target: Token): Promise<boolean> => {
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return false;
   const invokeWorkflow = await runActivity(feat, 'invoke', [target]);
   if (!invokeWorkflow?.failedSaves?.size) return true;

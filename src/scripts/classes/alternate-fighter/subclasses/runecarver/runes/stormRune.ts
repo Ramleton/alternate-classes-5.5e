@@ -1,9 +1,9 @@
 import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { postRune as post, preRune as pre } from './runeUtils.js';
 
 const during = async (feat: Item<'feat'>): Promise<boolean> => {
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return false;
   const {
     utils: { effectUtils, genericUtils },

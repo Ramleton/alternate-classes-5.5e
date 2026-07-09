@@ -1,6 +1,6 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { getAltMartialExploitDie } from 'exploits/utils.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import {
   getExploitUsesRemaining,
   spendExploitUses,
@@ -54,12 +54,12 @@ const during = async (
   target: Token,
   workflow: Workflow,
 ) => {
-  const exploitDie = getAltMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return false;
   const {
     utils: { genericUtils, rollUtils },
   } = chrisPremades;
-  const res = await rollUtils.rollDice(`1d${exploitDie.faces}`, {
+  const res = await rollUtils.rollDice(`1d${exploitDie}`, {
     chatMessage: true,
   });
   await genericUtils.sleep(1500);
