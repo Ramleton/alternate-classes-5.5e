@@ -145,11 +145,11 @@ jobs:
             console.log("README.md updated successfully via Node.js fetch engine.");
           }
           run();
+          '
 
           echo "--- FINAL README.MD CONTENT ---"
           cat README.md
           echo "--- END FINAL README.MD CONTENT ---"
-          '
 
       - name: Validate README Formatting
         run: |
