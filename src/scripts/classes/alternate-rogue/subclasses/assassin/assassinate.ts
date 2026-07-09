@@ -5,9 +5,9 @@ import CPRMacro, {
 } from 'chris-premades/macro.js';
 import {
   getAltMartialExploitDie,
-  getAltMartialExploitsRemaining,
   spendAlternateMartialExploitUses,
 } from 'exploits/utils.js';
+import { getExploitUsesRemaining } from 'exploits/utils/exploitUtils.js';
 
 const autoCritical: MidiMacroFunction = async ({
   trigger: { entity },
@@ -57,7 +57,7 @@ const autoCritical: MidiMacroFunction = async ({
 
 const prompt: MacroFunction = async ({ trigger: { entity, token } }) => {
   const feat = entity as Item<'feat'>;
-  if (!getAltMartialExploitsRemaining(feat)) return;
+  if (!getExploitUsesRemaining(feat)) return;
   const {
     utils: { genericUtils, dialogUtils, socketUtils, rollUtils },
   } = chrisPremades;
