@@ -12,14 +12,14 @@ This module adds comprehensive D&D 5e alternate class and subclass options with 
 
 | Class         | Automation Status |
 | :------------ | :---------------: |
-| **Barbarian** |  🔄 Implemented   |
+| **Barbarian** |  ✅ Implemented   |
 | **Bard**      |    ❌ Upcoming    |
 | **Cleric**    |    ❌ Upcoming    |
 | **Druid**     |    ❌ Upcoming    |
-| **Fighter**   |  🔄 Implemented   |
-| **Monk**      |  🔄 Implemented   |
-| **Paladin**   |  🔄 Implemented   |
-| **Ranger**    |  🔄 Implemented   |
+| **Fighter**   |  ✅ Implemented   |
+| **Monk**      |  ✅ Implemented   |
+| **Paladin**   |  ✅ Implemented   |
+| **Ranger**    |  ✅ Implemented   |
 | **Rogue**     |  ✅ Implemented   |
 | **Sorcerer**  |    ❌ Upcoming    |
 | **Warlock**   |    ❌ Upcoming    |
