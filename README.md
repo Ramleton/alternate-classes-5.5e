@@ -20,7 +20,7 @@ This module adds comprehensive D&D 5e alternate class and subclass options with 
 | **Monk**      |  🔄 Implemented   |
 | **Paladin**   |  🔄 Implemented   |
 | **Ranger**    |  🔄 Implemented   |
-| **Rogue**     |  🛠️ In Progress   |
+| **Rogue**     |  ✅ Implemented   |
 | **Sorcerer**  |    ❌ Upcoming    |
 | **Warlock**   |    ❌ Upcoming    |
 | **Wizard**    |    ❌ Upcoming    |
@@ -30,7 +30,7 @@ This module adds comprehensive D&D 5e alternate class and subclass options with 
 1. In FoundryVTT, go to **Add-on Modules** → **Install Module**
 2. Paste the module manifest URL:
    ```
-   https://github.com/Ramleton/alternate-classes-5.5e/releases/download/latest/module.json
+   https://github.com/Ramleton/alternate-classes-5.5e/releases/download/v1.5.2/module.json
    ```
 3. Click **Install** and activate in your world
 
@@ -75,6 +75,14 @@ module.json           # Module initialization and hooks
 
 ## Changelog
 
+### Version 1.5.2 (July 2026)
+
+-   **New Class:** Fully implemented and automated the Alternate Rogue class, including:
+    -   Base class features
+    -   Subclass features
+    -   Devious Exploit mechanics
+-   Internal: Implemented AI-driven README updater for automated release notes generation.
+
 ### Version 1.5.0 (June 2026)
 
 - Initial tracking and implementation setup for alternate classes.
@@ -98,5 +106,5 @@ This module is heavily inspired by the exceptional work of **Laserllama**. Their
 
 ---
 
-**Current Module Version:** 1.5.0  
-**Latest Release Date:** June 2026
+**Current Module Version:** v1.5.2  
+**Latest Release Date:** July 2026
