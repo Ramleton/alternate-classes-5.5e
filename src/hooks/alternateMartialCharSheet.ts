@@ -6,9 +6,44 @@ import {
 } from 'exploits/utils.js';
 
 interface ExploitTabAlternateMartialClass {
+  id: string;
+  uuid: string;
+  subclassUuid?: string;
   name: string;
+  img: string;
   level: number;
+  saveDC: string;
+  hasSubclass: boolean;
+  subclassName?: string;
+  subclassImg?: string;
 }
+
+interface ExploitSaveDCInfo {
+  type: 'devious' | 'martial' | 'savage';
+  ability:
+    | 'dexterity'
+    | 'strength'
+    | 'constitution'
+    | 'intelligence'
+    | 'wisdom'
+    | 'charisma';
+}
+
+const exploitSaveDCRecord: Record<
+  string,
+  [ExploitSaveDCInfo, ExploitSaveDCInfo]
+> = {
+  'alternate-rogue': [
+    {
+      type: 'devious',
+      ability: 'dexterity',
+    },
+    {
+      type: 'devious',
+      ability: 'strength',
+    },
+  ],
+};
 
 Hooks.once('init', () => {
   const SheetClass = dnd5e.applications.actor.CharacterActorSheet;
@@ -30,6 +65,40 @@ Hooks.once('init', () => {
     '[Alternate Classes 5.5e]: Added Alternate Martial Exploits Tab to Character Sheets',
   );
 });
+
+const getSaveDC = (actor: Actor5e, altClass: string): string => {
+  const classRecord = exploitSaveDCRecord[altClass];
+  if (!classRecord) return '—';
+  const saveDCOptions = exploitSaveDCRecord[altClass].map((sdc) => ({
+    key: `${sdc.type}-exploits-${sdc.ability}-save`,
+    ability: sdc.ability,
+  }));
+  const activeOption = saveDCOptions.find((sdc) => actor.system.scale[sdc.key]);
+  if (!activeOption) return '—';
+  let abilityMod = 0;
+  switch (activeOption.ability) {
+    case 'dexterity':
+      abilityMod = actor.system.abilities.dex.mod;
+      break;
+    case 'strength':
+      abilityMod = actor.system.abilities.str.mod;
+      break;
+    case 'constitution':
+      abilityMod = actor.system.abilities.con.mod;
+      break;
+    case 'intelligence':
+      abilityMod = actor.system.abilities.int.mod;
+      break;
+    case 'wisdom':
+      abilityMod = actor.system.abilities.wis.mod;
+      break;
+    case 'charisma':
+      abilityMod = actor.system.abilities.cha.mod;
+      break;
+  }
+  const profBonus = actor.system.attributes.prof ?? 2;
+  return (8 + abilityMod + profBonus).toString();
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
@@ -112,20 +181,39 @@ Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
     if (!(altClass in ALTERNATE_MARTIAL_MULTICLASSING_RECORD)) return acc;
     const altClassRecord = ALTERNATE_MARTIAL_MULTICLASSING_RECORD[altClass];
     if (typeof altClassRecord === 'number') {
+      const classItem = sheet.actor.classes[altClass];
+      const saveDC = getSaveDC(sheet.actor, altClass);
       acc.push({
-        name: sheet.actor.classes[altClass].name,
-        level: sheet.actor.classes[altClass].system.levels,
+        id: altClass,
+        uuid: classItem.uuid,
+        name: classItem.name,
+        img: classItem.img,
+        level: classItem.system.levels,
+        saveDC,
+        hasSubclass: false,
       });
     } else {
       const classItem = sheet.actor.classes[altClass];
-      const altSubclassIdentifier = (
-        classItem as { subclass?: { identifier: string } }
-      ).subclass?.identifier;
+      const altSubclass = (
+        classItem as {
+          subclass: { name: string; img?: string; identifier: string };
+        }
+      ).subclass;
+      const altSubclassIdentifier = altSubclass.identifier;
       if (!altSubclassIdentifier) return acc;
       if (!(altSubclassIdentifier in altClassRecord)) return acc;
+      const saveDC = getSaveDC(sheet.actor, altSubclassIdentifier);
       acc.push({
+        id: altClass,
+        uuid: classItem.uuid,
+        subclassUuid: sheet.actor.classes[altClass].subclass.uuid,
         name: `${classItem.name} (${sheet.actor.classes[altClass].subclass.name})`,
+        img: sheet.actor.classes[altClass].img,
         level: sheet.actor.classes[altClass].system.levels,
+        saveDC,
+        hasSubclass: true,
+        subclassName: altSubclass.name,
+        subclassImg: altSubclass.img || 'icons/svg/mystery-man.svg',
       });
     }
     return acc;
