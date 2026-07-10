@@ -1,34 +1,21 @@
 import { HandleEnchantedShot } from '../handle.js';
+import { createEnchantedShotTargetEffectData } from './targetEffectDataFactory.js';
 
 const handleUmbralShot: HandleEnchantedShot = async ({
   item,
   saveWorkflow,
 }) => {
-  const { utils: { effectUtils } } = chrisPremades;
-  const targetEffectData = {
-    name: `${item.name}: Blinded`,
-    icon: item.img,
-    origin: item.uuid,
-    duration: { seconds: 60 },
-    flags: {
-      'dae': {
-        stackable: 'noneName',
-      },
-      'chris-premades': {
-        info: {
-          identifier: 'ac55eUmbralShotEffect',
-        },
-      },
-    },
+  const {
+    utils: { effectUtils },
+  } = chrisPremades;
+  const targetEffectData = createEnchantedShotTargetEffectData({
+    item,
+    nameSuffix: 'Blinded',
+    identifierSuffix: 'UmbralShotEffect',
+    saveDC: saveWorkflow.saveDC,
+    saveAbility: 'int',
     statuses: ['blinded'],
-    changes: [{
-      key: 'flags.midi-qol.OverTime',
-      mode: 0,
-      value: `turn=end,allowIncapacitated=true,saveAbility=int,\
-        saveDC=${saveWorkflow.saveDC},saveDamage=nodamage,saveRemove=true,\
-        saveMagic=true,rollMode=publicroll,`,
-    }],
-  };
+  });
   for (const target of saveWorkflow.failedSaves) {
     if (!target.actor) continue;
     await effectUtils.createEffect(target.actor, targetEffectData, {

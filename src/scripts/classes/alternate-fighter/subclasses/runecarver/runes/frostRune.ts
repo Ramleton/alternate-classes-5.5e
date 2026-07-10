@@ -8,31 +8,33 @@ const pre = async (
   feat: Item<'feat'>,
   workflow: Workflow,
 ): Promise<boolean> => {
-  if (!workflow.targets.size)
-    return false;
+  if (!workflow.targets.size) return false;
   return await preRune(feat);
 };
 const during = async (
   feat: Item<'feat'>,
   workflow: Workflow,
 ): Promise<boolean> => {
-  const exploitDie = getAlternateMartialExploitDie(feat);
-  if (!exploitDie)
-    return false;
-  const bonusFormula = `1d${exploitDie.faces}`;
-  const { utils: { effectUtils, genericUtils } } = chrisPremades;
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
+  if (!exploitDie) return false;
+  const bonusFormula = `1d${exploitDie}`;
+  const {
+    utils: { effectUtils, genericUtils },
+  } = chrisPremades;
   await genericUtils.setFlag(
     feat.actor!,
     'alternate-classes-55e',
     'macros.runeCarver.frost',
     1,
   );
-  const changes: EffectChange[] = [{
-    key: 'system.attributes.movement.all',
-    mode: 0,
-    value: '+10',
-    priority: 20,
-  }];
+  const changes: EffectChange[] = [
+    {
+      key: 'system.attributes.movement.all',
+      mode: 0,
+      value: '+10',
+      priority: 20,
+    },
+  ];
   for (const ability of ['str', 'con']) {
     changes.push({
       key: `system.abilities.${ability}.bonuses.check`,
@@ -65,7 +67,9 @@ const during = async (
 };
 const post = async (feat: Item<'feat'>) => {
   await postRune(feat);
-  const { utils: { genericUtils } } = chrisPremades;
+  const {
+    utils: { genericUtils },
+  } = chrisPremades;
   await genericUtils.unsetFlag(
     feat.actor!,
     'alternate-classes-55e',
@@ -73,15 +77,14 @@ const post = async (feat: Item<'feat'>) => {
   );
 };
 const workflow: MidiMacroFunction = async ({
-  trigger: { entity: item }, workflow },
-) => {
+  trigger: { entity: item },
+  workflow,
+}) => {
   const feat = item as Item<'feat'>;
   const res1 = await pre(feat, workflow);
-  if (!res1)
-    return;
+  if (!res1) return;
   const res2 = await during(feat, workflow);
-  if (!res2)
-    return;
+  if (!res2) return;
   await post(feat);
 };
 const macro: CPRMacro = {

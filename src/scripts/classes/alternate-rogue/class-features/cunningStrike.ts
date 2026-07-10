@@ -15,7 +15,7 @@ import {
 import CPRMacro from 'chris-premades/macro.js';
 import { genericARCWorkflow } from 'exploits/handling/genericARCExploit.js';
 import { useWorkflow } from 'exploits/handling/genericUseExploit.js';
-import { getAltMartialExploitsRemaining } from 'exploits/utils.js';
+import { getExploitUsesRemaining } from 'exploits/utils/exploitUtils.js';
 import { handleMindRend } from '../subclasses/psiknife/empoweredBlades.js';
 import { handlePanache } from '../subclasses/swashbuckler/panache.js';
 import {
@@ -83,7 +83,7 @@ const SUBCLASS_FEATURE_CUNNING_STRIKES: SubclassFeatureCunningStrikeData[] = [
     identifier: 'ac55eSupremeSneak',
     preCheck: () => Promise.resolve(true),
     handler: async () => {
-      /* empty */
+      /* This feature is passive or handled by other macros/effects. */
     },
     sneakAttackDiceCost: 1,
   },
@@ -124,7 +124,7 @@ const checkExploitUsable = (
   exploitHandler: ExploitPrerequisiteCheck,
 ): boolean => {
   // ? Remove exploits that cannot be used by the actor
-  if (!getAltMartialExploitsRemaining(feat)) return false;
+  if (!getExploitUsesRemaining(feat)) return false;
   return exploitHandler({ feat, token, workflow });
 };
 

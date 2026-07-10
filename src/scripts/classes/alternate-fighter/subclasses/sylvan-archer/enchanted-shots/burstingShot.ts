@@ -2,27 +2,23 @@ import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { SaveActivity } from 'fvtt-types/Activity.js';
-import { pre as enchantedShotPre, getTokensInCircularTemplate, post } from '../enchantedShotSave.js';
+import {
+  pre as enchantedShotPre,
+  getTokensInCircularTemplate,
+  post,
+} from '../enchantedShotSave.js';
 
 const pre = async (
   item: Item<'feat'>,
   workflow: Workflow,
 ): Promise<Token[]> => {
-  if (item
-    .actor!
-    .flags['alternate-classes-55e']
-    ?.macros
-    ?.enchantedShot
-    ?.legendarySylvanArcher
+  if (
+    item.actor!.flags['alternate-classes-55e']?.macros?.enchantedShot
+      ?.legendarySylvanArcher
   )
     return enchantedShotPre(item, workflow);
   const target = workflow.hitTargets.first() as Token;
-  const tokens = await getTokensInCircularTemplate(
-    item,
-    workflow,
-    target,
-    2,
-  );
+  const tokens = await getTokensInCircularTemplate(item, workflow, target, 2);
   return Array.from(new Set<Token>([target, ...tokens]));
 };
 
@@ -30,39 +26,28 @@ const during = async (
   item: Item<'feat'>,
   targets: Token[],
 ): Promise<number> => {
-  const { utils: {
-    activityUtils,
-    genericUtils,
-    itemUtils,
-    workflowUtils,
-  } }
-    = chrisPremades;
-  const exploitDie = getAlternateMartialExploitDie(item);
+  const {
+    utils: { activityUtils, genericUtils, itemUtils, workflowUtils },
+  } = chrisPremades;
+  const exploitDie = getAlternateMartialExploitDie(item.actor!);
   if (!exploitDie) return 0;
-  const activity = activityUtils.getActivityByIdentifier(
-    item,
-    'save',
-    { strict: true },
-  );
+  const activity = activityUtils.getActivityByIdentifier(item, 'save', {
+    strict: true,
+  });
   if (!activity) return 0;
   const saveActivityData: SaveActivity = genericUtils.duplicate(activity);
-  const usedLegendarySylvanArchery = item
-    .actor!
-    .flags['alternate-classes-55e']
-    ?.macros
-    ?.enchantedShot
-    ?.legendarySylvanArcher;
+  const usedLegendarySylvanArchery =
+    item.actor!.flags['alternate-classes-55e']?.macros?.enchantedShot
+      ?.legendarySylvanArcher;
   const exploitDice = usedLegendarySylvanArchery ? 3 : 2;
   saveActivityData.damage.parts[0].custom.enabled = true;
-  saveActivityData.damage.parts[0].custom.formula
-    = `${exploitDice}d${exploitDie.faces}`;
+  saveActivityData.damage.parts[0].custom.formula = `${exploitDice}d${exploitDie}`;
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
     item.actor!,
     'ac55eSylvanShot',
   );
-  if (sylvanShot)
-    saveActivityData.damage.onSave = 'half';
+  if (sylvanShot) saveActivityData.damage.onSave = 'half';
   await workflowUtils.syntheticActivityDataRoll(
     saveActivityData,
     item,

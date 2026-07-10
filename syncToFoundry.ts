@@ -2,6 +2,7 @@ import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
 import { build, InlineConfig, ViteDevServer } from 'vite';
+
 export const syncToFoundry = (
   foundryPath: string,
   viteConfig?: InlineConfig,
@@ -19,32 +20,52 @@ export const syncToFoundry = (
     try {
       console.log('[foundry-sync] Script change detected, rebuilding...');
       await build({ ...viteConfig, logLevel: 'silent' });
-      // Copy the rebuilt script to Foundry
+
+      // Copy script.js
       const scriptSrc = path.join('dist', 'script.js');
       if (foundryPath && fs.existsSync(scriptSrc)) {
         await fsp.copyFile(scriptSrc, path.join(foundryPath, 'script.js'));
         console.log('[foundry-sync] script.js rebuilt and synced.');
       }
+
+      // Copy any rebuilt hook files
+      if (foundryPath && fs.existsSync(path.join('dist', 'hooks'))) {
+        const hookFiles = await fsp.readdir(path.join('dist', 'hooks'));
+        for (const file of hookFiles) {
+          if (!file.endsWith('.js')) continue;
+          await fsp.copyFile(
+            path.join('dist', 'hooks', file),
+            path.join(foundryPath, 'hooks', file),
+          );
+        }
+      }
+
+      await syncModuleJson();
     } finally {
       rebuilding = false;
     }
   };
 
-  // Debounce to avoid triggering multiple builds on rapid saves
   let rebuildTimeout: ReturnType<typeof setTimeout> | null = null;
   const debouncedRebuild = () => {
     if (rebuildTimeout) clearTimeout(rebuildTimeout);
     rebuildTimeout = setTimeout(rebuildScripts, 300);
   };
 
-  // Helper function to build and sync module.json
+  const getHookModules = async (): Promise<string[]> => {
+    const hooksOutDir = path.join(foundryPath, 'hooks');
+    if (!fs.existsSync(hooksOutDir)) return [];
+    return (await fsp.readdir(hooksOutDir))
+      .filter((f) => f.endsWith('.js'))
+      .map((f) => `hooks/${f}`);
+  };
+
   const syncModuleJson = async () => {
     const moduleJsonPath = path.resolve('module.json');
     if (!fs.existsSync(moduleJsonPath)) return;
 
     const moduleJson = JSON.parse(await fsp.readFile(moduleJsonPath, 'utf-8'));
 
-    // Re-discover all copied CSS files and inject them dynamically
     let styleFiles: string[] = [];
     if (fs.existsSync('src/styles')) {
       styleFiles = (await fsp.readdir('src/styles'))
@@ -53,13 +74,11 @@ export const syncToFoundry = (
     }
     moduleJson.styles = styleFiles;
 
+    const hookModules = await getHookModules();
+    moduleJson.esmodules = ['script.js', ...hookModules];
+
     const moduleJsonOut = JSON.stringify(moduleJson, null, 2);
 
-    // Write to dist/
-    await fsp.mkdir('dist', { recursive: true });
-    await fsp.writeFile(path.join('dist', 'module.json'), moduleJsonOut);
-
-    // Write to local Foundry folder if path is set
     if (foundryPath) {
       await fsp.writeFile(path.join(foundryPath, 'module.json'), moduleJsonOut);
     }
@@ -85,8 +104,6 @@ export const syncToFoundry = (
         await fsp.copyFile(filePath, foundryTarget);
       }
       console.log(`[foundry-sync] ${relative} → ${dest}`);
-
-      // If a new CSS file is added or removed, we need to rebuild module.json's styles array
       if (ext === '.css') {
         await syncModuleJson();
       }
@@ -98,14 +115,32 @@ export const syncToFoundry = (
     configureServer(server: ViteDevServer) {
       server.watcher.add(path.resolve('module.json'));
       server.watcher.add(path.resolve('src/scripts'));
+      server.watcher.add(path.resolve('src/hooks'));
+      server.watcher.add(path.resolve('src/script.ts'));
+
+      const isScriptChange = (filePath: string) => {
+        const normalized = path.resolve(filePath).toLowerCase();
+        return (
+          normalized.includes(path.join('src', 'scripts').toLowerCase()) ||
+          normalized.includes(path.join('src', 'hooks').toLowerCase()) ||
+          normalized === path.resolve('src/script.ts').toLowerCase()
+        );
+      };
+
       server.watcher.on('change', (filePath) => {
-        if (filePath.includes(path.join('src', 'scripts'))) {
+        if (isScriptChange(filePath)) {
           debouncedRebuild();
         } else {
           copy(filePath);
         }
       });
-      server.watcher.on('add', copy);
+      server.watcher.on('add', (filePath) => {
+        if (isScriptChange(filePath)) {
+          debouncedRebuild();
+        } else {
+          copy(filePath);
+        }
+      });
       server.watcher.on('unlink', copy);
     },
     async closeBundle() {
@@ -115,11 +150,9 @@ export const syncToFoundry = (
         for (const file of files) {
           if (!String(file).endsWith(ext)) continue;
           const srcFile = path.join(src, String(file));
-          // Copy into dist/
           const distTarget = path.join('dist', dest, String(file));
           await fsp.mkdir(path.dirname(distTarget), { recursive: true });
           await fsp.copyFile(srcFile, distTarget);
-          // Copy into Foundry module folder if path is set
           if (foundryPath) {
             const foundryTarget = path.join(foundryPath, dest, String(file));
             await fsp.mkdir(path.dirname(foundryTarget), { recursive: true });

@@ -5,18 +5,14 @@ import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { generateOverTimeEffectChange } from '../../../../../automation/effectUtils.js';
 import { isRuneInvokable, postRune as post } from './runeUtils.js';
 
-const pre = async (
-  feat: Item<'feat'>,
-  workflow: Workflow,
-) => {
-  const { utils: { dialogUtils, socketUtils } } = chrisPremades;
-  if (workflow.activity?.getActionType() !== 'mwak')
-    return false;
-  if (!workflow.hitTargets.size)
-    return false;
+const pre = async (feat: Item<'feat'>, workflow: Workflow) => {
+  const {
+    utils: { dialogUtils, socketUtils },
+  } = chrisPremades;
+  if (workflow.activity?.getActionType() !== 'mwak') return false;
+  if (!workflow.hitTargets.size) return false;
   const res = isRuneInvokable(feat);
-  if (!res.usable)
-    return false;
+  if (!res.usable) return false;
   return await dialogUtils.confirm(
     feat.name,
     'You hit a creature with a melee weapon attack. Invoke Fire Rune?',
@@ -24,41 +20,34 @@ const pre = async (
   );
 };
 const during = async (feat: Item<'feat'>, workflow: Workflow) => {
-  const exploitDie = getAlternateMartialExploitDie(feat);
-  if (!exploitDie)
-    return false;
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
+  if (!exploitDie) return false;
   const target = workflow.hitTargets.first()! as Token;
-  const invokeWorkflow = await runActivity(
-    feat,
-    'invoke',
-    [target],
-  );
-  if (!invokeWorkflow?.failedSaves?.size)
-    return true;
-  const dmgFormula = `2d${exploitDie.faces}`;
-  const { utils: { effectUtils, genericUtils } } = chrisPremades;
+  const invokeWorkflow = await runActivity(feat, 'invoke', [target]);
+  if (!invokeWorkflow?.failedSaves?.size) return true;
+  const dmgFormula = `2d${exploitDie}`;
+  const {
+    utils: { effectUtils, genericUtils },
+  } = chrisPremades;
   await genericUtils.setFlag(
     feat.actor!,
     'alternate-classes-55e',
     'macros.runeCarver.fire',
     dmgFormula,
   );
-  const overTimeChange = generateOverTimeEffectChange(
-    'Fire Rune: Restrained',
-    {
-      label: 'Fire Rune: Restrained',
-      turn: 'start',
-      saveAbility: 'str',
-      saveDC: invokeWorkflow.saveDC,
-      saveMagic: true,
-      damageRoll: dmgFormula,
-      damageType: 'fire',
-      damageBeforeSave: true,
-      saveCount: '1-',
-      actionSave: 'roll',
-      allowIncapacitated: true,
-    },
-  );
+  const overTimeChange = generateOverTimeEffectChange('Fire Rune: Restrained', {
+    label: 'Fire Rune: Restrained',
+    turn: 'start',
+    saveAbility: 'str',
+    saveDC: invokeWorkflow.saveDC,
+    saveMagic: true,
+    damageRoll: dmgFormula,
+    damageType: 'fire',
+    damageBeforeSave: true,
+    saveCount: '1-',
+    actionSave: 'roll',
+    allowIncapacitated: true,
+  });
   const fireRuneEffect = {
     name: 'Fire Rune: Restrained',
     icon: feat.img,
@@ -73,45 +62,34 @@ const during = async (feat: Item<'feat'>, workflow: Workflow) => {
     statuses: new Set(['restrained']),
     changes: [overTimeChange],
   };
-  await effectUtils.createEffect(
-    target.actor!,
-    fireRuneEffect,
-  );
+  await effectUtils.createEffect(target.actor!, fireRuneEffect);
   return true;
 };
-const workflow: MidiMacroFunction = async (
-  { trigger: { entity: item }, workflow },
-) => {
+const workflow: MidiMacroFunction = async ({
+  trigger: { entity: item },
+  workflow,
+}) => {
   const feat = item as Item<'feat'>;
   const res1 = await pre(feat, workflow);
-  if (!res1)
-    return;
+  if (!res1) return;
   const res2 = await during(feat, workflow);
-  if (!res2)
-    return;
+  if (!res2) return;
   await post(feat);
 };
 
-const fireRuneDamage: MidiMacroFunction = async (
-  { trigger: { entity: item }, workflow },
-) => {
-  if (!workflow.hitTargets.size)
-    return '';
+const fireRuneDamage: MidiMacroFunction = async ({
+  trigger: { entity: item },
+  workflow,
+}) => {
+  if (!workflow.hitTargets.size) return '';
   const feat = item as Item<'feat'>;
-  const formula = feat
-    .actor!
-    .flags['alternate-classes-55e']
-    ?.macros
-    ?.runeCarver
-    ?.fire;
-  if (!formula)
-    return;
-  const { utils: { genericUtils, workflowUtils } } = chrisPremades;
-  await workflowUtils.bonusDamage(
-    workflow,
-    formula,
-    { damageType: 'fire' },
-  );
+  const formula =
+    feat.actor!.flags['alternate-classes-55e']?.macros?.runeCarver?.fire;
+  if (!formula) return;
+  const {
+    utils: { genericUtils, workflowUtils },
+  } = chrisPremades;
+  await workflowUtils.bonusDamage(workflow, formula, { damageType: 'fire' });
   await genericUtils.unsetFlag(
     feat.actor!,
     'alternate-classes-55e',

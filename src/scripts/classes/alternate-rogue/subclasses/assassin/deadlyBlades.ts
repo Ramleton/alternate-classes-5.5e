@@ -25,8 +25,9 @@ const criticalRerollOnes: MidiMacroFunction = async ({
   } = chrisPremades;
   const feat = entity as Item<'feat'>;
   for (const roll of updatedRolls) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    for (const die of roll.dice as any[]) {
+    for (const die of roll.dice as (foundry.dice.terms.DiceTerm & {
+      _total: number;
+    })[]) {
       for (const dieResult of die.results) {
         if (dieResult.result === 1) {
           const newRoll = await rollUtils.rollDice(`1d${die.faces}`, {

@@ -33,9 +33,7 @@ const determineBonus = async (actor: Actor5e) => {
     options,
     { userId: socketUtils.firstOwner(actor, true) },
   );
-  return selection === 'add'
-    ? `1d${exploitDie.faces}`
-    : `-1d${exploitDie.faces}`;
+  return selection === 'add' ? `1d${exploitDie}` : `-1d${exploitDie}`;
 };
 const during = async (actor: Actor5e, roll: D20Roll): Promise<D20Roll> => {
   const formula = await determineBonus(actor);

@@ -8,7 +8,7 @@ const conjurePsiblade: MidiMacroFunction = async ({ trigger: { entity } }) => {
     utils: { compendiumUtils, genericUtils, itemUtils },
   } = chrisPremades;
   const feat = entity as Item<'feat'>;
-  const exploitDie = getAlternateMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
   const previousPsiblade = itemUtils.getItemByIdentifier(
     feat.actor!,
@@ -30,7 +30,7 @@ const conjurePsiblade: MidiMacroFunction = async ({ trigger: { entity } }) => {
     types: new Set(['psychic']),
     custom: {
       enabled: true,
-      formula: `1d${exploitDie.faces}`,
+      formula: `1d${exploitDie}`,
     },
     scaling: {
       number: 1,
