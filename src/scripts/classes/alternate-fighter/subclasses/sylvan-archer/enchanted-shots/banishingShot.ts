@@ -56,9 +56,18 @@ const during = async (
       {
         key: 'flags.midi-qol.OverTime',
         mode: 0,
-        value: `turn=start,allowIncapacitated=true,saveAbility=cha,\
-          saveDC=${saveWorkflow.saveDC},saveDamage=nodamage,saveRemove=true,\
-          saveMagic=true,actionSave=roll,saveCount=1-,rollMode=publicroll,`,
+        value: [
+          'turn=start',
+          'allowIncapacitated=true',
+          'saveAbility=cha',
+          `saveDC=${saveWorkflow.saveDC}`,
+          'saveDamage=nodamage',
+          'saveRemove=true',
+          'saveMagic=true',
+          'actionSave=roll',
+          'saveCount=1-',
+          'rollMode=publicroll',
+        ].join(', '),
       },
       {
         key: 'flags.midi-qol.superSaver.all',
