@@ -83,7 +83,7 @@ const SUBCLASS_FEATURE_CUNNING_STRIKES: SubclassFeatureCunningStrikeData[] = [
     identifier: 'ac55eSupremeSneak',
     preCheck: () => Promise.resolve(true),
     handler: async () => {
-      /* empty */
+      /* This feature is passive or handled by other macros/effects. */
     },
     sneakAttackDiceCost: 1,
   },
