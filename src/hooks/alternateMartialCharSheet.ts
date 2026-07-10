@@ -1,3 +1,4 @@
+import { ALTERNATE_MARTIAL_EXPLOIT_TIERS } from 'exploits/config/exploitConfig.js';
 import {
   ALTERNATE_MARTIAL_MULTICLASSING_RECORD,
   calcAlternateMartialMulticlassLevel,
@@ -85,6 +86,25 @@ const getSaveDC = (actor: Actor5e, altClass: string): string => {
   };
   const profBonus = actor.system.attributes.prof ?? 2;
   return (8 + abilityModifiers[activeOption.ability] + profBonus).toString();
+};
+
+type OrderedNumber = `${number}${'th' | 'st' | 'nd' | 'rd'}`;
+
+const numberToOrdering = (num: number): OrderedNumber => {
+  const strNum = num.toString();
+  if (strNum.endsWith('1')) {
+    if (strNum.endsWith('11')) return `${num}th`;
+    return `${num}st`;
+  }
+  if (num.toString().endsWith('2')) {
+    if (strNum.endsWith('12')) return `${num}th`;
+    return `${num}nd`;
+  }
+  if (num.toString().endsWith('3')) {
+    if (strNum.endsWith('13')) return `${num}th`;
+    return `${num}rd`;
+  }
+  return `${num}th`;
 };
 
 // ? Hooks.on requires Foundry types for hooks, dnd5e hooks are not included
@@ -224,10 +244,9 @@ Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
 
   context.activeClasses = activeClasses;
   context.multiclassLevel = calcAlternateMartialMulticlassLevel(sheet.actor);
-  context.multiclassTable = [
-    { level: '3rd - 4th', die: 'd4', count: 2 },
-    { level: '5th - 10th', die: 'd6', count: 3 },
-    { level: '11th - 16th', die: 'd8', count: 4 },
-    { level: '17th - 20th', die: 'd10', count: 5 },
-  ];
+  context.multiclassTable = ALTERNATE_MARTIAL_EXPLOIT_TIERS.map((tier) => ({
+    level: `${numberToOrdering(tier.minLevel)} - ${numberToOrdering(tier.maxLevel)}`,
+    count: tier.count,
+    die: tier.die,
+  }));
 });
