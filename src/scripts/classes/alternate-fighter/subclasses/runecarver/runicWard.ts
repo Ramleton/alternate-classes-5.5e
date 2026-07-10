@@ -37,13 +37,12 @@ export const pre = async (
       'ac55eStoneRune',
       'ac55eStormRune',
     ];
-    const usableRunes: Item<'feat'>[] = runeIdentifiers
-      .map((identifier) =>
-        itemUtils.getItemByIdentifier(feat.actor!, identifier),
-      )
-      .filter((rune) => !!rune)
-      .filter((rune) => isRuneInvokable(rune as Item<'feat'>).usable)
-      .map((rune) => rune as Item<'feat'>);
+    const usableRunes: Item<'feat'>[] = [];
+    for (const identifier of runeIdentifiers) {
+      const rune = itemUtils.getItemByIdentifier(feat.actor!, identifier) as
+        Item<'feat'> | undefined;
+      if (rune && isRuneInvokable(rune).usable) usableRunes.push(rune);
+    }
     const rune = (await dialogUtils.selectDocumentDialog(
       feat.name,
       'A creature was attacked within range of your Runic Ward, but you are out of uses. Invoke a rune to ward the target?',
