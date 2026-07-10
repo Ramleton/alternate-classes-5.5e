@@ -75,29 +75,16 @@ const getSaveDC = (actor: Actor5e, altClass: string): string => {
   }));
   const activeOption = saveDCOptions.find((sdc) => actor.system.scale[sdc.key]);
   if (!activeOption) return '—';
-  let abilityMod = 0;
-  switch (activeOption.ability) {
-    case 'dexterity':
-      abilityMod = actor.system.abilities.dex.mod;
-      break;
-    case 'strength':
-      abilityMod = actor.system.abilities.str.mod;
-      break;
-    case 'constitution':
-      abilityMod = actor.system.abilities.con.mod;
-      break;
-    case 'intelligence':
-      abilityMod = actor.system.abilities.int.mod;
-      break;
-    case 'wisdom':
-      abilityMod = actor.system.abilities.wis.mod;
-      break;
-    case 'charisma':
-      abilityMod = actor.system.abilities.cha.mod;
-      break;
-  }
+  const abilityModifiers: Record<ExploitSaveDCInfo['ability'], number> = {
+    dexterity: actor.system.abilities.dex.mod,
+    strength: actor.system.abilities.str.mod,
+    constitution: actor.system.abilities.con.mod,
+    intelligence: actor.system.abilities.int.mod,
+    wisdom: actor.system.abilities.wis.mod,
+    charisma: actor.system.abilities.cha.mod,
+  };
   const profBonus = actor.system.attributes.prof ?? 2;
-  return (8 + abilityMod + profBonus).toString();
+  return (8 + abilityModifiers[activeOption.ability] + profBonus).toString();
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
