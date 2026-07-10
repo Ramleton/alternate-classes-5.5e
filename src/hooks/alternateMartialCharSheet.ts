@@ -15,6 +15,7 @@ Hooks.once('init', () => {
 
   SheetClass.TABS.push({
     tab: 'exploits',
+    group: 'primary', // CRITICAL: This must match the sheet's primary tab group
     label: 'Exploits',
     icon: 'fas fa-sword',
   });
@@ -25,6 +26,23 @@ Hooks.once('init', () => {
     container: { id: 'tabs' },
     scrollable: ['.inventory-list'],
   };
+
+  const originalOnRender = SheetClass.prototype._onRender;
+  SheetClass.prototype._onRender = function (context, options) {
+    originalOnRender.call(this, context, options);
+
+    // Check if 'exploits' is currently tracked as the active tab in this sheet instance's memory
+    if (this.tabGroups?.primary === 'exploits') {
+      // Find your tab element inside the newly rendered DOM container
+      const exploitsTabEl = this.element.querySelector(
+        '.tab[data-tab="exploits"]',
+      );
+      if (exploitsTabEl && !exploitsTabEl.classList.contains('active')) {
+        exploitsTabEl.classList.add('active');
+      }
+    }
+  };
+
   console.log(
     '[Alternate Classes 5.5e]: Added Alternate Martial Exploits Tab to Character Sheets',
   );
@@ -34,19 +52,22 @@ Hooks.once('init', () => {
 Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
   if (partId !== 'exploits') return;
   if (sheet.actor.type !== 'character') return;
+  const Inventory = customElements.get(
+    sheet.options.elements.inventory,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) as any;
+  if (!Inventory) return;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const Inventory = customElements.get(sheet.options.elements.inventory) as any;
-
-  if (!Inventory) return;
+  const exploitItems = (context.items as Item[]).filter((i: any) =>
+    isAlternateMartialExploit(i),
+  ) as Item<'feat'>[];
 
   const columns = Inventory.mapColumns([
     { id: 'uses', order: 200 },
     'recovery',
     'controls',
   ]);
-
-  const exploits = sheet.actor.items.filter(isAlternateMartialExploit);
 
   const sections: {
     columns: unknown[];
@@ -56,7 +77,7 @@ Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
   }[] = [];
 
   for (let degree = 1; degree <= 5; degree++) {
-    const degreeExploits = exploits.filter(
+    const degreeExploits = exploitItems.filter(
       (i) => getExploitDegree(i) === degree,
     );
 
@@ -71,7 +92,10 @@ Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
     }
   }
 
-  context.sections = Inventory.prepareSections(sections);
+  const preparedSections =
+    sections.length > 0 ? Inventory.prepareSections(sections) : [];
+
+  context.sections = preparedSections;
 
   context.listControls = {
     label: 'Search Exploits',
@@ -132,4 +156,6 @@ Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
     { level: '11th - 16th', die: 'd8', count: 4 },
     { level: '17th - 20th', die: 'd10', count: 5 },
   ];
+  // const tab = sheet.element.querySelector('[data-tab="exploits"]');
+  // console.log(tab?.className);
 });
