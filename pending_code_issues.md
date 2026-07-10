@@ -138,3 +138,19 @@ interface ExploitSetMinRollFactoryArgs {
   // ...other properties
 }
 ```
+
+---
+
+- File: src/scripts/classes/alternate-fighter/subclasses/runecarver/runicWard.ts
+- Description: The iteration and filtering for `usableRunes` within the `pre` function involves repetitive `as Item<'feat'>` type assertions, which can make the code more verbose than necessary.
+- Suggested Fix: Refactor the `usableRunes` creation into a more explicit `for...of` loop. This can reduce redundant type assertions and improve clarity by handling type narrowing explicitly.
+```typescript
+    const usableRunes: Item<'feat'>[] = [];
+    for (const identifier of runeIdentifiers) {
+      const rune = itemUtils.getItemByIdentifier(feat.actor!, identifier);
+      if (rune && isRuneInvokable(rune as Item<'feat'>).usable) {
+        usableRunes.push(rune as Item<'feat'>);
+      }
+    }
+    const rune = (await dialogUtils.selectDocumentDialog(
+```
