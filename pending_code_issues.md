@@ -61,3 +61,11 @@ Hooks.on(
   },
 );
 ```
+
+---
+
+(These will be stored and reviewed when PRs addressing those themes are opened)
+
+- File: src/hooks/alternateMartialLevelUpdate.ts
+- Description: The explicit `as any` assertion for the hook name `'dnd5e.advancementManagerComplete'` is a type escape hatch. While Foundry's type definitions for hooks can sometimes be incomplete, it's generally preferable to avoid `as any` where possible to leverage TypeScript fully and for clearer type inference.
+- Suggested Fix: Explore if a more precise type assertion or a way to extend the `Hooks` interface with this specific hook can be done within the project's ambient types, or add a comment explaining why `as any` is strictly necessary.
