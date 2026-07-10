@@ -88,6 +88,60 @@ const getSaveDC = (actor: Actor5e, altClass: string): string => {
   return (8 + abilityModifiers[activeOption.ability] + profBonus).toString();
 };
 
+// Helper function (e.g., in a utils file or within this file)
+const processAlternateMartialClass = (
+  actor: Actor5e,
+  altClassKey: string,
+): ExploitTabAlternateMartialClass | null => {
+  const classItem: Actor5e['classes'][string] = actor.classes[altClassKey];
+  if (!(altClassKey in ALTERNATE_MARTIAL_MULTICLASSING_RECORD)) return null;
+
+  const classConfig = ALTERNATE_MARTIAL_MULTICLASSING_RECORD[altClassKey];
+  let subclassUuid: string | undefined;
+  let subclassName: string | undefined;
+  let subclassImg: string | undefined;
+  let hasSubclass = false;
+  let effectiveAltClassId = altClassKey;
+
+  if (typeof classConfig !== 'number') {
+    const altSubclass = (
+      classItem as {
+        subclass?: {
+          identifier: string;
+          uuid: string;
+          name: string;
+          img: string;
+        };
+      }
+    ).subclass;
+    const altSubclassIdentifier = altSubclass?.identifier;
+
+    if (altSubclassIdentifier && altSubclassIdentifier in classConfig) {
+      effectiveAltClassId = altSubclassIdentifier;
+      subclassUuid = altSubclass.uuid;
+      subclassName = altSubclass.name;
+      subclassImg = altSubclass.img;
+      hasSubclass = true;
+    } else {
+      return null;
+    }
+  }
+
+  const saveDC = getSaveDC(actor, effectiveAltClassId);
+  return {
+    id: altClassKey,
+    uuid: classItem.uuid!,
+    name: hasSubclass ? `${classItem.name} (${subclassName})` : classItem.name,
+    img: classItem.img!,
+    level: classItem.system.levels,
+    saveDC,
+    hasSubclass,
+    subclassUuid,
+    subclassName,
+    subclassImg,
+  };
+};
+
 type OrderedNumber = `${number}${'th' | 'st' | 'nd' | 'rd'}`;
 
 const numberToOrdering = (num: number): OrderedNumber => {
@@ -112,13 +166,14 @@ const numberToOrdering = (num: number): OrderedNumber => {
 Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
   if (partId !== 'exploits') return;
   if (sheet.actor.type !== 'character') return;
-  const Inventory = customElements.get(
-    sheet.options.elements.inventory,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Inventory = customElements.get(sheet.options.elements.inventory) as any;
   if (!Inventory) return;
 
-  const exploitItems = (context.items as Item[]).filter((i) =>
+  // FIX: Safely retrieve the actor's items directly from the actor document
+  const actorItems = sheet.actor.items ?? [];
+
+  const exploitItems = actorItems.filter((i) =>
     isAlternateMartialExploit(i),
   ) as Item<'feat'>[];
 
@@ -185,59 +240,11 @@ Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
   const activeClasses: ExploitTabAlternateMartialClass[] = Object.keys(
     sheet.actor.classes,
   ).reduce((acc: ExploitTabAlternateMartialClass[], altClassKey) => {
-    const classItem: {
-      identifier: string;
-      name: string;
-      img: string;
-      system: { levels: number; [key: string]: unknown };
-      uuid: string;
-      subclass?: {
-        identifier: string;
-        uuid: string;
-        name: string;
-        img: string;
-        [key: string]: unknown;
-      };
-      [key: string]: unknown;
-    } = sheet.actor.classes[altClassKey];
-    if (!(altClassKey in ALTERNATE_MARTIAL_MULTICLASSING_RECORD)) return acc;
-    const classConfig = ALTERNATE_MARTIAL_MULTICLASSING_RECORD[altClassKey];
-    let subclassUuid: string | undefined;
-    let subclassName: string | undefined;
-    let subclassImg: string | undefined;
-    let hasSubclass = false;
-    let effectiveAltClassId = altClassKey;
-
-    if (typeof classConfig !== 'number') {
-      const altSubclass = classItem.subclass;
-      const altSubclassIdentifier = altSubclass?.identifier;
-
-      if (altSubclassIdentifier && altSubclassIdentifier in classConfig) {
-        effectiveAltClassId = altSubclassIdentifier;
-        subclassUuid = altSubclass.uuid;
-        subclassName = altSubclass.name;
-        subclassImg = altSubclass.img;
-        hasSubclass = true;
-      } else {
-        return acc;
-      }
-    }
-
-    const saveDC = getSaveDC(sheet.actor, effectiveAltClassId);
-    acc.push({
-      id: altClassKey,
-      uuid: classItem.uuid,
-      name: hasSubclass
-        ? `${classItem.name} (${subclassName})`
-        : classItem.name,
-      img: classItem.img,
-      level: classItem.system.levels,
-      saveDC,
-      hasSubclass,
-      subclassUuid,
-      subclassName,
-      subclassImg,
-    });
+    const processedClass = processAlternateMartialClass(
+      sheet.actor,
+      altClassKey,
+    );
+    if (processedClass) acc.push(processedClass);
     return acc;
   }, []);
 
