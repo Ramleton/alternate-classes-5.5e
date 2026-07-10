@@ -54,14 +54,17 @@ const isTwinStrikeBlocking = (
   const {
     utils: { effectUtils, itemUtils },
   } = chrisPremades;
-  const twinStrike = itemUtils.getItemByIdentifier(
-    sneakAttack.actor!,
-    'ac55eTwinStrike',
-  );
-  return !!(
-    twinStrike &&
-    effectUtils.getEffectByIdentifier(target.actor!, 'ac55eSneakAttacked')
-  );
+  if (!sneakAttack.system.uses?.value) {
+    const twinStrike = itemUtils.getItemByIdentifier(
+      sneakAttack.actor!,
+      'ac55eTwinStrike',
+    );
+    return !!(
+      twinStrike &&
+      !effectUtils.getEffectByIdentifier(target.actor!, 'ac55eSneakAttacked')
+    );
+  }
+  return false;
 };
 
 /**
@@ -91,7 +94,6 @@ export const qualifiesForSneakAttack = (
   const {
     utils: { effectUtils, itemUtils, tokenUtils },
   } = chrisPremades;
-  if (!sneakAttack.system.uses?.value) return false;
   if (!workflow.targets.size) return false;
   if (isTwinStrikeBlocking(sneakAttack, token)) return false;
   if (getWorkflowProperty(workflow, sneakAttack.actor!, 'sneakAttack'))
