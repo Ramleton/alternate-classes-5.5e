@@ -15,7 +15,6 @@ const prompt: MidiMacroFunction = async ({
 }) => {
   if (!workflow.hitTargets.size) return;
   const feat = entity as Item<'feat'>;
-  if (!feat.system.uses?.value) return;
   if (!qualifiesForSneakAttack(feat, token, workflow)) return;
   const {
     utils: { socketUtils },

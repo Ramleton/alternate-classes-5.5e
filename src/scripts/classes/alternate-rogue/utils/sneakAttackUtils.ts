@@ -91,6 +91,7 @@ export const qualifiesForSneakAttack = (
   const {
     utils: { effectUtils, itemUtils, tokenUtils },
   } = chrisPremades;
+  if (!sneakAttack.system.uses?.value) return false;
   if (!workflow.targets.size) return false;
   if (isTwinStrikeBlocking(sneakAttack, token)) return false;
   if (getWorkflowProperty(workflow, sneakAttack.actor!, 'sneakAttack'))
