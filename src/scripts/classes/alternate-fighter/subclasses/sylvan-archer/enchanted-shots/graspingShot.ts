@@ -42,9 +42,16 @@ const handleGraspingShot: HandleEnchantedShot = async ({
       {
         key: 'flags.midi-qol.OverTime',
         mode: 0,
-        value: `turn=start,label=Grasping Shot,rollType=check,saveAbility=str,\
-        saveDC=${saveWorkflow.saveDC}, saveCount=1-, actionSave=roll,\
-        allowIncapacitated=true`,
+        value: [
+          'turn=start',
+          'label=Grasping Shot',
+          'rollType=check',
+          'saveAbility=str',
+          `saveDC=${saveWorkflow.saveDC}`,
+          'saveCount=1-',
+          'actionSave=roll',
+          'allowIncapacitated=true',
+        ].join(', '),
         priority: 20,
       },
       {
