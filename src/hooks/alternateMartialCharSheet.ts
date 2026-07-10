@@ -118,8 +118,7 @@ Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
   ) as any;
   if (!Inventory) return;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const exploitItems = (context.items as Item[]).filter((i: any) =>
+  const exploitItems = (context.items as Item[]).filter((i) =>
     isAlternateMartialExploit(i),
   ) as Item<'feat'>[];
 
