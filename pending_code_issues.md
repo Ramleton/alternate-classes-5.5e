@@ -69,3 +69,29 @@ Hooks.on(
 - File: src/hooks/alternateMartialLevelUpdate.ts
 - Description: The explicit `as any` assertion for the hook name `'dnd5e.advancementManagerComplete'` is a type escape hatch. While Foundry's type definitions for hooks can sometimes be incomplete, it's generally preferable to avoid `as any` where possible to leverage TypeScript fully and for clearer type inference.
 - Suggested Fix: Explore if a more precise type assertion or a way to extend the `Hooks` interface with this specific hook can be done within the project's ambient types, or add a comment explaining why `as any` is strictly necessary.
+
+---
+
+- File: src/scripts/classes/alternate-fighter/subclasses/sylvan-archer/macros.ts
+- Description: The import path for `CPRMACRO` is `../../../../../types/chris-premades/macro.js`, which is excessively deep and inconsistent with other `chris-premades` imports like `chris-premades/macro.js`.
+- Suggested Fix: Update the import path to the canonical `chris-premades/macro.js`.
+```typescript
+import CPRMacro from 'chris-premades/macro.js'; // Use consistent path
+```
+
+---
+
+- File: src/scripts/classes/alternate-fighter/subclasses/sylvan-archer/enchantedShotSave.ts
+- Description: The import path for `CPRMACRO` is `../../../../../types/chris-premades/macro.js`, which is excessively deep and inconsistent with other `chris-premades` imports.
+- Suggested Fix: Update the import path to the canonical `chris-premades/macro.js`.
+```typescript
+import CPRMacro, {
+  MidiMacroFunction,
+} from 'chris-premades/macro.js'; // Use consistent path
+```
+
+---
+
+- File: src/scripts/exploits/4th-degree/expertFocus.ts
+- Description: The `await fromUuid((value as any).id)` contains an `as any` type assertion. While sometimes necessary with external libraries like Foundry VTT, it's an escape hatch that ideally should be minimized or accompanied by a clear justification.
+- Suggested Fix: Explore if a more precise type can be used for `value.id`, or add a comment explaining why `as any` is strictly necessary here.
