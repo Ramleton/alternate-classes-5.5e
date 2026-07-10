@@ -156,6 +156,4 @@ Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
     { level: '11th - 16th', die: 'd8', count: 4 },
     { level: '17th - 20th', die: 'd10', count: 5 },
   ];
-  // const tab = sheet.element.querySelector('[data-tab="exploits"]');
-  // console.log(tab?.className);
 });
