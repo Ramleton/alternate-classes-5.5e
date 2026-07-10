@@ -95,3 +95,46 @@ import CPRMacro, {
 - File: src/scripts/exploits/4th-degree/expertFocus.ts
 - Description: The `await fromUuid((value as any).id)` contains an `as any` type assertion. While sometimes necessary with external libraries like Foundry VTT, it's an escape hatch that ideally should be minimized or accompanied by a clear justification.
 - Suggested Fix: Explore if a more precise type can be used for `value.id`, or add a comment explaining why `as any` is strictly necessary here.
+
+---
+
+- File: src/hooks/alternateMartialCharSheet.ts
+- Description: The explicit `as any` assertions for the hook name `'dnd5e.prepareSheetContext'` and `customElements.get(...) as any` are type escape hatches. While Foundry's type definitions for hooks can sometimes be incomplete, it's generally preferable to avoid `as any` where possible to leverage TypeScript fully and for clearer type inference.
+- Suggested Fix: Explore if a more precise type assertion or a way to extend the `Hooks` interface with this specific hook can be done within the project's ambient types, or add a comment explaining why `as any` is strictly necessary.
+
+---
+
+- File: src/scripts/classes/alternate-fighter/subclasses/runecarver/runicWard.ts
+- Description: The chained `map` and `filter` operations for `usableRunes` contain repetitive `as Item<'feat'>` type assertions, which can reduce readability and verbosity.
+- Suggested Fix: Refactor the `usableRunes` creation into a more explicit loop to reduce redundant type assertions and improve clarity.
+```typescript
+    const usableRunes: Item<'feat'>[] = [];
+    for (const identifier of runeIdentifiers) {
+      const rune = itemUtils.getItemByIdentifier(feat.actor!, identifier);
+      // 'rune' can be Item | undefined here.
+      // isRuneInvokable expects Item<'feat'>, so the cast is needed for the check.
+      if (rune && isRuneInvokable(rune as Item<'feat'>).usable) {
+        usableRunes.push(rune as Item<'feat'>); // Cast needed to ensure push is of Item<'feat'>
+      }
+    }
+    const rune = (await dialogUtils.selectDocumentDialog(
+```
+
+---
+
+- File: src/scripts/exploits/4th-degree/expertFocus.ts
+- Description: The expression `(value as any).id` within `getProficientSkillsAndTools` uses an `as any` type assertion. While sometimes necessary with external libraries like Foundry VTT where type definitions might be incomplete, it's an escape hatch that ideally should be minimized or accompanied by a clear justification.
+- Suggested Fix: Explore if a more precise type can be used for `value` to avoid the `as any`, or add a comment explaining why `as any` is strictly necessary here due to external type limitations.
+
+---
+
+- File: src/scripts/exploits/utils/exploitSetMinRollFactory.ts
+- Description: The `macros` property in `ExploitSetMinRollFactoryArgs` uses an overly specific tuple type `[MacroKey] | [MacroKey, MacroKey?] | [MacroKey, MacroKey?, MacroKey?]` when `MacroKey[]` would be more concise and flexible, as it's filtered and cast to `MacroKey[]` anyway.
+- Suggested Fix: Simplify the type definition for `macros` to `MacroKey[]`.
+```typescript
+interface ExploitSetMinRollFactoryArgs {
+  // ...other properties
+  macros: MacroKey[]; // Simplified type
+  // ...other properties
+}
+```
