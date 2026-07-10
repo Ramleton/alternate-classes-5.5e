@@ -1,10 +1,8 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
+import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { spendExploitUses } from 'exploits/utils/exploitUtils.js';
 import { SaveActivity } from 'fvtt-types/Activity.js';
-import CPRMacro, {
-  MidiMacroFunction,
-} from '../../../../../types/chris-premades/macro.js';
 import handleEnchantedShot from './handle.js';
 
 export const getTokensInCircularTemplate = async (

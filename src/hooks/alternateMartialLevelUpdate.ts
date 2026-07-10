@@ -4,6 +4,7 @@ import {
 } from 'exploits/utils.js';
 
 Hooks.on(
+  // ? Hooks.on requires Foundry types for hooks, dnd5e hooks are not included
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'dnd5e.advancementManagerComplete' as any,
   async ({ actor }: { actor: Actor5e }) => {

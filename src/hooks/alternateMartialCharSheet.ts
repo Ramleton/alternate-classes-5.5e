@@ -87,6 +87,7 @@ const getSaveDC = (actor: Actor5e, altClass: string): string => {
   return (8 + abilityModifiers[activeOption.ability] + profBonus).toString();
 };
 
+// ? Hooks.on requires Foundry types for hooks, dnd5e hooks are not included
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
   if (partId !== 'exploits') return;
