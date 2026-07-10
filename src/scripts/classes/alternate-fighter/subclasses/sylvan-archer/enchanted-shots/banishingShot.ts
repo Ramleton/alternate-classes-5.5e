@@ -2,6 +2,7 @@ import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { SaveActivity } from 'fvtt-types/Activity.js';
 import { post, pre } from '../enchantedShotSave.js';
+import { createEnchantedShotTargetEffectData } from './targetEffectDataFactory.js';
 
 const during = async (
   item: Item<'feat'>,
@@ -37,66 +38,39 @@ const during = async (
     targets,
     { consumeResources: true },
   );
-  const targetEffectData = {
-    name: `${item.name}: Banished`,
-    icon: item.img,
-    origin: item.uuid,
-    duration: { seconds: 60 },
-    flags: {
-      dae: {
-        stackable: 'noneName',
-      },
-      'chris-premades': {
-        info: {
-          identifier: 'ac55eBanishingShotEffect',
-        },
-      },
-    },
+  const targetEffectData = createEnchantedShotTargetEffectData({
+    item,
+    nameSuffix: 'Banished',
+    identifierSuffix: 'BanishingShotEffect',
     changes: [
-      {
-        key: 'flags.midi-qol.OverTime',
-        mode: 0,
-        value: [
-          'turn=start',
-          'allowIncapacitated=true',
-          'saveAbility=cha',
-          `saveDC=${saveWorkflow.saveDC}`,
-          'saveDamage=nodamage',
-          'saveRemove=true',
-          'saveMagic=true',
-          'actionSave=roll',
-          'saveCount=1-',
-          'rollMode=publicroll',
-        ].join(', '),
-      },
       {
         key: 'flags.midi-qol.superSaver.all',
         mode: 0,
-        value: 1,
+        value: 1 + '',
         priority: 20,
       },
       {
         key: 'system.attributes.ac.bonus',
         mode: 5,
-        value: 99,
+        value: 99 + '',
         priority: 20,
       },
       {
         key: 'flags.midi-qol.min.ability.save.all',
         mode: 5,
-        value: 99,
+        value: 99 + '',
         priority: 20,
       },
       {
         key: 'flags.midi-qol.grants.noCritical.all',
         mode: 0,
-        value: 1,
+        value: 1 + '',
         priority: 20,
       },
       {
         key: 'flags.midi-qol.neverTarget',
         mode: 0,
-        value: 1,
+        value: 1 + '',
         priority: 20,
       },
       {
@@ -106,7 +80,9 @@ const during = async (
         priority: 20,
       },
     ],
-  };
+    saveAbility: 'cha',
+    saveDC: saveWorkflow.saveDC,
+  });
   for (const target of saveWorkflow.failedSaves) {
     if (!target.actor) continue;
     await effectUtils.createEffect(target.actor, targetEffectData, {

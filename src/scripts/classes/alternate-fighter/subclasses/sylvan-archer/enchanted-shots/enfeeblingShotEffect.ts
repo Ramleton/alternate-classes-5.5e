@@ -1,8 +1,10 @@
 import { Workflow } from '@midi-qol/types/module/Workflow';
-import CPRMacro from '../../../../../../types/chris-premades/macro.js';
+import CPRMacro from 'chris-premades/macro.js';
 
 async function pre(workflow: Workflow): Promise<boolean> {
-  const { utils: { constants } } = chrisPremades;
+  const {
+    utils: { constants },
+  } = chrisPremades;
   if (!workflow.hitTargets.size) return false;
   if (!constants.weaponAttacks.includes(workflow.activity.getActionType()))
     return false;
@@ -10,7 +12,9 @@ async function pre(workflow: Workflow): Promise<boolean> {
 }
 
 async function post(workflow: Workflow): Promise<void> {
-  const { utils: { workflowUtils } } = chrisPremades;
+  const {
+    utils: { workflowUtils },
+  } = chrisPremades;
   const damageRoll = workflow.damageRoll;
   const replaceRoll = `floor((${damageRoll!.formula}) * 0.5)`;
   await workflowUtils.replaceDamage(workflow, replaceRoll);
@@ -19,7 +23,7 @@ async function post(workflow: Workflow): Promise<void> {
 const workflow = async ({ workflow }) => {
   const res1 = await pre(workflow);
   if (!res1) return;
-  post(workflow);
+  await post(workflow);
 };
 
 const macro: CPRMacro = {
