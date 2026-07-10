@@ -1,10 +1,10 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import {
-  getAlternateMartialExploitDie,
-  getAltMartialExploitsRemaining,
-} from 'exploits/utils.js';
-import { spendExploitUses } from 'exploits/utils/exploitUtils.js';
+  getExploitUsesRemaining,
+  spendExploitUses,
+} from 'exploits/utils/exploitUtils.js';
 import { EffectData } from '../../../../../types/effects.js';
 
 interface PreNobleGuardian {
@@ -54,12 +54,12 @@ const during = async (
   target: Token,
   workflow: Workflow,
 ) => {
-  const exploitDie = getAlternateMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return false;
   const {
     utils: { genericUtils, rollUtils },
   } = chrisPremades;
-  const res = await rollUtils.rollDice(`1d${exploitDie.faces}`, {
+  const res = await rollUtils.rollDice(`1d${exploitDie}`, {
     chatMessage: true,
   });
   await genericUtils.sleep(1500);
@@ -80,7 +80,7 @@ const during = async (
     return 1;
   }
   // In this case, the attack still hits, so we need to ask if the user wants to spend an exploit die to grant resistance to the damage
-  if (!getAltMartialExploitsRemaining(feat)) return 1;
+  if (!getExploitUsesRemaining(feat)) return 1;
   const {
     utils: { dialogUtils, effectUtils },
   } = chrisPremades;

@@ -65,6 +65,7 @@ export default class EquipmentSystemData extends foundry.abstract.TypeDataModel<
 
   declare type: {
     value: string;
+    subtype: string;
     baseItem: string;
   };
 

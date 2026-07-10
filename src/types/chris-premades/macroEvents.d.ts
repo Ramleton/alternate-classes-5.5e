@@ -102,7 +102,9 @@ export type ItemEvent =
   | 'actorUnequipped' // Run when any item is unequipped off an actor.
   | 'itemMedkit' // Run after an item is medkit. This includes being actor medkit.
   | 'actorMedkit' // Run after an actor medkit is applied
-  | 'actorMunch'; // Run after a character has been imported via the DDBI module.
+  | 'actorMunch' // Run after a character has been imported via the DDBI module.
+  | 'updated' // Run after an item has been updated.
+  | 'actorUpdated'; // Run after a character has been updated.
 
 export type MacroEvent =
   | MidiQOLEvent

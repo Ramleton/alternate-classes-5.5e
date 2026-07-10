@@ -4,13 +4,13 @@ import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 const skillBonus: MacroFunction = async ({
   trigger: { entity: item, roll, skillId },
 }): Promise<D20Roll | undefined> => {
-  if (!['his', 'ins', 'prf', 'per'].includes(skillId))
-    return;
+  if (!['his', 'ins', 'prf', 'per'].includes(skillId)) return;
   const feat = item as Item<'feat'>;
-  const exploitDie = getAlternateMartialExploitDie(feat);
-  if (!exploitDie)
-    return;
-  const { utils: { itemUtils, rollUtils } } = chrisPremades;
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
+  if (!exploitDie) return;
+  const {
+    utils: { itemUtils, rollUtils },
+  } = chrisPremades;
   const exiledCourtierHistory = itemUtils.getItemByIdentifier(
     feat.actor!,
     'ac55eExiledCourtierHistory',
@@ -27,15 +27,11 @@ const skillBonus: MacroFunction = async ({
     feat.actor!,
     'ac55eExiledCourtierPersuasion',
   );
-  if (skillId === 'his' && !exiledCourtierHistory)
-    return;
-  if (skillId === 'ins' && !exiledCourtierInsight)
-    return;
-  if (skillId === 'prf' && !exiledCourtierPerformance)
-    return;
-  if (skillId === 'per' && !exiledCourtierPersuasion)
-    return;
-  return await rollUtils.addToRoll(roll, `1d${exploitDie.faces}`);
+  if (skillId === 'his' && !exiledCourtierHistory) return;
+  if (skillId === 'ins' && !exiledCourtierInsight) return;
+  if (skillId === 'prf' && !exiledCourtierPerformance) return;
+  if (skillId === 'per' && !exiledCourtierPersuasion) return;
+  return await rollUtils.addToRoll(roll, `1d${exploitDie}`);
 };
 const macro: CPRMacro = {
   identifier: 'ac55eLordlyBearing',

@@ -10,7 +10,7 @@ const bonus: MacroFunction = async ({
   if (!roll.options.target) return;
   if (roll.total > roll.options.target) return;
   const feat = entity as Item<'feat'>;
-  const exploitDie = getAlternateMartialExploitDie(feat);
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
   const {
     utils: { dialogUtils, rollUtils, socketUtils },
@@ -22,7 +22,7 @@ const bonus: MacroFunction = async ({
     { userId },
   );
   if (!selection) return;
-  await rollUtils.addToRoll(roll, `1d${exploitDie.faces}`);
+  await rollUtils.addToRoll(roll, `1d${exploitDie}`);
 };
 
 const macro: CPRMacro = {

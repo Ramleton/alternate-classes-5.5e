@@ -5,44 +5,41 @@ import { generateOverTimeEffectChange } from '../../../../../automation/effectUt
 import { isRuneInvokable, postRune } from './runeUtils.js';
 
 const pre = async (feat: Item<'feat'>, target: Token | undefined) => {
-  if (!target)
-    return false;
+  if (!target) return false;
   const res = isRuneInvokable(feat);
-  if (!res.usable)
-    return false;
-  const { utils: { dialogUtils, socketUtils } } = chrisPremades;
+  if (!res.usable) return false;
+  const {
+    utils: { dialogUtils, socketUtils },
+  } = chrisPremades;
   return await dialogUtils.confirm(
     feat.name,
-    // eslint-disable-next-line @stylistic/max-len
     `${target.actor!.name} ended their turn within 30 feet of you, invoke Stone Rune?`,
-    { userId: socketUtils.firstOwner(feat.actor, true) });
+    { userId: socketUtils.firstOwner(feat.actor, true) },
+  );
 };
 const during = async (feat: Item<'feat'>, target: Token): Promise<boolean> => {
-  const exploitDie = getAlternateMartialExploitDie(feat);
-  if (!exploitDie)
-    return false;
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
+  if (!exploitDie) return false;
   const invokeWorkflow = await runActivity(feat, 'invoke', [target]);
-  if (!invokeWorkflow?.failedSaves?.size)
-    return true;
-  const { utils: { effectUtils, genericUtils } } = chrisPremades;
+  if (!invokeWorkflow?.failedSaves?.size) return true;
+  const {
+    utils: { effectUtils, genericUtils },
+  } = chrisPremades;
   await genericUtils.setFlag(
     feat.actor!,
     'alternate-classes-55e',
     'macros.runeCarver.stone',
     1,
   );
-  const overTimeChange = generateOverTimeEffectChange(
-    'Stone Rune: Dreaming',
-    {
-      label: 'Stone Rune: Dreaming',
-      turn: 'end',
-      saveAbility: 'wis',
-      saveDC: invokeWorkflow.saveDC,
-      saveMagic: true,
-      saveCount: '1-',
-      allowIncapacitated: true,
-    },
-  );
+  const overTimeChange = generateOverTimeEffectChange('Stone Rune: Dreaming', {
+    label: 'Stone Rune: Dreaming',
+    turn: 'end',
+    saveAbility: 'wis',
+    saveDC: invokeWorkflow.saveDC,
+    saveMagic: true,
+    saveCount: '1-',
+    allowIncapacitated: true,
+  });
   const stoneRuneEffect = {
     name: 'Stone Rune: Dreaming',
     icon: feat.img,
@@ -68,16 +65,14 @@ const during = async (feat: Item<'feat'>, target: Token): Promise<boolean> => {
   await effectUtils.createEffect(target.actor!, stoneRuneEffect);
   return true;
 };
-const workflow: MacroFunction = async (
-  { trigger: { entity: item, target } },
-) => {
+const workflow: MacroFunction = async ({
+  trigger: { entity: item, target },
+}) => {
   const feat = item as Item<'feat'>;
   const res1 = await pre(feat, target);
-  if (!res1)
-    return;
+  if (!res1) return;
   const res2 = await during(feat, target!);
-  if (!res2)
-    return;
+  if (!res2) return;
   await postRune(feat);
 };
 const macro: CPRMacro = {

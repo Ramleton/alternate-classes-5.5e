@@ -10,38 +10,33 @@ const during = async (
   item: Item<'feat'>,
   workflow: Workflow,
 ): Promise<number> => {
-  const { utils: {
-    activityUtils,
-    genericUtils,
-    itemUtils,
-    effectUtils,
-    workflowUtils,
-    tokenUtils,
-    templateUtils,
-  } }
-    = chrisPremades;
+  const {
+    utils: {
+      activityUtils,
+      genericUtils,
+      itemUtils,
+      effectUtils,
+      workflowUtils,
+      tokenUtils,
+      templateUtils,
+    },
+  } = chrisPremades;
   if (!token) return 0;
-  const exploitDie = getAlternateMartialExploitDie(item);
+  const exploitDie = getAlternateMartialExploitDie(item.actor!);
   if (!exploitDie) return 0;
-  const activity = activityUtils.getActivityByIdentifier(
-    item,
-    'save',
-    { strict: true },
-  );
+  const activity = activityUtils.getActivityByIdentifier(item, 'save', {
+    strict: true,
+  });
   if (!activity) return 0;
   const target = workflow.hitTargets.first() as Token;
   const range = tokenUtils.getDistance(token, target);
   const saveActivityData: SaveActivity = genericUtils.duplicate(activity);
-  const ray = new foundry.canvas.geometry.Ray(
-    token.center,
-    target.center,
-  );
+  const ray = new foundry.canvas.geometry.Ray(token.center, target.center);
   if (!ray.distance) return 0;
   const templateData = {
     angle: 0,
     direction: Math.toDegrees(ray.angle),
-    distance:
-      canvas!.scene!.grid.distance * 6.5,
+    distance: canvas!.scene!.grid.distance * 6.5,
     x: ray.B.x,
     y: ray.B.y,
     t: 'ray' as const,
@@ -50,10 +45,9 @@ const during = async (
     width: 5,
   };
   const effectData = {
-    name: genericUtils.format(
-      'CHRISPREMADES.GenericEffects.TemplateEffect',
-      { itemName: workflow.item.name },
-    ),
+    name: genericUtils.format('CHRISPREMADES.GenericEffects.TemplateEffect', {
+      itemName: workflow.item.name,
+    }),
     img: workflow.item.img,
     origin: workflow.item.uuid,
     duration: {
@@ -68,16 +62,12 @@ const during = async (
   await genericUtils.sleep(100);
   const tokens = templateUtils.getTokensInTemplate(template);
   saveActivityData.range.value = '' + range;
-  const usedLegendarySylvanArchery = item
-    .actor!
-    .flags['alternate-classes-55e']
-    ?.macros
-    ?.enchantedShots
-    ?.legendarySylvanArcher;
+  const usedLegendarySylvanArchery =
+    item.actor!.flags['alternate-classes-55e']?.macros?.enchantedShots
+      ?.legendarySylvanArcher;
   const exploitDice = usedLegendarySylvanArchery ? 3 : 2;
   saveActivityData.damage.parts[0].custom.enabled = true;
-  saveActivityData.damage.parts[0].custom.formula
-    = `${exploitDice}d${exploitDie.faces}`;
+  saveActivityData.damage.parts[0].custom.formula = `${exploitDice}d${exploitDie}`;
   // If the actor has Sylvan Shot, on save the target takes half damage
   const sylvanShot = itemUtils.getItemByIdentifier(
     item.actor!,
@@ -86,13 +76,11 @@ const during = async (
   const effect = await effectUtils.createEffect(workflow.actor, effectData);
   await effectUtils.addDependent(effect, [template]);
   await workflowUtils.addEntityRemoval(workflow, [effect]);
-  const piercedTargets = Array.from(new Set([
-    ...targets,
-    ...Array.from(tokens)],
-  ));
+  const piercedTargets = Array.from(
+    new Set([...targets, ...Array.from(tokens)]),
+  );
   if (!targets.length) return 1;
-  if (sylvanShot)
-    saveActivityData.damage.onSave = 'half';
+  if (sylvanShot) saveActivityData.damage.onSave = 'half';
   await workflowUtils.syntheticActivityDataRoll(
     saveActivityData,
     item,

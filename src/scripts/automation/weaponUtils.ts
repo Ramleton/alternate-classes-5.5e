@@ -102,20 +102,29 @@ export const promptSelectWeapon = async (
   return selectedWeapon;
 };
 
+export interface ExploitPrerequisiteCheckArgs {
+  feat: Item<'feat'>;
+  token: Token;
+  workflow: Workflow;
+}
+
 export type ExploitPrerequisiteCheck = ({
   feat,
   token,
   workflow,
-}: {
-  feat: Item<'feat'>;
-  token: Token;
-  workflow: Workflow;
-}) => boolean;
+}: ExploitPrerequisiteCheckArgs) => boolean;
 
-export const attackHitCheck: ExploitPrerequisiteCheck = ({
-  workflow,
-}): boolean => {
+export const hitCheck: ExploitPrerequisiteCheck = ({ workflow }): boolean => {
   return !!workflow.hitTargets.size;
+};
+
+export const attackHitCheck: ExploitPrerequisiteCheck = (data): boolean => {
+  if (!hitCheck(data)) return false;
+  const {
+    utils: { constants, workflowUtils },
+  } = chrisPremades;
+  const actionType = workflowUtils.getActionType(data.workflow);
+  return constants.attacks.some((attack) => attack === actionType);
 };
 
 export const isWeaponAttack: ExploitPrerequisiteCheck = ({
@@ -141,19 +150,19 @@ export const isMeleeWeaponAttack: ExploitPrerequisiteCheck = ({
 export const weaponAttackHitCheck: ExploitPrerequisiteCheck = (
   data,
 ): boolean => {
-  return attackHitCheck(data) && isWeaponAttack(data);
+  return hitCheck(data) && isWeaponAttack(data);
 };
 
 export const meleeWeaponAttackHitCheck: ExploitPrerequisiteCheck = (
   data,
 ): boolean => {
-  return attackHitCheck(data) && isMeleeWeaponAttack(data);
+  return hitCheck(data) && isMeleeWeaponAttack(data);
 };
 
 export const meleeWeaponAttackMissCheck: ExploitPrerequisiteCheck = (
   data,
 ): boolean => {
-  return !attackHitCheck(data) && isMeleeWeaponAttack(data);
+  return !hitCheck(data) && isMeleeWeaponAttack(data);
 };
 
 export const meleeWeaponAttackRedirectCheck: ExploitPrerequisiteCheck = (

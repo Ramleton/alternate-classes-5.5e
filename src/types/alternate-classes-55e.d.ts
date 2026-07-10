@@ -27,7 +27,7 @@ type TotalMulticlassingLevel =
   | 19
   | 20;
 
-type ExploitDie = 'd4' | 'd6' | 'd8' | 'd10' | 'd12';
+type ExploitDie = 'd4' | 'd6' | 'd8' | 'd10';
 
 interface ExploitMulticlassingRow {
   totalLevel: TotalMulticlassingLevel;
