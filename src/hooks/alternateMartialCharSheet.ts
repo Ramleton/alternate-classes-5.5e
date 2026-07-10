@@ -164,45 +164,60 @@ Hooks.on('dnd5e.prepareSheetContext' as any, (sheet, partId, context) => {
 
   const activeClasses: ExploitTabAlternateMartialClass[] = Object.keys(
     sheet.actor.classes,
-  ).reduce((acc: ExploitTabAlternateMartialClass[], altClass) => {
-    if (!(altClass in ALTERNATE_MARTIAL_MULTICLASSING_RECORD)) return acc;
-    const altClassRecord = ALTERNATE_MARTIAL_MULTICLASSING_RECORD[altClass];
-    if (typeof altClassRecord === 'number') {
-      const classItem = sheet.actor.classes[altClass];
-      const saveDC = getSaveDC(sheet.actor, altClass);
-      acc.push({
-        id: altClass,
-        uuid: classItem.uuid,
-        name: classItem.name,
-        img: classItem.img,
-        level: classItem.system.levels,
-        saveDC,
-        hasSubclass: false,
-      });
-    } else {
-      const classItem = sheet.actor.classes[altClass];
-      const altSubclass = (
-        classItem as {
-          subclass: { name: string; img?: string; identifier: string };
-        }
-      ).subclass;
-      const altSubclassIdentifier = altSubclass.identifier;
-      if (!altSubclassIdentifier) return acc;
-      if (!(altSubclassIdentifier in altClassRecord)) return acc;
-      const saveDC = getSaveDC(sheet.actor, altSubclassIdentifier);
-      acc.push({
-        id: altClass,
-        uuid: classItem.uuid,
-        subclassUuid: sheet.actor.classes[altClass].subclass.uuid,
-        name: `${classItem.name} (${sheet.actor.classes[altClass].subclass.name})`,
-        img: sheet.actor.classes[altClass].img,
-        level: sheet.actor.classes[altClass].system.levels,
-        saveDC,
-        hasSubclass: true,
-        subclassName: altSubclass.name,
-        subclassImg: altSubclass.img || 'icons/svg/mystery-man.svg',
-      });
+  ).reduce((acc: ExploitTabAlternateMartialClass[], altClassKey) => {
+    const classItem: {
+      identifier: string;
+      name: string;
+      img: string;
+      system: { levels: number; [key: string]: unknown };
+      uuid: string;
+      subclass?: {
+        identifier: string;
+        uuid: string;
+        name: string;
+        img: string;
+        [key: string]: unknown;
+      };
+      [key: string]: unknown;
+    } = sheet.actor.classes[altClassKey];
+    if (!(altClassKey in ALTERNATE_MARTIAL_MULTICLASSING_RECORD)) return acc;
+    const classConfig = ALTERNATE_MARTIAL_MULTICLASSING_RECORD[altClassKey];
+    let subclassUuid: string | undefined;
+    let subclassName: string | undefined;
+    let subclassImg: string | undefined;
+    let hasSubclass = false;
+    let effectiveAltClassId = altClassKey;
+
+    if (typeof classConfig !== 'number') {
+      const altSubclass = classItem.subclass;
+      const altSubclassIdentifier = altSubclass?.identifier;
+
+      if (altSubclassIdentifier && altSubclassIdentifier in classConfig) {
+        effectiveAltClassId = altSubclassIdentifier;
+        subclassUuid = altSubclass.uuid;
+        subclassName = altSubclass.name;
+        subclassImg = altSubclass.img;
+        hasSubclass = true;
+      } else {
+        return acc;
+      }
     }
+
+    const saveDC = getSaveDC(sheet.actor, effectiveAltClassId);
+    acc.push({
+      id: altClassKey,
+      uuid: classItem.uuid,
+      name: hasSubclass
+        ? `${classItem.name} (${subclassName})`
+        : classItem.name,
+      img: classItem.img,
+      level: classItem.system.levels,
+      saveDC,
+      hasSubclass,
+      subclassUuid,
+      subclassName,
+      subclassImg,
+    });
     return acc;
   }, []);
 
