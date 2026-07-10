@@ -15,32 +15,15 @@ Hooks.once('init', () => {
 
   SheetClass.TABS.push({
     tab: 'exploits',
-    group: 'primary', // CRITICAL: This must match the sheet's primary tab group
     label: 'Exploits',
     icon: 'fas fa-sword',
   });
 
   SheetClass.PARTS.exploits = {
+    container: { classes: ['tab-body'], id: 'tabs' },
     template: 'modules/alternate-classes-55e/assets/templates/exploitsTab.hbs',
-    id: 'exploits',
-    container: { id: 'tabs' },
-    scrollable: ['.inventory-list'],
-  };
-
-  const originalOnRender = SheetClass.prototype._onRender;
-  SheetClass.prototype._onRender = function (context, options) {
-    originalOnRender.call(this, context, options);
-
-    // Check if 'exploits' is currently tracked as the active tab in this sheet instance's memory
-    if (this.tabGroups?.primary === 'exploits') {
-      // Find your tab element inside the newly rendered DOM container
-      const exploitsTabEl = this.element.querySelector(
-        '.tab[data-tab="exploits"]',
-      );
-      if (exploitsTabEl && !exploitsTabEl.classList.contains('active')) {
-        exploitsTabEl.classList.add('active');
-      }
-    }
+    templates: ['systems/dnd5e/templates/inventory/inventory.hbs'],
+    scrollable: [''],
   };
 
   console.log(
