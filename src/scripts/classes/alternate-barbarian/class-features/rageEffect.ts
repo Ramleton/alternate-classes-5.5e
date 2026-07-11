@@ -56,8 +56,13 @@ const endRage: MacroFunction = async ({
   const effect = entity as unknown as ActiveEffect;
   const lastRound = effect.flags['alternate-classes-55e']?.lastRound;
   const {
-    utils: { genericUtils },
+    utils: { genericUtils, itemUtils },
   } = chrisPremades;
+  const feralInstinct = itemUtils.getItemByIdentifier(
+    effect.parent! as Actor5e,
+    'ac55eFeralInstinct',
+  );
+  if (feralInstinct) return;
   if (!lastRound) {
     await genericUtils.setFlag(
       effect,
