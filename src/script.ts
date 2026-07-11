@@ -1,4 +1,4 @@
-import macros from './scripts/macros.js';
+import macros from './scripts/injectedMacros.js';
 
 Hooks.once('init', () => {
   // Adds the class feature types from LaserLlama's Alternate Classes
