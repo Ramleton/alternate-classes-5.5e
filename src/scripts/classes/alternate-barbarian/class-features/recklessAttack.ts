@@ -7,6 +7,8 @@ const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
     utils: { dialogUtils, effectUtils, socketUtils },
   } = chrisPremades;
   const feat = entity as Item<'feat'>;
+  if (effectUtils.getEffectByIdentifier(feat.actor!, 'ac55eRecklessAttack'))
+    return;
   const userId = socketUtils.firstOwner(feat, true);
   const selection = await dialogUtils.confirmUseItem(feat, { userId });
   if (!selection) return;
@@ -18,6 +20,11 @@ const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
     flags: {
       dae: {
         specialDuration: ['turnStartSource'],
+      },
+      'chris-premades': {
+        info: {
+          identifier: 'ac55eRecklessAttack',
+        },
       },
     },
     changes: [
