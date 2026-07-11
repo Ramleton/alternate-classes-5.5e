@@ -159,6 +159,10 @@ export const meleeWeaponAttackHitCheck: ExploitPrerequisiteCheck = (
   return hitCheck(data) && isMeleeWeaponAttack(data);
 };
 
+export const meleeWeaponAttackCritCheck: ExploitPrerequisiteCheck = (
+  data,
+): boolean => data.workflow.isCritical && isMeleeWeaponAttack(data);
+
 export const meleeWeaponAttackMissCheck: ExploitPrerequisiteCheck = (
   data,
 ): boolean => {

@@ -214,6 +214,7 @@ export default macros;
   // 2. PROCESS EXPLOITS FOLDER (With Naming Fix Added)
   // ----------------------------------------------------
   const registeredDegrees: string[] = [];
+  const registeredExploitHandlers: string[] = [];
   if (isDirectory(exploitsPath)) {
     console.log(`\nGenerating macros.ts for exploits...`);
 
@@ -241,20 +242,40 @@ export default macros;
       }
     }
 
+    const handlingMacros = generateMacrosIndex(
+      join(exploitsPath, 'handling'),
+      'macros.ts',
+      'exploits/handling',
+    );
+
+    if (
+      handlingMacros.length > 0 ||
+      readdirSync(join(exploitsPath, 'handling')).includes('macros.ts')
+    )
+      registeredExploitHandlers.push('handling');
+
     if (registeredDegrees.length > 0) {
       // Prefixes 'degree' to guarantee variable string names pass JS token safety rules
       const exploitsImports = registeredDegrees
         .map((d) => `import degree${toCamelCase(d)} from './${d}/macros.js';`)
         .join('\n');
+      const exploitHandlerImports = registeredExploitHandlers
+        .map((d) => `import ${toCamelCase(d)} from './handling/macros.js';`)
+        .join('\n');
       const exploitsSpreads = registeredDegrees
         .map((d) => `...degree${toCamelCase(d)}`)
+        .join(',\n  ');
+      const exploitHandlersSpreads = registeredExploitHandlers
+        .map((d) => `...${toCamelCase(d)}`)
         .join(',\n  ');
 
       const exploitsContent = `import CPRMacro from 'chris-premades/macro.js';
 ${exploitsImports}
+${exploitHandlerImports}
 
 const macros: CPRMacro[] = [
-  ${exploitsSpreads}
+  ${exploitsSpreads},
+  ${exploitHandlersSpreads}
 ];
 
 export default macros;
