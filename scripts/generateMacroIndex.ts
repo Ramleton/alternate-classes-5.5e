@@ -2,11 +2,11 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { basename, join, resolve } from 'path';
 import { format, resolveConfig } from 'prettier';
 
-function toCamelCase(fileName) {
+function toCamelCase(fileName: string) {
   return fileName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
-function isDirectory(path) {
+function isDirectory(path: string) {
   try {
     return statSync(path).isDirectory();
   } catch {
@@ -93,7 +93,8 @@ async function buildFromRoot() {
   const registeredClasses: string[] = [];
   if (isDirectory(classesPath)) {
     const classDirs = readdirSync(classesPath).filter(
-      (f) => f !== 'macros.ts' && isDirectory(join(classesPath, f)),
+      (f) =>
+        f !== 'macros.ts' && f !== 'utils' && isDirectory(join(classesPath, f)),
     );
 
     for (const classDir of classDirs) {
@@ -128,8 +129,8 @@ async function buildFromRoot() {
       }
 
       if (isDirectory(subclassPath)) {
-        const subdirs = readdirSync(subclassPath).filter((f) =>
-          isDirectory(join(subclassPath, f)),
+        const subdirs = readdirSync(subclassPath).filter(
+          (f) => f !== 'utils' && isDirectory(join(subclassPath, f)),
         );
         const activeSubclasses: string[] = [];
 
@@ -219,6 +220,7 @@ export default macros;
     const degreeDirs = readdirSync(exploitsPath).filter(
       (f) =>
         f !== 'macros.ts' &&
+        f !== 'utils' &&
         isDirectory(join(exploitsPath, f)) &&
         f.endsWith('-degree'),
     );

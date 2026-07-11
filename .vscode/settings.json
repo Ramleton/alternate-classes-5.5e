@@ -12,6 +12,9 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
+  "triggerTaskOnSave.tasks": {
+    "Generate Macro Index": ["src/scripts/**/*.ts"]
+  },
   "editor.rulers": [80],
   "editor.tabSize": 2,
   "editor.insertSpaces": true,

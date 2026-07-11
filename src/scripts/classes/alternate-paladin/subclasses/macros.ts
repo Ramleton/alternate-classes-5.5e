@@ -9,7 +9,6 @@ import oathOfTheThrone from './oath-of-the-throne/macros.js';
 import oathOfVengeance from './oath-of-vengeance/macros.js';
 import oathOfVigilance from './oath-of-vigilance/macros.js';
 import oathless from './oathless/macros.js';
-import utils from './utils/macros.js';
 
 const macros: CPRMacro[] = [
   ...blackguard,
@@ -22,7 +21,6 @@ const macros: CPRMacro[] = [
   ...oathOfVengeance,
   ...oathOfVigilance,
   ...oathless,
-  ...utils,
 ];
 
 export default macros;
