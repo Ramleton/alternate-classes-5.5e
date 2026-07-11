@@ -1,12 +1,12 @@
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
-import { basename, join } from 'path';
+import { basename, join, resolve } from 'path';
 import { format, resolveConfig } from 'prettier';
 
-function toCamelCase(fileName: string): string {
+function toCamelCase(fileName) {
   return fileName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
-function isDirectory(path: string): boolean {
+function isDirectory(path) {
   try {
     return statSync(path).isDirectory();
   } catch {
@@ -14,20 +14,22 @@ function isDirectory(path: string): boolean {
   }
 }
 
+/**
+ * Generates a local macros.ts file for a directory containing raw macro files.
+ * Accept an optional context name for descriptive console logs.
+ */
 function generateMacrosIndex(
-  folderPath: string,
+  folderPath,
   indexFileName = 'macros.ts',
-): string[] {
+  contextName = '',
+) {
   const files = readdirSync(folderPath)
     .filter((f) => f.endsWith('.ts') && f !== indexFileName)
     .sort();
 
-  if (files.length === 0) {
-    return [];
-  }
+  if (files.length === 0) return [];
 
   const names = files.map((f) => toCamelCase(basename(f, '.ts')));
-
   const imports = files
     .map((f, i) => `import ${names[i]} from './${basename(f, '.ts')}.js';`)
     .join('\n');
@@ -41,29 +43,22 @@ export default macros;
 `;
 
   writeFileSync(join(folderPath, indexFileName), content);
-  console.log(
-    `Generated ${indexFileName} in ${basename(folderPath)} with ${names.length} macros`,
-  );
+
+  if (contextName) {
+    console.log(
+      `  -> Processed raw macros for ${contextName} (${names.length} found)`,
+    );
+  }
 
   return names;
 }
 
-async function formatGeneratedFiles(targetPath: string) {
-  const prettierConfig = await resolveConfig(targetPath);
-
-  const filesToFormat = [
-    join(targetPath, 'macros.ts'),
-    join(targetPath, '../../subclasses', 'macros.ts'),
-  ];
-  const subclassesPath = join(targetPath, '../../subclasses');
-  if (isDirectory(subclassesPath)) {
-    const subdirs = readdirSync(subclassesPath).filter((f) =>
-      isDirectory(join(subclassesPath, f)),
-    );
-    for (const subdir of subdirs) {
-      filesToFormat.push(join(subclassesPath, subdir, 'macros.ts'));
-    }
-  }
+/**
+ * Deeply formats all created index files using your local Prettier settings.
+ */
+async function formatGeneratedFiles(filesToFormat) {
+  if (filesToFormat.length === 0) return;
+  const prettierConfig = await resolveConfig(filesToFormat[0]);
 
   for (const filePath of filesToFormat) {
     try {
@@ -79,57 +74,160 @@ async function formatGeneratedFiles(targetPath: string) {
   }
 }
 
-async function generateSubclassIndices(targetPath: string) {
-  const subclassesPath = join(targetPath, '../../subclasses');
+/**
+ * Top-down aggregator script with structured logging outputs
+ */
+async function buildFromRoot() {
+  const scriptsRoot = resolve('./src/scripts');
+  const classesPath = join(scriptsRoot, 'classes');
+  const classesIndexFile = join(classesPath, 'macros.ts');
+  const rootIndexFile = join(scriptsRoot, 'macros.ts');
 
-  if (!isDirectory(subclassesPath)) {
-    console.log(`Subclasses directory not found at ${subclassesPath}`);
+  if (!isDirectory(classesPath)) {
+    console.error(`Error: Could not find classes directory at ${classesPath}`);
     return;
   }
 
-  // Get all subdirectories in subclasses folder
-  const subdirs = readdirSync(subclassesPath)
-    .filter((f) => isDirectory(join(subclassesPath, f)))
-    .sort();
+  const filesToFormat = [rootIndexFile, classesIndexFile];
+  const registeredClasses: string[] = [];
 
-  const subclassNames: string[] = [];
+  const classDirs = readdirSync(classesPath).filter(
+    (f) => f !== 'macros.ts' && isDirectory(join(classesPath, f)),
+  );
 
-  // Step 1: Generate index for each subclass folder
-  for (const subdir of subdirs) {
-    const subclassPath = join(subclassesPath, subdir);
-    const macroNames = generateMacrosIndex(subclassPath);
+  for (const classDir of classDirs) {
+    // Determine a clean name for log output (e.g., "alternate-barbarian" -> "alternate-barbarian")
+    const className = classDir;
+    console.log(`\nGenerating macros.ts for ${className}...`);
 
-    if (macroNames.length > 0) {
-      subclassNames.push(toCamelCase(subdir));
+    const classFullPath = join(classesPath, classDir);
+    const featuresPath = join(classFullPath, 'class-features');
+    const subclassPath = join(classFullPath, 'subclasses');
+
+    const classImports: string[] = [];
+    const classSpreads: string[] = [];
+
+    // Process direct root macros inside the class folder if there are any
+    const baseMacros = generateMacrosIndex(classFullPath, 'macros.ts');
+    if (baseMacros.length > 0) {
+      filesToFormat.push(join(classFullPath, 'macros.ts'));
     }
-  }
 
-  // Step 2: Generate parent subclasses/macros.ts that spreads all subclass macros
-  if (subclassNames.length > 0) {
-    const imports = subclassNames
-      .map((name) => `import ${name} from './${name}/macros.js';`)
-      .join('\n');
+    // Process class-features/
+    if (isDirectory(featuresPath)) {
+      const featureMacros = generateMacrosIndex(
+        featuresPath,
+        'macros.ts',
+        `${className} class-features`,
+      );
+      if (featureMacros.length > 0) {
+        filesToFormat.push(join(featuresPath, 'macros.ts'));
+        classImports.push(
+          `import classFeatures from './class-features/macros.js';`,
+        );
+        classSpreads.push('...classFeatures');
+      }
+    }
 
-    const content = `import CPRMacro from 'chris-premades/macro.js';
+    // Process subclasses/
+    if (isDirectory(subclassPath)) {
+      const subdirs = readdirSync(subclassPath).filter((f) =>
+        isDirectory(join(subclassPath, f)),
+      );
+      const activeSubclasses: string[] = [];
+
+      for (const subdir of subdirs) {
+        const path = join(subclassPath, subdir);
+        const subMacros = generateMacrosIndex(
+          path,
+          'macros.ts',
+          `${className} subclass: ${subdir}`,
+        );
+        if (subMacros.length > 0) {
+          activeSubclasses.push(subdir);
+          filesToFormat.push(join(path, 'macros.ts'));
+        }
+      }
+
+      if (activeSubclasses.length > 0) {
+        const subIndexFile = join(subclassPath, 'macros.ts');
+        filesToFormat.push(subIndexFile);
+
+        const imports = activeSubclasses
+          .map(
+            (name) => `import ${toCamelCase(name)} from './${name}/macros.js';`,
+          )
+          .join('\n');
+
+        const content = `import CPRMacro from 'chris-premades/macro.js';
 ${imports}
 
-const macros: CPRMacro[] = [${subclassNames.map((n) => `...${n}`).join(', ')}];
+const macros: CPRMacro[] = [${activeSubclasses.map((n) => `...${toCamelCase(n)}`).join(', ')}];
 
 export default macros;
 `;
+        writeFileSync(subIndexFile, content);
 
-    writeFileSync(join(subclassesPath, 'macros.ts'), content);
-    console.log(
-      `Generated subclasses/macros.ts aggregating ${subclassNames.length} subclasses`,
-    );
+        classImports.push(`import subclasses from './subclasses/macros.js';`);
+        classSpreads.push('...subclasses');
+      }
+    }
+
+    // Generate the alternate-{CLASS_NAME}/macros.ts file aggregating its features and subclasses
+    const classIndexFile = join(classFullPath, 'macros.ts');
+    filesToFormat.push(classIndexFile);
+
+    const classContent = `import CPRMacro from 'chris-premades/macro.js';
+${classImports.join('\n')}
+
+const macros: CPRMacro[] = [
+  ${classSpreads.join(',\n  ')}
+];
+
+export default macros;
+`;
+    writeFileSync(classIndexFile, classContent);
+    registeredClasses.push(classDir);
+
+    console.log(`Generated macros.ts for ${className}.`);
   }
 
-  // Step 3: Generate top-level macros.ts
-  generateMacrosIndex(targetPath);
+  // 2. Generate classes/macros.ts
+  const classesImports = registeredClasses
+    .map((c) => `import ${toCamelCase(c)} from './${c}/macros.js';`)
+    .join('\n');
+  const classesSpreads = registeredClasses
+    .map((c) => `...${toCamelCase(c)}`)
+    .join(',\n  ');
 
-  await formatGeneratedFiles(targetPath);
+  const classesContent = `import CPRMacro from 'chris-premades/macro.js';
+${classesImports}
+
+const macros: CPRMacro[] = [
+  ${classesSpreads}
+];
+
+export default macros;
+`;
+  writeFileSync(classesIndexFile, classesContent);
+
+  // 3. Generate src/scripts/macros.ts
+  const rootContent = `import CPRMacro from 'chris-premades/macro.js';
+import classes from './classes/macros.js';
+
+const macros: CPRMacro[] = [
+  ...classes
+];
+
+export default macros;
+`;
+  writeFileSync(rootIndexFile, rootContent);
+  console.log(
+    `\nSuccessfully linked up clean top-down architecture index structural maps!`,
+  );
+
+  // 4. Run through prettier
+  await formatGeneratedFiles(filesToFormat);
 }
 
-// Usage: pass the class folder path
-const targetFolder = process.argv[2] ?? '.';
-generateSubclassIndices(targetFolder);
+buildFromRoot();

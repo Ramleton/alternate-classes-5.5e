@@ -1,10 +1,7 @@
 import CPRMacro from 'chris-premades/macro.js';
-import classFeature from './class-features/macros.js';
-import subclass from './subclasses/macros.js';
+import classFeatures from './class-features/macros.js';
+import subclasses from './subclasses/macros.js';
 
-const alternateFighterMacros: CPRMacro[] = [
-  ...classFeature,
-  ...subclass,
-];
+const macros: CPRMacro[] = [...classFeatures, ...subclasses];
 
-export default alternateFighterMacros;
+export default macros;

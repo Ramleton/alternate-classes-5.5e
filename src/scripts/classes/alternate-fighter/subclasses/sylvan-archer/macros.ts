@@ -1,24 +1,14 @@
-import CPRMacro from '../../../../../types/chris-premades/macro.js';
-import banishingShotMacro from './enchanted-shots/banishingShot.js';
-import burstingShotMacro from './enchanted-shots/burstingShot.js';
-import enfeeblingShotMacro from './enchanted-shots/enfeeblingShotEffect.js';
-import graspingShotEffectMovedMacro from './enchanted-shots/graspingShotEffectMoved.js';
-import graspingShotEffectResetMacro from './enchanted-shots/graspingShotEffectReset.js';
-import piercingShotMacro from './enchanted-shots/piercingShot.js';
-import enchantedShotPromptMacro from './enchantedShotPrompt.js';
-import enchantedShotResetMacro from './enchantedShotReset.js';
-import enchantedShotSaveMacro from './enchantedShotSave.js';
+import CPRMacro from 'chris-premades/macro.js';
+import enchantedShotPrompt from './enchantedShotPrompt.js';
+import enchantedShotReset from './enchantedShotReset.js';
+import enchantedShotSave from './enchantedShotSave.js';
+import handle from './handle.js';
 
-const sylvanArcherMacros: CPRMacro[] = [
-  enchantedShotSaveMacro,
-  enchantedShotPromptMacro,
-  enchantedShotResetMacro,
-  enfeeblingShotMacro,
-  graspingShotEffectMovedMacro,
-  graspingShotEffectResetMacro,
-  piercingShotMacro,
-  banishingShotMacro,
-  burstingShotMacro,
+const macros: CPRMacro[] = [
+  enchantedShotPrompt,
+  enchantedShotReset,
+  enchantedShotSave,
+  handle,
 ];
 
-export default sylvanArcherMacros;
+export default macros;

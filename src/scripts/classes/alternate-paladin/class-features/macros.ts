@@ -1,13 +1,15 @@
-import CPRMacro from '../../../../types/chris-premades/macro.js';
+import CPRMacro from 'chris-premades/macro.js';
 import anointedWarriorEvil from './anointedWarriorEvil.js';
-import { divineSmiteNecrotic, divineSmiteRadiant, divineSmiteThunder } from './divineSmite.js';
+import divineSmite from './divineSmite.js';
+import divineSmiteDamage from './divineSmiteDamage.js';
+import divineSmiteFactory from './divineSmiteFactory.js';
 import righteousStrikes from './righteousStrikes.js';
 
 const macros: CPRMacro[] = [
   anointedWarriorEvil,
-  divineSmiteRadiant,
-  divineSmiteThunder,
-  divineSmiteNecrotic,
+  divineSmite,
+  divineSmiteDamage,
+  divineSmiteFactory,
   righteousStrikes,
 ];
 

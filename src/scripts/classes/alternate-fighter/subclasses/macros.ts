@@ -8,7 +8,7 @@ import runecarver from './runecarver/macros.js';
 import shadowdancer from './shadowdancer/macros.js';
 import sylvanArcher from './sylvan-archer/macros.js';
 
-const subclassMacros: CPRMacro[] = [
+const macros: CPRMacro[] = [
   ...champion,
   ...knightErrant,
   ...marksman,
@@ -19,4 +19,4 @@ const subclassMacros: CPRMacro[] = [
   ...sylvanArcher,
 ];
 
-export default subclassMacros;
+export default macros;

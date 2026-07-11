@@ -1,11 +1,6 @@
-import CPRMacro from '../types/chris-premades/macro.js';
-import classMacros from './classes/macros.js';
-import exploitMacros from './exploits/macros.js';
-import { injectAC55ePropertiesInWorkflow } from './macroUtils/ac55ePropertyInjection.js';
+import CPRMacro from 'chris-premades/macro.js';
+import classes from './classes/macros.js';
 
-const macros: CPRMacro[] = injectAC55ePropertiesInWorkflow([
-  ...classMacros,
-  ...exploitMacros,
-]);
+const macros: CPRMacro[] = [...classes];
 
 export default macros;

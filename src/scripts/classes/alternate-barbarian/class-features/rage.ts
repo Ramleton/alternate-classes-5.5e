@@ -1,4 +1,5 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { EffectData } from 'types/effects.js';
 import { extendRage } from './rageEffect.js';
 
@@ -15,6 +16,7 @@ const use: MidiMacroFunction = async ({ trigger: { entity } }) => {
   if (effect) return await extendRage(effect as unknown as ActiveEffect);
   if (!feat.system.uses?.value)
     return genericUtils.notify('Rage is out of uses', 'warn');
+  const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   const effectData: EffectData = {
     name: 'Rage',
     icon: feat.img,
@@ -62,8 +64,7 @@ const use: MidiMacroFunction = async ({ trigger: { entity } }) => {
       {
         key: 'flags.automated-conditions-5e.damage.bonus',
         mode: 0,
-        value:
-          "bonus=@scale.alternate-barbarian.exploit-die); ability.str && (mwak || rwak) && !effects.some(e => e.name.toLowerCase() === 'sorcery-01') && !effects.some(e => e.name.toLowerCase() === 'divine alignment: good');",
+        value: `bonus=1${exploitDie}; ability.str && (mwak || rwak);`,
         priority: 0,
       },
       {

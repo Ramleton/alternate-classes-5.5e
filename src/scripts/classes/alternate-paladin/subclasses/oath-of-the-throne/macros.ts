@@ -1,12 +1,7 @@
 import CPRMacro from 'chris-premades/macro.js';
-import { challengingSmite, challengingSmiteCompelled, challengingSmiteSource } from './challengingSmite.js';
+import challengingSmite from './challengingSmite.js';
 import divineAegis from './divineAegis.js';
 
-const macros: CPRMacro[] = [
-  challengingSmite,
-  challengingSmiteCompelled,
-  challengingSmiteSource,
-  divineAegis,
-];
+const macros: CPRMacro[] = [challengingSmite, divineAegis];
 
 export default macros;
