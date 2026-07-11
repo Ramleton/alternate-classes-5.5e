@@ -3,16 +3,18 @@ import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { getNearbyTargets, preCheck } from 'exploits/2nd-degree/redirect.js';
 
 const pre = async (feat: Item<'feat'>, workflow: Workflow) => {
-  const { utils: { effectUtils } } = chrisPremades;
+  const {
+    utils: { effectUtils },
+  } = chrisPremades;
   const effect = effectUtils.getEffectByIdentifier(
     feat.actor!,
     'ac55eAvatarOfDishonorEffect',
   );
-  if (!effect)
-    return;
-  if (!preCheck(feat, workflow))
-    return;
-  const { utils: { dialogUtils, socketUtils } } = chrisPremades;
+  if (!effect) return;
+  if (!preCheck(feat, workflow)) return;
+  const {
+    utils: { dialogUtils, socketUtils },
+  } = chrisPremades;
   const selection = await dialogUtils.confirmUseItem(feat, {
     userId: socketUtils.firstOwner(feat.actor!, true),
   });
@@ -20,27 +22,25 @@ const pre = async (feat: Item<'feat'>, workflow: Workflow) => {
 };
 
 const during = async (feat: Item<'feat'>, workflow: Workflow) => {
-  const { utils: { dialogUtils, genericUtils, workflowUtils } } = chrisPremades;
+  const {
+    utils: { dialogUtils, genericUtils, workflowUtils },
+  } = chrisPremades;
   const nearbyTargets = getNearbyTargets(feat, workflow);
   let selectTarget: Token | undefined;
   if (nearbyTargets.length === 1) {
     selectTarget = nearbyTargets[0];
-  }
-  else {
+  } else {
     const res = await dialogUtils.selectTargetDialog(
       feat.name,
       'Select a new target for the attack',
       nearbyTargets,
     );
-    if (!res)
-      return;
+    if (!res) return;
     selectTarget = res[0];
   }
-  if (!selectTarget)
-    return;
+  if (!selectTarget) return;
   const newAttack = genericUtils.duplicate(workflow.activity);
-  if (!newAttack)
-    return;
+  if (!newAttack) return;
   await workflowUtils.syntheticActivityDataRoll(
     newAttack,
     workflow.item,
@@ -60,17 +60,21 @@ const workflow: MidiMacroFunction = async ({
   await during(feat, workflow);
 };
 
-export const avatarOfDishonor: CPRMacro = {
+const avatarOfDishonor: CPRMacro = {
   identifier: 'ac55eAvatarOfDishonor',
   name: 'Oathless: Avatar of Dishonor',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',
   midi: {
-    actor: [{
-      pass: 'targetAttackRollComplete',
-      macro: workflow,
-      priority: 910,
-    }],
+    actor: [
+      {
+        pass: 'targetAttackRollComplete',
+        macro: workflow,
+        priority: 910,
+      },
+    ],
   },
 };
+
+export default avatarOfDishonor;
