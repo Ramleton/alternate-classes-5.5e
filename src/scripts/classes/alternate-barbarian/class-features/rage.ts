@@ -3,16 +3,24 @@ import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { EffectData } from 'types/effects.js';
 import { extendRage } from './rageEffect.js';
 
-const use: MacroFunction = async ({ trigger: { entity } }) => {
-  const feat = entity as Item<'feat'>;
+const getRageEffect = (feat: Item<'feat'>): ActiveEffect => {
   const {
-    utils: { effectUtils, genericUtils },
+    utils: { effectUtils },
   } = chrisPremades;
   const effect = effectUtils.getEffectByIdentifier(
     feat.actor!,
     'ac55eRageEffect',
   );
+  return effect as unknown as ActiveEffect;
+};
+
+const use: MacroFunction = async ({ trigger: { entity } }) => {
+  const feat = entity as Item<'feat'>;
+  const {
+    utils: { effectUtils, genericUtils },
+  } = chrisPremades;
   // If the effect already exists, extend it
+  const effect = getRageEffect(feat);
   if (effect) return await extendRage(effect as unknown as ActiveEffect);
   if (!feat.system.uses?.value)
     return genericUtils.notify('Rage is out of uses', 'warn');
@@ -112,6 +120,7 @@ const dangerSensePrompt: MacroFunction = async (data) => {
     utils: { dialogUtils, itemUtils, socketUtils },
   } = chrisPremades;
   if (!itemUtils.getItemByIdentifier(feat.actor!, 'ac55eDangerSense')) return;
+  if (getRageEffect(feat)) return;
   const userId = socketUtils.firstOwner(feat, true);
   const selection = await dialogUtils.confirmUseItem(feat, { userId });
   if (!selection) return;
@@ -138,7 +147,7 @@ const macro: CPRMacro = {
     {
       pass: 'combatStart',
       macro: dangerSensePrompt,
-      priority: 0,
+      priority: 10,
     },
   ],
 };

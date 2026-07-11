@@ -70,6 +70,17 @@ const endRage: MacroFunction = async ({
   await effect.delete();
 };
 
+const resetOnCombatStart: MacroFunction = async ({ trigger: { entity } }) => {
+  const effect = entity as unknown as ActiveEffect;
+  const {
+    utils: { genericUtils },
+  } = chrisPremades;
+  const combat = game.combat!;
+  console.log(combat.combatants, effect.parent!.id);
+  if (!combat.combatants.find((c) => c.actorId === effect.parent!.id)) return;
+  await genericUtils.setFlag(effect, 'alternate-classes-55e', 'lastRound', 1);
+};
+
 const rageEffectMacro: CPRMacro = {
   identifier: 'ac55eRageEffect',
   name: 'Rage: Effect',
@@ -105,6 +116,11 @@ const rageEffectMacro: CPRMacro = {
     },
   ],
   combat: [
+    {
+      pass: 'combatStart',
+      macro: resetOnCombatStart,
+      priority: 0,
+    },
     {
       pass: 'turnEnd',
       macro: endRage,
