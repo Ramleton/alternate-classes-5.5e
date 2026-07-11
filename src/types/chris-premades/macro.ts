@@ -458,6 +458,10 @@ export interface Trigger {
   roll: D20Roll;
   saveId: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
   skillId: SkillIdentifier;
+  currentRound?: number;
+  currentTurn?: number;
+  previousRound?: number;
+  previousTurn?: number;
   config: {
     ability?: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
     advantage?: boolean;
