@@ -1,9 +1,9 @@
-import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { EffectData } from 'types/effects.js';
 import { extendRage } from './rageEffect.js';
 
-const use: MidiMacroFunction = async ({ trigger: { entity } }) => {
+const use: MacroFunction = async ({ trigger: { entity } }) => {
   const feat = entity as Item<'feat'>;
   const {
     utils: { effectUtils, genericUtils },
@@ -102,6 +102,22 @@ const use: MidiMacroFunction = async ({ trigger: { entity } }) => {
   });
 };
 
+const dangerSensePrompt: MacroFunction = async (data) => {
+  const {
+    trigger: { entity },
+  } = data;
+  const feat = entity as Item<'feat'>;
+  if (!feat.system.uses?.value) return;
+  const {
+    utils: { dialogUtils, itemUtils, socketUtils },
+  } = chrisPremades;
+  if (!itemUtils.getItemByIdentifier(feat.actor!, 'ac55eDangerSense')) return;
+  const userId = socketUtils.firstOwner(feat, true);
+  const selection = await dialogUtils.confirmUseItem(feat, { userId });
+  if (!selection) return;
+  await use(data);
+};
+
 const macro: CPRMacro = {
   identifier: 'ac55eRage',
   name: 'Rage',
@@ -118,6 +134,13 @@ const macro: CPRMacro = {
       },
     ],
   },
+  combat: [
+    {
+      pass: 'combatStart',
+      macro: dangerSensePrompt,
+      priority: 0,
+    },
+  ],
 };
 
 export default macro;
