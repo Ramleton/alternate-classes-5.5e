@@ -16,6 +16,7 @@ export const injectAC55ePropertiesInWorkflow = (
           (eventDetails: MidiMacroEventDetails) => {
             const originalFunction = eventDetails.macro;
             eventDetails.macro = async (data: MidiMacroFunctionArgs) => {
+              if (!data.workflow) return await originalFunction(data);
               if (!data.workflow['alternate-classes-55e'])
                 data.workflow['alternate-classes-55e'] = {};
               return await originalFunction(data);
