@@ -86,6 +86,40 @@ const resetOnCombatStart: MacroFunction = async ({ trigger: { entity } }) => {
   await genericUtils.setFlag(effect, 'alternate-classes-55e', 'lastRound', 1);
 };
 
+const unstoppable: MidiMacroFunction = async ({
+  trigger: { entity },
+  ditem,
+}) => {
+  if (!ditem || ditem.newHP) return;
+  const effect = entity as unknown as ActiveEffect;
+  const {
+    utils: { itemUtils },
+  } = chrisPremades;
+  const unstoppable = itemUtils.getItemByIdentifier(
+    effect.parent! as Actor5e,
+    'ac55eUnstoppable',
+  );
+  if (!unstoppable) return;
+  ditem.totalDamage = ditem.oldHP - 1;
+  ditem.newHP = 1;
+  ditem.newTempHP = 0;
+  ditem.hpDamage = ditem.totalDamage;
+  ditem.damageDetail.forEach((i) => (i.value = 0));
+  ditem.damageDetail[0].value = ditem.totalDamage;
+  await effect.delete();
+};
+
+const unstoppableSaveBonus: MacroFunction = async ({
+  trigger: { entity, roll, saveId },
+}) => {
+  if (!['int', 'wis', 'cha'].some((ability) => ability === saveId)) return;
+  const conMod = (entity.parent! as Actor5e).system.abilities.con.mod;
+  const {
+    utils: { rollUtils },
+  } = chrisPremades;
+  return await rollUtils.addToRoll(roll, `${Math.max(1, conMod)}`);
+};
+
 const rageEffectMacro: CPRMacro = {
   identifier: 'ac55eRageEffect',
   name: 'Rage: Effect',
@@ -101,11 +135,23 @@ const rageEffectMacro: CPRMacro = {
       },
       {
         pass: 'targetApplyDamage',
+        macro: unstoppable,
+        priority: 990,
+      },
+      {
+        pass: 'targetApplyDamage',
         macro: extendRageDamaged,
         priority: 0,
       },
     ],
   },
+  save: [
+    {
+      pass: 'bonus',
+      macro: unstoppableSaveBonus,
+      priority: 0,
+    },
+  ],
   skill: [
     {
       pass: 'post',

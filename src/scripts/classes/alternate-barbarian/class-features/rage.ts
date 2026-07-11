@@ -25,10 +25,14 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
   if (!feat.system.uses?.value)
     return genericUtils.notify('Rage is out of uses', 'warn');
   const exploitDie = getAlternateMartialExploitDie(feat.actor!);
+  const seconds =
+    feat.actor!.classes['alternate-barbarian'].system.levels < 15 ? 600 : 3600;
   const effectData: EffectData = {
     name: 'Rage',
     icon: feat.img,
-    duration: { seconds: 600 },
+    duration: {
+      seconds,
+    },
     origin: feat.uuid!,
     flags: {
       dae: {
