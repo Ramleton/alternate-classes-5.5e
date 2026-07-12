@@ -130,11 +130,11 @@ export default interface CauldronOfPlentifulResources {
         regionDatas: object[],
         scene: Scene,
         options?: {
-          parentEntity: any;
+          parentEntity?: any;
           excludeGPSRegionHandling?: boolean;
-          origin: any;
+          origin?: any;
         },
-      ): object[];
+      ): Promise<object[]>;
 
       templateToRegionShape(
         template: any,
