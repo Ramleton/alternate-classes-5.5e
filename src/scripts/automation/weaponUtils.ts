@@ -137,6 +137,12 @@ export const isWeaponAttack: ExploitPrerequisiteCheck = ({
   return constants.weaponAttacks.some((type) => type === actionType);
 };
 
+export const weaponAttackCritCheck: ExploitPrerequisiteCheck = (
+  data,
+): boolean => {
+  return data.workflow.isCritical && isWeaponAttack(data);
+};
+
 export const isMeleeWeaponAttack: ExploitPrerequisiteCheck = ({
   workflow,
 }): boolean => {
