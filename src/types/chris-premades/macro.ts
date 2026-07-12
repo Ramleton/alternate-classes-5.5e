@@ -647,6 +647,15 @@ export interface D20MacroEventDetails extends CPRMacroEventDetails {
   pass: D20Event;
 }
 
+interface ConfigOption {
+  value: string;
+  label: string;
+  type: 'checkbox' | 'number' | 'text' | 'select-many' | unknown;
+  default: any;
+  homebrew?: boolean;
+  category: 'animation' | 'homebrew' | unknown;
+}
+
 export default interface CPRMacro {
   identifier: string;
   name: string;
@@ -668,4 +677,5 @@ export default interface CPRMacro {
   skill?: D20MacroEventDetails[];
   death?: D20MacroEventDetails[];
   D20?: D20MacroEventDetails[];
+  config?: ConfigOption[];
 }

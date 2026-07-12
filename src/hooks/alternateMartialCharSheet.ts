@@ -1,10 +1,13 @@
-import { ALTERNATE_MARTIAL_EXPLOIT_TIERS } from 'exploits/config/exploitConfig.js';
 import {
+  ALTERNATE_MARTIAL_EXPLOIT_TIERS,
   ALTERNATE_MARTIAL_MULTICLASSING_RECORD,
+} from 'exploits/config/exploitConfig.js';
+import {
   calcAlternateMartialMulticlassLevel,
   getExploitDegree,
   isAlternateMartialExploit,
 } from 'exploits/utils.js';
+import { getExploitSaveDC } from 'exploits/utils/exploitUtils.js';
 
 interface ExploitTabAlternateMartialClass {
   id: string;
@@ -18,33 +21,6 @@ interface ExploitTabAlternateMartialClass {
   subclassName?: string;
   subclassImg?: string;
 }
-
-interface ExploitSaveDCInfo {
-  type: 'devious' | 'martial' | 'savage';
-  ability:
-    | 'dexterity'
-    | 'strength'
-    | 'constitution'
-    | 'intelligence'
-    | 'wisdom'
-    | 'charisma';
-}
-
-const exploitSaveDCRecord: Record<
-  string,
-  [ExploitSaveDCInfo, ExploitSaveDCInfo]
-> = {
-  'alternate-rogue': [
-    {
-      type: 'devious',
-      ability: 'dexterity',
-    },
-    {
-      type: 'devious',
-      ability: 'strength',
-    },
-  ],
-};
 
 Hooks.once('init', () => {
   const SheetClass = dnd5e.applications.actor.CharacterActorSheet;
@@ -66,27 +42,6 @@ Hooks.once('init', () => {
     '[Alternate Classes 5.5e]: Added Alternate Martial Exploits Tab to Character Sheets',
   );
 });
-
-const getSaveDC = (actor: Actor5e, altClass: string): string => {
-  const classRecord = exploitSaveDCRecord[altClass];
-  if (!classRecord) return '—';
-  const saveDCOptions = exploitSaveDCRecord[altClass].map((sdc) => ({
-    key: `${sdc.type}-exploits-${sdc.ability}-save`,
-    ability: sdc.ability,
-  }));
-  const activeOption = saveDCOptions.find((sdc) => actor.system.scale[sdc.key]);
-  if (!activeOption) return '—';
-  const abilityModifiers: Record<ExploitSaveDCInfo['ability'], number> = {
-    dexterity: actor.system.abilities.dex.mod,
-    strength: actor.system.abilities.str.mod,
-    constitution: actor.system.abilities.con.mod,
-    intelligence: actor.system.abilities.int.mod,
-    wisdom: actor.system.abilities.wis.mod,
-    charisma: actor.system.abilities.cha.mod,
-  };
-  const profBonus = actor.system.attributes.prof ?? 2;
-  return (8 + abilityModifiers[activeOption.ability] + profBonus).toString();
-};
 
 // Helper function (e.g., in a utils file or within this file)
 const processAlternateMartialClass = (
@@ -127,14 +82,14 @@ const processAlternateMartialClass = (
     }
   }
 
-  const saveDC = getSaveDC(actor, effectiveAltClassId);
+  const saveDC = getExploitSaveDC(actor, effectiveAltClassId);
   return {
     id: altClassKey,
     uuid: classItem.uuid!,
     name: hasSubclass ? `${classItem.name} (${subclassName})` : classItem.name,
     img: classItem.img!,
     level: classItem.system.levels,
-    saveDC,
+    saveDC: saveDC ? saveDC + '' : '-',
     hasSubclass,
     subclassUuid,
     subclassName,
