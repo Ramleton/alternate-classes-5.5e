@@ -137,7 +137,7 @@ const macro: CPRMacro = {
   },
   combat: [
     {
-      pass: 'turnStartSource',
+      pass: 'turnStart',
       macro: resetSpectralWarriors,
       priority: 0,
     },
