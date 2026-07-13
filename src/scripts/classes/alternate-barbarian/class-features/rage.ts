@@ -17,7 +17,7 @@ const getRageEffect = (feat: Item<'feat'>): ActiveEffect => {
 const use: MacroFunction = async ({ trigger: { entity } }) => {
   const feat = entity as Item<'feat'>;
   const {
-    utils: { effectUtils, genericUtils },
+    utils: { effectUtils, genericUtils, itemUtils },
   } = chrisPremades;
   // If the effect already exists, extend it
   const effect = getRageEffect(feat);
@@ -27,6 +27,18 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
   const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   const seconds =
     feat.actor!.classes['alternate-barbarian'].system.levels < 15 ? 600 : 3600;
+  const spectralWarriors = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eSpectralWarriors',
+  );
+  if (spectralWarriors) {
+    await genericUtils.setFlag(
+      spectralWarriors,
+      'alternate-classes-55e',
+      'spectralWarriorsSpace',
+      feat.actor!.uuid!,
+    );
+  }
   const effectData: EffectData = {
     name: 'Rage',
     icon: feat.img,

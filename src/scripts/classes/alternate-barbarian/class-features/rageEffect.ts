@@ -2,6 +2,7 @@ import CPRMacro, {
   MacroFunction,
   MidiMacroFunction,
 } from 'chris-premades/macro.js';
+import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 
 export const extendRage = async (effect: ActiveEffect) => {
   const combat = game.combat;
@@ -120,6 +121,30 @@ const unstoppableSaveBonus: MacroFunction = async ({
   return await rollUtils.addToRoll(roll, `${Math.max(1, conMod)}`);
 };
 
+const updateDamageType: MidiMacroFunction = async ({ trigger: { entity } }) => {
+  const effect = entity as unknown as ActiveEffect;
+  const {
+    utils: { genericUtils, itemUtils },
+  } = chrisPremades;
+  const actor = effect.parent as Actor5e;
+  const spectralWarriors = itemUtils.getItemByIdentifier(
+    actor,
+    'ac55eSpectralWarriors',
+  );
+  const exploitDie = getAlternateMartialExploitDie(actor);
+  if (!exploitDie) return;
+  if (!spectralWarriors) return;
+  const spectralWarriorsSpace =
+    spectralWarriors.flags['alternate-classes-55e'].spectralWarriorsSpace;
+  if (spectralWarriorsSpace !== actor.uuid) return;
+  const newChanges = effect.changes.map((c) => {
+    if (c.key === 'flags.automated-conditions-5e.damage.bonus') {
+      c.value = `bonus=1${exploitDie}[radiant]; ability.str && (mwak || rwak);`;
+    }
+  });
+  await genericUtils.update(effect, { changes: newChanges });
+};
+
 const rageEffectMacro: CPRMacro = {
   identifier: 'ac55eRageEffect',
   name: 'Rage: Effect',
@@ -134,14 +159,19 @@ const rageEffectMacro: CPRMacro = {
         priority: 0,
       },
       {
-        pass: 'targetApplyDamage',
-        macro: unstoppable,
-        priority: 990,
+        pass: 'attackRollComplete',
+        macro: updateDamageType,
+        priority: 0,
       },
       {
         pass: 'targetApplyDamage',
         macro: extendRageDamaged,
         priority: 0,
+      },
+      {
+        pass: 'targetApplyDamage',
+        macro: unstoppable,
+        priority: 990,
       },
     ],
   },

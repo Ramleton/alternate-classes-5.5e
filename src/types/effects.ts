@@ -71,6 +71,7 @@ export interface EffectFlags {
         targetUuid?: string;
       };
       origin?: string;
+      [key: string]: unknown;
     };
   };
   'chris-premades'?: {
