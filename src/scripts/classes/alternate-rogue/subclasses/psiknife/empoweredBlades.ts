@@ -60,7 +60,7 @@ const sentientStrike: MidiMacroFunction = async ({
     { userId: socketUtils.firstOwner(feat.actor!, true) },
   );
   if (!selection) return;
-  await workflowUtils.bonusAttack(workflow, `1d${exploitDie}`);
+  await workflowUtils.bonusAttack(workflow, `1${exploitDie}`);
 };
 
 const macro: CPRMacro = {

@@ -10,7 +10,7 @@ const bonus: MacroFunction = async ({ trigger: { entity, roll, skillId } }) => {
     (entity as Item<'feat'>).actor!,
   );
   if (!exploitDie) return;
-  return await rollUtils.addToRoll(roll, `1d${exploitDie}`);
+  return await rollUtils.addToRoll(roll, `1${exploitDie}`);
 };
 
 const macro: CPRMacro = {

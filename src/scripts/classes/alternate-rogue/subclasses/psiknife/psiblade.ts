@@ -30,7 +30,7 @@ const conjurePsiblade: MidiMacroFunction = async ({ trigger: { entity } }) => {
     types: new Set(['psychic']),
     custom: {
       enabled: true,
-      formula: `1d${exploitDie}`,
+      formula: `1${exploitDie}`,
     },
     scaling: {
       number: 1,

@@ -31,7 +31,7 @@ const skillBonus: MacroFunction = async ({
   if (skillId === 'ins' && !exiledCourtierInsight) return;
   if (skillId === 'prf' && !exiledCourtierPerformance) return;
   if (skillId === 'per' && !exiledCourtierPersuasion) return;
-  return await rollUtils.addToRoll(roll, `1d${exploitDie}`);
+  return await rollUtils.addToRoll(roll, `1${exploitDie}`);
 };
 const macro: CPRMacro = {
   identifier: 'ac55eLordlyBearing',

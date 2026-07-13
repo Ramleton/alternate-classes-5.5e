@@ -17,7 +17,7 @@ const during = async (
 ): Promise<boolean> => {
   const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return false;
-  const bonusFormula = `1d${exploitDie}`;
+  const bonusFormula = `1${exploitDie}`;
   const {
     utils: { effectUtils, genericUtils },
   } = chrisPremades;
