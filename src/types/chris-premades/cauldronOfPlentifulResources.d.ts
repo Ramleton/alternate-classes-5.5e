@@ -621,7 +621,7 @@ export default interface CauldronOfPlentifulResources {
           buttons?: string;
           userId?: string;
         },
-      ): Promise<object>;
+      ): Promise<number | undefined>;
 
       selectDialog(
         title: string,
