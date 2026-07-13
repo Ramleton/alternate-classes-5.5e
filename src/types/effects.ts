@@ -2,16 +2,17 @@ import { ScaleValueTypeDice } from 'fvtt-types/CharacterSystemData.js';
 import { DamageType } from './damage.js';
 
 export const STATUSES = [
+  'blinded',
+  'charmed',
+  'concentrating',
   'poisoned',
   'paralyzed',
-  'blinded',
   'deafened',
   'frightened',
   'stunned',
   'incapacitated',
   'unconscious',
   'diseased',
-  'charmed',
   'grappled',
   'petrified',
   'prone',
