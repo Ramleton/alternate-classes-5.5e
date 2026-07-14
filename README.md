@@ -6,7 +6,7 @@ A FoundryVTT module providing enhanced D&D 5e alternate class implementations in
 
 This module adds comprehensive D&D 5e alternate class and subclass options with full automation support. Features are implemented using TypeScript and integrated with the midi-qol/chris-premades ecosystem to deliver seamless, automated gameplay mechanics.
 
-**Inspiration:** This project automates the excellent alternate class designs created by [Laserllama](https://www.patreon.com/cw/laserllama), bringing their creative work to FoundryVTT with full midi-qol/CPR integration.
+**Inspiration:** This project automates the excellent alternate class designs created by [Laserllama](https://www.patreon.com/cw/laserllama), bringing their creative work to FoundryVTT with full midi-qol/CPR/Automated Conditions 5e integration.
 
 ### Supported Classes & Automation Status
 
