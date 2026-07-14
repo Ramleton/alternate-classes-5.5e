@@ -27,7 +27,7 @@ export const runActivity = async (
 };
 
 export const getActivityData = async (
-  item: Item<'feat'>,
+  item: Item<'feat'> | Item<'equipment'>,
   activityIdentifier: string,
 ): Promise<Activity | undefined> => {
   const {
