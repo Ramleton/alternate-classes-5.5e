@@ -1,5 +1,6 @@
 import { runActivity } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { isRaging } from '../../utils/rageUtils.js';
 
 const handle: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
   if (!workflow.hitTargets.size) return;
@@ -11,6 +12,7 @@ const handle: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
   const feat = entity as Item<'feat'>;
   const target = workflow.hitTargets.first() as Token;
   if (actorUtils.compareSize(feat.actor!, target.actor!, '>')) return;
+  if (!isRaging(feat.actor!)) return;
   await runActivity(feat, 'save', [target]);
 };
 
