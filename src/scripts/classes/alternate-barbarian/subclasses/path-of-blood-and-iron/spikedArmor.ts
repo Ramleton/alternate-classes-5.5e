@@ -6,7 +6,7 @@ const handle: MidiMacroFunction = async ({ trigger: { entity } }) => {
     utils: { compendiumUtils, genericUtils, itemUtils },
   } = chrisPremades;
   const unarmedStrike = await compendiumUtils.getItemFromCompendium(
-    'Compendium.chris-premades.CPRItems2024',
+    'chris-premades.CPRItems2024',
     'Unarmed Strike',
   );
   if (!unarmedStrike) return;

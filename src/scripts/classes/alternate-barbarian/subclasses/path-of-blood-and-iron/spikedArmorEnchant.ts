@@ -11,7 +11,9 @@ const handleSpikedRetribution: MidiMacroFunction = async ({
   trigger: { entity },
   workflow,
 }) => {
-  const item = entity as Item<'equipment'>;
+  const effect = entity as unknown as ActiveEffect;
+  if (effect.disabled) return;
+  const item = effect.parent as Item<'equipment'>;
   if (!item.system.equipped) return;
   if (!workflow.hitTargets.size) return;
   const {
@@ -19,11 +21,6 @@ const handleSpikedRetribution: MidiMacroFunction = async ({
   } = chrisPremades;
   const actionType = workflowUtils.getActionType(workflow);
   if (!constants.meleeAttacks.some((type) => type === actionType)) return;
-  const effect = itemUtils.getEffectByIdentifier(
-    item,
-    'ac55eSpikedArmorEnchant',
-  ) as unknown as ActiveEffect;
-  if (effect.disabled) return;
   const actor = item.actor as Actor5e;
   const spikedRetribution = itemUtils.getItemByIdentifier(
     actor,
@@ -57,27 +54,33 @@ const handleSpikedRetribution: MidiMacroFunction = async ({
 };
 
 const handleGrappleDamage: MacroFunction = async ({
-  trigger: { entity, token, sourceToken },
+  trigger: { entity, token, target },
 }) => {
-  const item = entity as Item<'equipment'>;
-  if (!item.system.equipped) return;
-  if (!sourceToken) return;
+  const effect = entity as unknown as ActiveEffect;
+  if (effect.disabled) return;
+  if (!target) return;
   const {
-    utils: { tokenUtils, workflowUtils },
+    utils: { genericUtils, tokenUtils, workflowUtils },
   } = chrisPremades;
-  if (!tokenUtils.isGrappledBy(sourceToken, token)) return;
-  const grappleDamageActivity = (await getActivityData(
-    item,
-    'grappleDamage',
-  )) as DamageActivity | undefined;
-  if (!grappleDamageActivity) return;
+  const item = effect.parent as Item<'equipment'>;
+  if (!item.system.equipped) return;
+  if (!tokenUtils.isGrappledBy(target, token)) return;
+  const activity = Object.values(item.system.activities.contents).find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (a: any) =>
+      a.midiProperties.identifier === 'PathOfBloodAndIron.grappleDamage',
+  ) as DamageActivity | null;
+  if (!activity) return;
+  const grappleDamageActivity = genericUtils.duplicate(
+    activity,
+  ) as DamageActivity;
   const exploitDie = getAlternateMartialExploitDie(item.actor!);
   grappleDamageActivity.damage.parts[0].custom.formula = `1${exploitDie}`;
   await workflowUtils.syntheticActivityDataRoll(
     grappleDamageActivity,
     item,
     item.actor!,
-    [sourceToken],
+    [target],
   );
 };
 
@@ -98,7 +101,7 @@ const macro: CPRMacro = {
   },
   combat: [
     {
-      pass: 'everyTurn',
+      pass: 'turnStartNear',
       macro: handleGrappleDamage,
       priority: 0,
     },
