@@ -2,6 +2,7 @@ import { getActivityData } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { DamageActivity } from 'fvtt-types/Activity.js';
+import { isRaging } from '../../utils/rageUtils.js';
 
 const handle: MidiMacroFunction = async ({
   trigger: { entity, token, sourceToken, targetToken },
@@ -18,7 +19,6 @@ const handle: MidiMacroFunction = async ({
     utils: {
       actorUtils,
       dialogUtils,
-      effectUtils,
       genericUtils,
       itemUtils,
       rollUtils,
@@ -31,11 +31,7 @@ const handle: MidiMacroFunction = async ({
   if (tokenUtils.getDistance(token, targetToken) > 30) return;
   const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
-  const rage = effectUtils.getEffectByIdentifier(
-    feat.actor!,
-    'ac55eRageEffect',
-  );
-  if (!rage) return;
+  if (!isRaging(feat.actor!)) return;
   const spectralWarriors = itemUtils.getItemByIdentifier(
     feat.actor,
     'ac55eSpectralWarriors',

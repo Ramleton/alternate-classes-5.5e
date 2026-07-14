@@ -8,6 +8,7 @@ import CPRMacro, {
   MidiMacroFunction,
 } from 'chris-premades/macro.js';
 import { EffectData } from 'types/effects.js';
+import { isRaging } from '../../utils/rageUtils.js';
 
 const useEtherealScourge: MidiMacroFunction = async ({
   trigger: { entity, token },
@@ -17,6 +18,7 @@ const useEtherealScourge: MidiMacroFunction = async ({
   if (!meleeWeaponAttackHitCheck({ feat, token, workflow })) return;
   const space = feat.flags['alternate-classes-55e']?.spectralWarriorsSpace;
   if (space !== feat.actor!.uuid!) return;
+  if (!isRaging(feat.actor!)) return;
   const {
     utils: { dialogUtils, genericUtils, socketUtils },
   } = chrisPremades;
