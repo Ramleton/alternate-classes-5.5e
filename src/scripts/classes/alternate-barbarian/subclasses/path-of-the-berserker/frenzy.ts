@@ -1,15 +1,23 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 
-const handle: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
+const handle: MidiMacroFunction = async ({
+  trigger: { entity, token },
+  workflow,
+}) => {
   const feat = entity as Item<'feat'>;
   if (!feat.system.uses?.value) return;
   if (!workflow.hitTargets.size) return;
   const {
-    utils: { effectUtils, genericUtils, workflowUtils },
+    utils: { effectUtils, genericUtils, itemUtils, combatUtils, workflowUtils },
   } = chrisPremades;
   if (!effectUtils.getEffectByIdentifier(feat.actor!, 'ac55eRecklessAttack'))
     return;
+  const unrivaledFury = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eUnrivaledFury',
+  );
+  if (!unrivaledFury && !combatUtils.isOwnTurn(token)) return;
   const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
   await workflowUtils.bonusDamage(workflow, `2${exploitDie}`);
