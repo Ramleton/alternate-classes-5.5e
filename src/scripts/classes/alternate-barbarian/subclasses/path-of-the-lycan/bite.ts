@@ -18,8 +18,8 @@ const handle: MidiMacroFunction = async ({
 };
 
 const macro: CPRMacro = {
-  identifier: 'ac55ePathOfLycanthropyBite',
-  name: 'Path Of Lycanthropy: Bite',
+  identifier: 'ac55ePathOfTheLycanBite',
+  name: 'Path of the Lycan: Bite',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',

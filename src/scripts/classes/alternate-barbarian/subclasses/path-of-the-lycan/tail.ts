@@ -28,8 +28,8 @@ const acBoostCallback: ACBoostCallback = async ({ feat }) => {
 };
 
 export default acBoostMacroFactory({
-  identifier: 'ac55ePathOfLycanthropyTail',
-  name: 'Path of Lycanthropy: Tail',
+  identifier: 'ac55ePathOfTheLycanTail',
+  name: 'Path of the Lycan: Tail',
   preCallback,
   acBoostCallback,
 });

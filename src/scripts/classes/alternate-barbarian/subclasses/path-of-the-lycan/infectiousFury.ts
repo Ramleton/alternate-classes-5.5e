@@ -130,7 +130,7 @@ const handle: MidiMacroFunction = async ({
 
 const macro: CPRMacro = {
   identifier: 'ac55eInfectiousFury',
-  name: 'Path of Lycanthropy: Infectious Fury',
+  name: 'Path of the Lycan: Infectious Fury',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',

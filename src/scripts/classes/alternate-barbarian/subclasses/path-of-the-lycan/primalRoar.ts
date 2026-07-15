@@ -9,7 +9,7 @@ export const hasPrimalRoar = (actor: Actor5e): boolean => {
 
 const macro: CPRMacro = {
   identifier: 'ac55ePrimalRoar',
-  name: 'Path of Lycanthropy: Primal Roar',
+  name: 'Path of the Lycan: Primal Roar',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',
