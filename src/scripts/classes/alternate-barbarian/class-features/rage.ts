@@ -2,6 +2,10 @@ import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { EffectData } from 'types/effects.js';
 import { getElementDamage } from '../subclasses/path-of-elemental-chaos/heartOfChaos.js';
+import {
+  getWildSorceryResult,
+  handleRollWildSorceryTable,
+} from '../subclasses/path-of-sorcery/wildSorcery.js';
 import { extendRage } from './rageEffect.js';
 
 const getRageEffect = (feat: Item<'feat'>): ActiveEffect => {
@@ -44,6 +48,8 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
   const pathOfElementalChaosElement = getElementDamage(feat.actor!, true);
   if (pathOfElementalChaosElement)
     overrideRageDamageType = `[${pathOfElementalChaosElement}]`;
+  const wildSorceryResult = getWildSorceryResult(feat.actor!);
+  if (wildSorceryResult === 1) overrideRageDamageType = '[necrotic]';
   const effectData: EffectData = {
     name: 'Rage',
     icon: feat.img,
@@ -123,9 +129,16 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
     ],
     statuses: [],
   };
-  await effectUtils.createEffect(feat.actor!, effectData, {
+  const rageEffect = await effectUtils.createEffect(feat.actor!, effectData, {
     rules: 'modern',
   });
+  const wildSorcery = itemUtils.getItemByIdentifier(
+    feat.actor!,
+    'ac55eWildSorcery',
+  );
+  if (wildSorcery) {
+    await handleRollWildSorceryTable(feat.actor!, rageEffect);
+  }
   await genericUtils.update(feat, {
     'system.uses.spent': feat.system.uses.spent + 1,
   });

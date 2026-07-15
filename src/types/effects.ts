@@ -48,6 +48,7 @@ type DAESpecialDuration =
 export interface EffectFlags {
   'alternate-classes-55e'?: {
     macros?: {
+      wildSorcery?: number;
       chivalricMark?: {
         distance: number;
       };
