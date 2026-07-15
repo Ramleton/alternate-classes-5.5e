@@ -1,6 +1,7 @@
 import CPRMacro, { MacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { EffectData } from 'types/effects.js';
+import { getElementDamage } from '../subclasses/path-of-elemental-chaos/heartOfChaos.js';
 import { extendRage } from './rageEffect.js';
 
 const getRageEffect = (feat: Item<'feat'>): ActiveEffect => {
@@ -39,6 +40,10 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
       feat.actor!.uuid!,
     );
   }
+  let overrideRageDamageType = '';
+  const pathOfElementalChaosElement = getElementDamage(feat.actor!);
+  if (pathOfElementalChaosElement)
+    overrideRageDamageType = `[${pathOfElementalChaosElement}]`;
   const effectData: EffectData = {
     name: 'Rage',
     icon: feat.img,
@@ -88,7 +93,7 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
       {
         key: 'flags.automated-conditions-5e.damage.bonus',
         mode: 0,
-        value: `bonus=1${exploitDie}; ability.str && (mwak || rwak);`,
+        value: `bonus=1${exploitDie}${overrideRageDamageType}; ability.str && (mwak || rwak);`,
         priority: 0,
       },
       {
