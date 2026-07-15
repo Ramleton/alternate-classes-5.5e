@@ -6,7 +6,6 @@ import { getElementDamage } from './heartOfChaos.js';
 
 const handle: MidiMacroFunction = async ({ trigger: { entity } }) => {
   const feat = entity as Item<'feat'>;
-  if (!feat.system.uses?.value) return;
   const {
     utils: { genericUtils, itemUtils, workflowUtils },
   } = chrisPremades;
