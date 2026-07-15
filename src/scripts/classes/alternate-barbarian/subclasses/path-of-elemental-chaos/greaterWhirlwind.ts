@@ -25,7 +25,8 @@ const startOfTurnDamage: MacroFunction = async ({
   const damageActivity = (await getActivityData(feat, 'damage')) as
     DamageActivity | undefined;
   if (!damageActivity) return;
-  damageActivity.damage.parts[0].custom.formula = `1${exploitDie}`;
+  const conMod = feat.actor!.system.abilities.con.mod;
+  damageActivity.damage.parts[0].custom.formula = `1${exploitDie} + ${conMod}`;
   damageActivity.damage.parts[0].types = [element];
   await workflowUtils.syntheticActivityDataRoll(
     damageActivity,
