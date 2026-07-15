@@ -41,7 +41,7 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
     );
   }
   let overrideRageDamageType = '';
-  const pathOfElementalChaosElement = getElementDamage(feat.actor!);
+  const pathOfElementalChaosElement = getElementDamage(feat.actor!, true);
   if (pathOfElementalChaosElement)
     overrideRageDamageType = `[${pathOfElementalChaosElement}]`;
   const effectData: EffectData = {

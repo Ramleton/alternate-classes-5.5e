@@ -4,7 +4,10 @@ import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { DamageActivity } from 'fvtt-types/Activity.js';
 import { DamageType } from 'types/damage.js';
 
-export const getElementDamage = (actor: Actor5e): DamageType | void => {
+export const getElementDamage = (
+  actor: Actor5e,
+  usingRage = false,
+): DamageType | undefined => {
   const {
     utils: { effectUtils, itemUtils },
   } = chrisPremades;
@@ -12,11 +15,11 @@ export const getElementDamage = (actor: Actor5e): DamageType | void => {
     actor,
     'ac55eControlledChaos',
   );
-  if (!controlledChaos) {
+  if (!usingRage && !controlledChaos) {
     const rage = effectUtils.getEffectByIdentifier(actor, 'ac55eRageEffect');
     if (!rage) return;
   }
-  ['air', 'fire', 'water'].forEach((element) => {
+  for (const element of ['air', 'fire', 'water']) {
     const item = itemUtils.getItemByIdentifier(
       actor,
       `ac55ePathOfElementalChaosElement${element.capitalize()}`,
@@ -26,7 +29,7 @@ export const getElementDamage = (actor: Actor5e): DamageType | void => {
       if (element === 'water') return 'cold';
       return 'fire';
     }
-  });
+  }
 };
 
 const primevalRebuke: MidiMacroFunction = async ({
