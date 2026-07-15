@@ -6,6 +6,9 @@ import {
   getWildSorceryResult,
   handleRollWildSorceryTable,
 } from '../subclasses/path-of-sorcery/wildSorcery.js';
+import { hasDivineAlignmentEvil } from '../subclasses/path-of-the-zealot/divineAlignmentEvil.js';
+import { hasDivineAlignmentGood } from '../subclasses/path-of-the-zealot/divineAlignmentGood.js';
+import { hasDivineAlignmentNeutral } from '../subclasses/path-of-the-zealot/divineAlignmentNeutral.js';
 import { extendRage } from './rageEffect.js';
 
 const getRageEffect = (feat: Item<'feat'>): ActiveEffect => {
@@ -50,6 +53,12 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
     overrideRageDamageType = `[${pathOfElementalChaosElement}]`;
   const wildSorceryResult = getWildSorceryResult(feat.actor!);
   if (wildSorceryResult === 1) overrideRageDamageType = '[necrotic]';
+  if (hasDivineAlignmentGood(feat.actor!, true))
+    overrideRageDamageType = '[radiant]';
+  if (hasDivineAlignmentNeutral(feat.actor!, true))
+    overrideRageDamageType = '[thunder]';
+  if (hasDivineAlignmentEvil(feat.actor!, true))
+    overrideRageDamageType = '[necrotic]';
   const effectData: EffectData = {
     name: 'Rage',
     icon: feat.img,

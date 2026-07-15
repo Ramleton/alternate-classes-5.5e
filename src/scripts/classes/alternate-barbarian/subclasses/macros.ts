@@ -8,6 +8,7 @@ import pathOfTheBerserker from './path-of-the-berserker/macros.js';
 import pathOfTheBrute from './path-of-the-brute/macros.js';
 import pathOfTheChampion from './path-of-the-champion/macros.js';
 import pathOfTheLycan from './path-of-the-lycan/macros.js';
+import pathOfTheZealot from './path-of-the-zealot/macros.js';
 
 const macros: CPRMacro[] = [
   ...pathOfBloodAndIron,
@@ -19,6 +20,7 @@ const macros: CPRMacro[] = [
   ...pathOfTheBrute,
   ...pathOfTheChampion,
   ...pathOfTheLycan,
+  ...pathOfTheZealot,
 ];
 
 export default macros;
