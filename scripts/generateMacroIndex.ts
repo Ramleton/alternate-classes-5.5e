@@ -7,6 +7,7 @@ const MACROS_FILENAME = 'macros.ts';
 const UTILS_FILENAME = 'utils.ts';
 const UTILS_DIRNAME = 'utils';
 const CLASS_FEATURES_DIR = 'class-features';
+const MYSTIC_TECHNIQUES_DIR = 'mystic-techniques';
 const SUBCLASSES_DIR = 'subclasses';
 const EXPLOIT_HANDLING_DIR = 'handling';
 const DEGREE_DIR_SUFFIX = '-degree';
@@ -113,6 +114,7 @@ function processClassesFolder(
     const classFullPath = join(classesPath, classDir);
     const featuresPath = join(classFullPath, CLASS_FEATURES_DIR);
     const subclassPath = join(classFullPath, SUBCLASSES_DIR);
+    const mysticTechniquesPath = join(classFullPath, MYSTIC_TECHNIQUES_DIR);
 
     const classImports: string[] = [];
     const classSpreads: string[] = [];
@@ -179,6 +181,21 @@ export default macros;
           `import subclasses from './${SUBCLASSES_DIR}/macros.js';`,
         );
         classSpreads.push('...subclasses');
+      }
+    }
+
+    if (isDirectory(mysticTechniquesPath)) {
+      const techniqueMacros = generateMacrosIndex(
+        mysticTechniquesPath,
+        MACROS_FILENAME,
+        `${className} ${MYSTIC_TECHNIQUES_DIR}`,
+      );
+      if (techniqueMacros.length > 0) {
+        filesToFormat.push(join(mysticTechniquesPath, MACROS_FILENAME));
+        classImports.push(
+          `import mysticTechniques from './${MYSTIC_TECHNIQUES_DIR}/macros.js';`,
+        );
+        classSpreads.push('...mysticTechniques');
       }
     }
 
