@@ -5,7 +5,9 @@ import {
 } from 'chris-premades/macro.js';
 
 type MysticTechniqueMacroPass =
-  'attackRollComplete' | 'targetAttackRollComplete';
+  | 'attackRollComplete'
+  | 'targetAttackRollComplete'
+  | 'targetDamageRollComplete';
 
 export type MysticTechniquePreCheck = (
   data: MidiMacroFunctionArgs & { technique: Item<'feat'> },
