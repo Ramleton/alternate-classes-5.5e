@@ -27,7 +27,6 @@ if (!apiKey) {
 // Normalize version numbers
 const rawVersion = process.env.VERSION_INPUT || '0.0.0';
 const cleanVersion = rawVersion.replace(/^v/i, '');
-const versionWithV = `v${cleanVersion}`;
 
 // Safe release notes fallback
 const releaseNotes =
@@ -51,10 +50,10 @@ async function run(): Promise<void> {
 
   TASKS:
   1. Update the "Supported Classes & Automation Status" table. Based on the Release Notes, update mentioned classes to "✅ Implemented". Keep all other rows EXACTLY as they are.
-  2. Add a new entry to the "Changelog" section at the top of the list for version ${versionWithV} (${formattedDate}).
+  2. Add a new entry to the "Changelog" section at the top of the list for version ${cleanVersion} (${formattedDate}).
      - CONDENSE AND REWRITE the raw Release Notes into 2-4 clean, human-readable bullet points highlighting functional features or bug fixes.
      - DO NOT output PR links (e.g., "Dev by @user in http..."). Extract or infer meaningful summary descriptions.
-  3. Update the footer: **Current Module Version:** ${versionWithV} and **Latest Release Date:** ${formattedDate}.
+  3. Update the footer: **Current Module Version:** ${cleanVersion} and **Latest Release Date:** ${formattedDate}.
   4. Locate the installation instructions and ensure the module manifest URL is exactly: 
     https://github.com/Ramleton/alternate-classes-5.5e/releases/download/${cleanVersion}/module.json
   
