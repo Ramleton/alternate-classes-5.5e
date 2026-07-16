@@ -4,6 +4,12 @@ import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { DamageActivity } from 'fvtt-types/Activity.js';
 import { DamageType } from 'types/damage.js';
 
+const ELEMENT_DAMAGE_MAP: ReadonlyMap<string, DamageType> = new Map([
+  ['air', 'lightning'],
+  ['water', 'cold'],
+  ['fire', 'fire'],
+]);
+
 export const getElementDamage = (
   actor: Actor5e,
   usingRage = false,
@@ -25,9 +31,7 @@ export const getElementDamage = (
       `ac55ePathOfElementalChaosElement${element.capitalize()}`,
     );
     if (item) {
-      if (element === 'air') return 'lightning';
-      if (element === 'water') return 'cold';
-      return 'fire';
+      return ELEMENT_DAMAGE_MAP.get(element);
     }
   }
 };
