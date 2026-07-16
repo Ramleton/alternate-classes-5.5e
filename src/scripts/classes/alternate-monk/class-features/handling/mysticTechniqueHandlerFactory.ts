@@ -7,12 +7,20 @@ import {
 type MysticTechniqueMacroPass =
   'attackRollComplete' | 'targetAttackRollComplete';
 
-export interface MysticTechniqueHandler {
+export type MysticTechniquePreCheck = (
+  data: MidiMacroFunctionArgs,
+) => Promise<boolean>;
+
+export type MysticTechniqueHandler = (
+  data: MidiMacroFunctionArgs,
+) => Promise<void>;
+
+export interface MysticTechniqueData {
   pass: MysticTechniqueMacroPass;
   cprIdentifier: string;
   name?: string;
-  preCheck: (data: MidiMacroFunctionArgs) => Promise<boolean>;
-  handle: (data: MidiMacroFunctionArgs) => Promise<void>;
+  preCheck: MysticTechniquePreCheck;
+  handle: MysticTechniqueHandler;
 }
 
 interface MysticTechniqueHandlerFactoryArgs {
@@ -24,9 +32,9 @@ type MysticTechniqueHandlerFactory = (
   args: MysticTechniqueHandlerFactoryArgs,
 ) => MidiMacroEventDetails;
 
-const mysticTechniqueHandlers: MysticTechniqueHandler[] = [];
+const mysticTechniqueHandlers: MysticTechniqueData[] = [];
 
-export const addMysticTechniqueHandler = (handler: MysticTechniqueHandler) => {
+export const addMysticTechniqueHandler = (handler: MysticTechniqueData) => {
   mysticTechniqueHandlers.push(handler);
 };
 
