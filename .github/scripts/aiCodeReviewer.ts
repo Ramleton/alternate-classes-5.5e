@@ -1,8 +1,97 @@
+/// <reference types="node" />
 import { GoogleGenAI } from '@google/genai';
 import { execSync } from 'child_process';
 import fs from 'fs';
 
 const ai = new GoogleGenAI({});
+
+function extractKeywords(text: string): Set<string> {
+  const words = text.toLowerCase().match(/\b[a-z0-9_-]{3,}\b/g) || [];
+  const stopWords = new Set([
+    'the',
+    'and',
+    'for',
+    'with',
+    'fix',
+    'feat',
+    'chore',
+    'refactor',
+    'update',
+    'add',
+    'remove',
+    'main',
+    'master',
+    'origin',
+  ]);
+  return new Set(words.filter((w) => !stopWords.has(w)));
+}
+
+function getFileAgeDays(filePath: string, baseBranch: string): number {
+  try {
+    // Get Unix timestamp (%ct) of the last commit touching this file on origin/main
+    const timestampStr = execSync(
+      `git log -1 --format=%ct origin/${baseBranch} -- "${filePath}"`,
+    )
+      .toString()
+      .trim();
+
+    if (!timestampStr) return 0;
+
+    const commitTimestampMs = parseInt(timestampStr, 10) * 1000;
+    const ageInDays = (Date.now() - commitTimestampMs) / (1000 * 60 * 60 * 24);
+    return Math.max(0, ageInDays);
+  } catch {
+    return 0;
+  }
+}
+
+function calculateFileScore(
+  filePath: string,
+  diffSize: number,
+  prKeywords: Set<string>,
+  baseBranch: string,
+): number {
+  let multiplier = 1.0;
+  const lowerPath = filePath.toLowerCase();
+
+  // 1. Core Directory Priority
+  if (
+    lowerPath.includes('class-features') ||
+    lowerPath.includes('subclasses') ||
+    lowerPath.includes('exploits') ||
+    lowerPath.includes('handling')
+  ) {
+    multiplier *= 1.5;
+  } else if (lowerPath.includes('utils')) {
+    multiplier *= 1.1;
+  }
+
+  // Low priority for pure ambient types or workspace configs
+  if (lowerPath.endsWith('.d.ts') || lowerPath.includes('/types/')) {
+    multiplier *= 0.1;
+  } else if (lowerPath.includes('.config.') || lowerPath.includes('tsconfig')) {
+    multiplier *= 0.3;
+  }
+
+  // 2. PR Theme Relevance Boost (up to 3x)
+  let keywordMatches = 0;
+  for (const keyword of prKeywords) {
+    if (lowerPath.includes(keyword)) {
+      keywordMatches++;
+    }
+  }
+
+  if (keywordMatches > 0) {
+    multiplier *= 1 + Math.min(keywordMatches * 0.5, 2.0);
+  }
+
+  // 3. Stale Code / Age Boost (up to 1.5x)
+  const ageDays = getFileAgeDays(filePath, baseBranch);
+  const ageBoost = Math.min(ageDays / 30, 1.0) * 0.5;
+  multiplier *= 1 + ageBoost;
+
+  return diffSize * multiplier;
+}
 
 async function generateWithRetry(
   config: Parameters<typeof ai.models.generateContent>[0],
@@ -92,26 +181,72 @@ async function runReview() {
     console.log(`  Branch: ${prBranch}`);
     console.log(`  Base: ${baseBranch}`);
 
-    const MAX_DIFF_CHARS = 50000;
-    const rawDiff = execSync(
-      `git diff origin/${baseBranch}...HEAD -- . ':!package-lock.json' ':!package.json'`,
+    const prKeywords = extractKeywords(`${prTitle} ${prBranch} ${prBody}`);
+    console.log('Extracted PR Keywords:', Array.from(prKeywords));
+
+    // 1. Get changed TypeScript files
+    const changedFilesOutput = execSync(
+      `git diff origin/${baseBranch}...HEAD --name-only -- '*.ts' ':!package.json' ':!package-lock.json'`,
     )
       .toString()
       .trim();
 
-    if (!rawDiff) {
+    if (!changedFilesOutput) {
       console.log('No meaningful code changes detected.');
       return;
     }
 
-    const diff = rawDiff.slice(0, MAX_DIFF_CHARS);
-    if (rawDiff.length > MAX_DIFF_CHARS) {
-      console.log(
-        `Warning: diff truncated from ${rawDiff.length} to ${MAX_DIFF_CHARS} chars.`,
-      );
+    const changedFiles = changedFilesOutput.split('\n').filter(Boolean);
+
+    // 2. Fetch individual diffs and rank by weighted score (core logic over tests/types)
+    const fileDiffs = changedFiles
+      .map((filePath) => {
+        const fileDiff = execSync(
+          `git diff origin/${baseBranch}...HEAD -- "${filePath}"`,
+        )
+          .toString()
+          .trim();
+        const score = calculateFileScore(
+          filePath,
+          fileDiff.length,
+          prKeywords,
+          baseBranch,
+        );
+        return { filePath, diff: fileDiff, size: fileDiff.length, score };
+      })
+      .filter((item) => item.size > 0)
+      .sort((a, b) => b.score - a.score);
+
+    if (fileDiffs.length === 0) {
+      console.log('No meaningful code changes detected in selected files.');
+      return;
     }
 
-    // Get sibling files — scored by relatedness, only direct siblings of changed files
+    // 3. Select top 5 highest-value files to review
+    const MAX_FILES_TO_REVIEW = 5;
+    const MAX_FILE_DIFF_CHARS = 8000;
+
+    const selectedFiles = fileDiffs.slice(0, MAX_FILES_TO_REVIEW);
+    const skippedCount = fileDiffs.length - selectedFiles.length;
+
+    let sampledDiffsContext = '';
+    if (skippedCount > 0) {
+      sampledDiffsContext += `> **PR Scope Notice**: This PR modified ${fileDiffs.length} total files. Below are the ${MAX_FILES_TO_REVIEW} most relevant code files sampled for review.\n\n`;
+    }
+
+    for (const { filePath, diff: fileDiff, size } of selectedFiles) {
+      const truncatedDiff =
+        fileDiff.length > MAX_FILE_DIFF_CHARS
+          ? fileDiff.slice(0, MAX_FILE_DIFF_CHARS) +
+            '\n... (file diff truncated)'
+          : fileDiff;
+
+      sampledDiffsContext += `### File: ${filePath} (${size} chars changed)\n\`\`\`diff\n${truncatedDiff}\n\`\`\`\n\n`;
+    }
+
+    const diff = sampledDiffsContext;
+
+    // 4. Get sibling files for comparison (focused ONLY on selected top files)
     let siblingFilesContext = '';
     const processedFiles: Set<string> = new Set<string>();
 
@@ -119,76 +254,67 @@ async function runReview() {
     const MAX_SIBLING_FILE_CHARS = 3000;
 
     try {
-      const changedFilesOutput: string = execSync(
-        `git diff origin/${baseBranch}...HEAD --name-only -- '*.ts'`,
-      )
-        .toString()
-        .trim();
+      console.log(
+        `Finding related sibling files for top ${selectedFiles.length} files...`,
+      );
 
-      if (changedFilesOutput) {
-        const changedFiles = changedFilesOutput.split('\n').filter(Boolean);
+      for (const { filePath: changedFile } of selectedFiles) {
+        const lastSlash = changedFile.lastIndexOf('/');
+        const dir = lastSlash > -1 ? changedFile.substring(0, lastSlash) : '';
+        if (!dir) continue;
 
-        console.log(`Found ${changedFiles.length} changed files.`);
-
-        for (const changedFile of changedFiles) {
-          const lastSlash = changedFile.lastIndexOf('/');
-          const dir = lastSlash > -1 ? changedFile.substring(0, lastSlash) : '';
-          if (!dir) continue;
-
-          let changedFileContent = '';
-          try {
-            changedFileContent = fs.readFileSync(changedFile, 'utf-8');
-          } catch {
-            continue;
-          }
-
-          try {
-            const siblingCandidates = fs
-              .readdirSync(dir)
-              .filter((f: string) => f.endsWith('.ts') && !f.startsWith('.'))
-              .map((f: string) => `${dir}/${f}`)
-              .filter((f) => f !== changedFile && !processedFiles.has(f));
-
-            const scored = siblingCandidates
-              .map((filePath) => {
-                try {
-                  const content = fs.readFileSync(filePath, 'utf-8');
-                  const score = scoreRelatedness(
-                    changedFileContent,
-                    changedFile,
-                    content,
-                    filePath,
-                  );
-                  return { filePath, content, score };
-                } catch {
-                  return null;
-                }
-              })
-              .filter(
-                (entry): entry is NonNullable<typeof entry> => entry !== null,
-              )
-              .sort((a, b) => b.score - a.score)
-              .slice(0, MAX_SIBLINGS_PER_DIR);
-
-            for (const { filePath, content, score } of scored) {
-              processedFiles.add(filePath);
-              const truncated =
-                content.length > MAX_SIBLING_FILE_CHARS
-                  ? content.slice(0, MAX_SIBLING_FILE_CHARS) +
-                    '\n... (truncated)'
-                  : content;
-              siblingFilesContext += `\n--- ${filePath} (relatedness: ${score}) ---\n${truncated}`;
-            }
-          } catch {
-            // Skip missing directories
-          }
+        let changedFileContent = '';
+        try {
+          changedFileContent = fs.readFileSync(changedFile, 'utf-8');
+        } catch {
+          continue;
         }
 
-        console.log(
-          `Including ${processedFiles.size} sibling files for comparison:`,
-          Array.from(processedFiles),
-        );
+        try {
+          const siblingCandidates = fs
+            .readdirSync(dir)
+            .filter((f: string) => f.endsWith('.ts') && !f.startsWith('.'))
+            .map((f: string) => `${dir}/${f}`)
+            .filter((f) => f !== changedFile && !processedFiles.has(f));
+
+          const scored = siblingCandidates
+            .map((filePath) => {
+              try {
+                const content = fs.readFileSync(filePath, 'utf-8');
+                const score = scoreRelatedness(
+                  changedFileContent,
+                  changedFile,
+                  content,
+                  filePath,
+                );
+                return { filePath, content, score };
+              } catch {
+                return null;
+              }
+            })
+            .filter(
+              (entry): entry is NonNullable<typeof entry> => entry !== null,
+            )
+            .sort((a, b) => b.score - a.score)
+            .slice(0, MAX_SIBLINGS_PER_DIR);
+
+          for (const { filePath, content, score } of scored) {
+            processedFiles.add(filePath);
+            const truncated =
+              content.length > MAX_SIBLING_FILE_CHARS
+                ? content.slice(0, MAX_SIBLING_FILE_CHARS) + '\n... (truncated)'
+                : content;
+            siblingFilesContext += `\n--- ${filePath} (relatedness: ${score}) ---\n${truncated}`;
+          }
+        } catch {
+          // Skip missing directories
+        }
       }
+
+      console.log(
+        `Including ${processedFiles.size} sibling files for comparison:`,
+        Array.from(processedFiles),
+      );
     } catch {
       console.log('Warning: Could not retrieve sibling files for comparison.');
     }

@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import * as fs from 'node:fs';
+import fs from 'node:fs';
 
 interface GeminiPart {
   text?: string;
