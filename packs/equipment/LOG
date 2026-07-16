@@ -1,25 +1,3 @@
-2026/07/08-10:41:41.052 4f74 Recovering log #745
-2026/07/08-10:41:41.052 4f74 Level-0 table #748: started
-2026/07/08-10:41:41.057 4f74 Level-0 table #748: 162669 bytes OK
-2026/07/08-10:41:41.064 4f74 Delete type=0 #745
-2026/07/08-10:41:41.064 4f74 Delete type=3 #743
-2026/07/08-17:59:54.515 6d20 Level-0 table #751: started
-2026/07/08-17:59:54.521 6d20 Level-0 table #751: 56183 bytes OK
-2026/07/08-17:59:54.523 6d20 Delete type=0 #749
-2026/07/08-17:59:54.531 6d20 Manual compaction at level-0 from '!folders!CukPFU6PjETVEu1Y' @ 72057594037927935 : 1 .. '!items.effects!yzuxdfNob2XM3qod.uBJCuxbANBNYWtvH' @ 0 : 0; will stop at '!items.effects!Cfoo9wOTkRHpFbnK.InP5czpDhNmmpKtD' @ 888 : 1
-2026/07/08-17:59:54.531 6d20 Compacting 2@0 + 1@1 files
-2026/07/08-17:59:54.534 6d20 Generated table #752@0: 29 keys, 31028 bytes
-2026/07/08-17:59:54.534 6d20 Compacted 2@0 + 1@1 files => 31028 bytes
-2026/07/08-17:59:54.536 6d20 compacted to: files[ 0 1 1 0 0 0 0 ]
-2026/07/08-17:59:54.536 6d20 Delete type=2 #746
-2026/07/08-17:59:54.536 6d20 Delete type=2 #748
-2026/07/08-17:59:54.537 6d20 Delete type=2 #751
-2026/07/08-17:59:54.540 6d20 Manual compaction at level-0 from '!items.effects!Cfoo9wOTkRHpFbnK.InP5czpDhNmmpKtD' @ 888 : 1 .. '!items.effects!yzuxdfNob2XM3qod.uBJCuxbANBNYWtvH' @ 0 : 0; will stop at (end)
-2026/07/08-17:59:54.540 6d20 Manual compaction at level-1 from '!folders!CukPFU6PjETVEu1Y' @ 72057594037927935 : 1 .. '!items.effects!yzuxdfNob2XM3qod.uBJCuxbANBNYWtvH' @ 0 : 0; will stop at '!items.effects!yWopMbtHgBxln5jx.dLFgAg19CjwuRIS2' @ 875 : 1
-2026/07/08-17:59:54.540 6d20 Compacting 1@1 + 1@2 files
-2026/07/08-17:59:54.546 6d20 Generated table #753@1: 51 keys, 56623 bytes
-2026/07/08-17:59:54.546 6d20 Compacted 1@1 + 1@2 files => 56623 bytes
-2026/07/08-17:59:54.547 6d20 compacted to: files[ 0 0 1 0 0 0 0 ]
-2026/07/08-17:59:54.547 6d20 Delete type=2 #204
-2026/07/08-17:59:54.547 6d20 Delete type=2 #752
-2026/07/08-17:59:54.554 6d20 Manual compaction at level-1 from '!items.effects!yWopMbtHgBxln5jx.dLFgAg19CjwuRIS2' @ 875 : 1 .. '!items.effects!yzuxdfNob2XM3qod.uBJCuxbANBNYWtvH' @ 0 : 0; will stop at (end)
+2026/07/15-10:32:52.816 78a8 Recovering log #819
+2026/07/15-10:32:52.823 78a8 Delete type=0 #819
+2026/07/15-10:32:52.823 78a8 Delete type=3 #818

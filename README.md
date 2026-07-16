@@ -6,7 +6,7 @@ A FoundryVTT module providing enhanced D&D 5e alternate class implementations in
 
 This module adds comprehensive D&D 5e alternate class and subclass options with full automation support. Features are implemented using TypeScript and integrated with the midi-qol/chris-premades ecosystem to deliver seamless, automated gameplay mechanics.
 
-**Inspiration:** This project automates the excellent alternate class designs created by [Laserllama](https://www.patreon.com/cw/laserllama), bringing their creative work to FoundryVTT with full midi-qol/CPR integration.
+**Inspiration:** This project automates the excellent alternate class designs created by [Laserllama](https://www.patreon.com/cw/laserllama), bringing their creative work to FoundryVTT with full midi-qol/CPR/Automated Conditions 5e integration.
 
 ### Supported Classes & Automation Status
 
@@ -30,7 +30,7 @@ This module adds comprehensive D&D 5e alternate class and subclass options with 
 1. In FoundryVTT, go to **Add-on Modules** → **Install Module**
 2. Paste the module manifest URL:
    ```
-   https://github.com/Ramleton/alternate-classes-5.5e/releases/download/1.5.2/module.json
+   https://github.com/Ramleton/alternate-classes-5.5e/releases/download/1.5.3/module.json
    ```
 3. Click **Install** and activate in your world
 
@@ -75,6 +75,13 @@ module.json           # Module initialization and hooks
 
 ## Changelog
 
+### Version 1.5.3 (July 2026)
+
+- **Updated Class:** Fully implemented and automated the Alternate Barbarian class, including:
+   - Base class features
+   - Subclass features
+   - Savage Exploit mechanics
+
 ### Version 1.5.2 (July 2026)
 
 -   **New Class:** Fully implemented and automated the Alternate Rogue class, including:
@@ -106,5 +113,5 @@ This module is heavily inspired by the exceptional work of **Laserllama**. Their
 
 ---
 
-**Current Module Version:** v1.5.2  
+**Current Module Version:** 1.5.3  
 **Latest Release Date:** July 2026
