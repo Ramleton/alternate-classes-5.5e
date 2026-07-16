@@ -12,10 +12,13 @@ export const getKiRemaining = (actor: Actor5e): number => {
 };
 
 export const isMartialArtsAttack = (weapon: Item<'weapon'>): boolean => {
-  const cprIdentifier = weapon.flags['chris-premades']?.info?.identifier;
-  if (cprIdentifier && cprIdentifier.toLowerCase().includes('unarmedstrike'))
-    return true;
-  return false;
+  const {
+    utils: { itemUtils },
+  } = chrisPremades;
+  return !!itemUtils.getEffectByIdentifier(
+    weapon,
+    'ac55eMartialArtsEnchantment',
+  );
 };
 
 export const isMeleeMartialArtsAttack = (
