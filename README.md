@@ -75,6 +75,13 @@ module.json           # Module initialization and hooks
 
 ## Changelog
 
+### Version 1.5.3 (July 2026)
+
+- **Updated Class:** Fully implemented and automated the Alternate Barbarian class, including:
+   - Base class features
+   - Subclass features
+   - Savage Exploit mechanics
+
 ### Version 1.5.2 (July 2026)
 
 -   **New Class:** Fully implemented and automated the Alternate Rogue class, including:
@@ -106,5 +113,5 @@ This module is heavily inspired by the exceptional work of **Laserllama**. Their
 
 ---
 
-**Current Module Version:** v1.5.2  
+**Current Module Version:** 1.5.3  
 **Latest Release Date:** July 2026
