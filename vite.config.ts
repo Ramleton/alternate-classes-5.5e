@@ -20,12 +20,12 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [syncToFoundry(foundryPath)],
+    resolve: {
+      tsconfigPaths: true,
+    },
     build: {
       outDir: foundryPath,
       emptyOutDir: false,
-      resolve: {
-        tsconfigPaths: true,
-      },
       rollupOptions: {
         input: {
           script: path.resolve('src/script.ts'),
