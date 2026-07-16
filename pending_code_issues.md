@@ -270,7 +270,6 @@ interface ExploitSetMinRollFactoryArgs {
   // ...other properties
 }
 ```
----
 
 ---
 
@@ -284,3 +283,99 @@ interface ExploitSetMinRollFactoryArgs {
   // ...other properties
 }
 ```
+
+---
+
+- File: src/scripts/classes/alternate-barbarian/class-features/recklessAttack.ts
+- Description: The duration of `2` rounds for the Reckless Attack effect is a magic number.
+- Suggested Fix: Extract `2` into a named constant, e.g., `RECKLESS_ATTACK_DURATION_ROUNDS`.
+
+---
+
+- File: src/scripts/classes/alternate-barbarian/subclasses/path-of-blood-and-iron/spikedArmor.ts
+- Description: The string literal `'Unarmed Strike: Spiked Armor'` is a magic string.
+- Suggested Fix: Extract this into a named constant, e.g., `SPIKED_ARMOR_UNARMED_STRIKE_NAME`.
+
+---
+
+- File: src/scripts/classes/alternate-barbarian/subclasses/path-of-blood-and-iron/spikedArmorEnchant.ts
+- Description: The activity identifier `'PathOfBloodAndIron.grappleDamage'` is a magic string.
+- Suggested Fix: Extract this into a named constant, e.g., `GRAAPPLE_DAMAGE_ACTIVITY_IDENTIFIER`.
+
+---
+
+- File: src/scripts/classes/alternate-paladin/class-features/divineSmiteFactory.ts
+- Description: The number `5` used in `Math.min(spellData.level, 5)` to cap Divine Smite scaling is a magic number.
+- Suggested Fix: Extract `5` into a named constant, e.g., `MAX_DIVINE_SMITE_SPELL_LEVEL`.
+
+---
+
+- File: src/scripts/classes/alternate-paladin/subclasses/oath-of-conquest/conqueringSmite.ts
+- Description: The duration of `2` rounds for the effect is a magic number.
+- Suggested Fix: Extract `2` into a named constant, e.g., `CONQUERING_SMITE_DURATION_ROUNDS`.
+
+---
+
+- File: src/scripts/classes/alternate-paladin/subclasses/oath-of-repentance/subduingSmite.ts
+- Description: The numerical adjustments (`- 1`) and duration (`60` seconds) for effects are magic numbers.
+- Suggested Fix: Extract these into named constants, e.g., `SUBDUING_SMITE_MIN_HP_VALUE`, `SUBDUING_SMITE_DURATION_SECONDS`.
+
+---
+
+- File: src/scripts/classes/alternate-paladin/subclasses/oath-of-the-throne/challengingSmite.ts
+- Description: The duration of `60` seconds for the effect is a magic number.
+- Suggested Fix: Extract `60` into a named constant, e.g., `CHALLENGING_SMITE_DURATION_SECONDS`.
+
+---
+
+- File: src/scripts/classes/alternate-rogue/class-features/sneakAttack.ts
+- Description: The number `17` used for the level check (`levels >= 17`) is a magic number.
+- Suggested Fix: Extract `17` into a named constant, e.g., `INVESTIGATOR_EXPLOIT_WEAKNESS_LEVEL`.
+
+---
+
+- File: src/scripts/classes/alternate-rogue/class-features/uncannyDodge.ts
+- Description: The number `14` used for the level check (`level < 14`) is a magic number.
+- Suggested Fix: Extract `14` into a named constant, e.g., `UNCANNY_DODGE_TELEPORT_LEVEL`.
+
+---
+
+- File: src/scripts/exploits/1st-degree/lunge.ts
+- Description: The number `10` used in `weaponReach + 10 < distance` is a magic number representing extra reach.
+- Suggested Fix: Extract `10` into a named constant, e.g., `LUNGE_MAX_EXTRA_REACH`.
+
+---
+
+- File: src/scripts/exploits/1st-degree/tramplingRush.ts
+- Description: The number `20` used in `distanceMoved >= 20` is a magic number.
+- Suggested Fix: Extract `20` into a named constant, e.g., `TRAMPLING_RUSH_MIN_MOVE_DISTANCE`.
+
+---
+
+- File: src/scripts/exploits/2nd-degree/mightyBlow.ts
+- Description: The number `5` used as a multiplier in `strMod * 5` for push distance is a magic number.
+- Suggested Fix: Extract `5` into a named constant, e.g., `MIGHTY_BLOW_PUSH_MULTIPLIER`.
+
+---
+
+- File: src/scripts/exploits/3rd-degree/roarOfTriumph.ts
+- Description: The number `300` representing the radius for `findNearby` is a magic number.
+- Suggested Fix: Extract `300` into a named constant, e.g., `ROAR_OF_TRIUMPH_HEAL_RADIUS`.
+
+---
+
+- File: src/scripts/exploits/3rd-degree/savageDefiance.ts
+- Description: The number `60` representing the radius for `findNearby` is a magic number.
+- Suggested Fix: Extract `60` into a named constant, e.g., `SAVAGE_DEFIANCE_RADIUS`.
+
+---
+
+- File: src/scripts/exploits/3rd-degree/mightyShot.ts
+- Description: The number `3` used in `getSize(target.actor, false) > 3` to determine maximum prone size is a magic number.
+- Suggested Fix: Extract `3` into a named constant, e.g., `MIGHTY_SHOT_MAX_PRONE_SIZE_CATEGORY`.
+
+---
+
+- File: src/scripts/exploits/5th-degree/vorpalCritical.ts
+- Description: The number `50` used in `workflow.damageItem.newHP > 50` for the beheading threshold is a magic number.
+- Suggested Fix: Extract `50` into a named constant, e.g., `VORPAL_CRITICAL_BEHEAD_HP_THRESHOLD`.
