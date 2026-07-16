@@ -18,7 +18,6 @@ jobs:
     permissions:
       contents: write
 
-    # Environment variables defined here are accessible by ALL steps in this job
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       VERSION_INPUT: ${{ github.event.release.tag_name || github.event.inputs.version_tag }}
@@ -27,61 +26,14 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
 
       - name: Generate New README via Gemini API
-        run: |
-          node -e '
-          const fs = require("fs");
-          const readme = fs.readFileSync("README.md", "utf8");
-          const apiKey = process.env.GEMINI_API_KEY;
-
-          async function run() {
-            const prompt = `You are a technical documentation assistant. Update the README.md file provided below.
-            
-            CURRENT README CONTENT:
-            ${readme}
-
-            RELEASE NOTES:
-            ${process.env.RELEASE_INPUT}
-
-            TASKS:
-            1. Update the "Supported Classes & Automation Status" table. Based on the Release Notes, update mentioned classes to "✅ Implemented". Keep all other rows EXACTLY as they are.
-            2. Add a new entry to the "Changelog" section at the top of the list for version ${process.env.VERSION_INPUT} (${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}) with the bullet points from the Release Notes.
-            3. Update the footer: **Current Module Version:** v${process.env.VERSION_INPUT} and **Latest Release Date:** ${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}.
-            4. Locate the installation instructions and ensure the module manifest URL is exactly: 
-              https://github.com/Ramleton/alternate-classes-5.5e/releases/download/${process.env.VERSION_INPUT.replace(/^v/, '')}/module.json
-              (Ensure there is no "v" prefix in the version segment of that URL).
-            
-            STRICT RULES:
-            - Output the COMPLETE README file from start to finish.
-            - DO NOT truncate the file.
-            - DO NOT remove sections like Technology Stack, Project Structure, or Credits.
-            - Output ONLY the final markdown content. No conversational text.`;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            const response = await fetch(url, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            });
-            
-            const data = await response.json();
-            const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-            if (!textOutput) {
-              console.error("Failed to generate content");
-              process.exit(1);
-            }
-
-            fs.writeFileSync("README.md", textOutput.trim());
-            console.log("README.md updated successfully.");
-          }
-          run();
-          '
+        run: npx tsx .github/scripts/updateREADME.ts
 
       - name: Validate README Formatting
         run: |
-          # Check for key markers that should exist in a valid README
           if ! grep -q "| Class " README.md; then
             echo "Error: The table is missing or corrupted!"
             exit 1
@@ -104,10 +56,13 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          RAW_VER="${{ env.VERSION_INPUT }}"
+          CLEAN_VER="${RAW_VER#v}"
+
           if ! git diff --exit-code README.md; then
             git add README.md
-            git commit -m "docs: AI rewrite of README.md for v${{ env.VERSION_INPUT }} [skip ci]"
-            git push origin ${{ github.ref_name }}
+            git commit -m "docs: AI rewrite of README.md for v${CLEAN_VER} [skip ci]"
+            git push origin HEAD:${{ github.event.repository.default_branch }}
           else
             echo "No semantic layout modifications detected. Skipping commit."
           fi
