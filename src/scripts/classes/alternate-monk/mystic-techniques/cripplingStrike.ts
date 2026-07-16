@@ -10,23 +10,17 @@ import { getKiRemaining, isMeleeMartialArtsAttack } from './utils.js';
 
 const CPRIdentifier = 'ac55eCripplingStrikeMysticTechnique';
 
-const preCheck: MysticTechniquePreCheck = async ({
-  workflow,
-  technique: mysticTechnique,
-}) => {
+const preCheck: MysticTechniquePreCheck = async ({ workflow, technique }) => {
   if (!workflow.hitTargets.size) return false;
-  if (!mysticTechnique.system.uses?.value) return false;
+  if (!technique.system.uses?.value) return false;
   if (!getKiRemaining(workflow.actor)) return false;
   if (!isMeleeMartialArtsAttack(workflow.item, workflow)) return false;
   return true;
 };
 
-const handle: MysticTechniqueHandler = async ({
-  workflow,
-  technique: mysticTechnique,
-}) => {
+const handle: MysticTechniqueHandler = async ({ workflow, technique }) => {
   const target = workflow.hitTargets.first()! as Token;
-  const saveWorkflow = await runActivity(mysticTechnique, 'save', [target]);
+  const saveWorkflow = await runActivity(technique, 'save', [target]);
   if (!saveWorkflow?.failedSaves?.size) return;
   const {
     utils: { dialogUtils, effectUtils, socketUtils },
@@ -37,19 +31,19 @@ const handle: MysticTechniqueHandler = async ({
     ['Silenced', 'silenced'],
   ];
   const selection = await dialogUtils.buttonDialog(
-    mysticTechnique.name,
+    technique.name,
     'Select a condition',
     options,
     {
-      userId: socketUtils.firstOwner(mysticTechnique.actor!, true),
+      userId: socketUtils.firstOwner(technique.actor!, true),
     },
   );
   if (!selection) return;
   const effectData: EffectData = {
-    name: `${mysticTechnique.name}: ${selection.capitalize()}`,
-    icon: mysticTechnique.img,
+    name: `${technique.name}: ${selection.capitalize()}`,
+    icon: technique.img,
     duration: { rounds: 2 },
-    origin: mysticTechnique.uuid!,
+    origin: technique.uuid!,
     flags: {
       dae: {
         stackable: 'noneName',

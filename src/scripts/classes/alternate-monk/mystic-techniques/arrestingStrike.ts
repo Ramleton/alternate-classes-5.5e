@@ -9,23 +9,17 @@ import { getKiRemaining, isMeleeMartialArtsAttack } from './utils.js';
 
 const CPRIdentifier = 'ac55eArrestingStrikeMysticTechnique';
 
-const preCheck: MysticTechniquePreCheck = async ({
-  workflow,
-  technique: mysticTechnique,
-}) => {
+const preCheck: MysticTechniquePreCheck = async ({ workflow, technique }) => {
   if (!workflow.hitTargets.size) return false;
-  if (!mysticTechnique.system.uses?.value) return false;
+  if (!technique.system.uses?.value) return false;
   if (!getKiRemaining(workflow.actor)) return false;
   if (!isMeleeMartialArtsAttack(workflow.item, workflow)) return false;
   return true;
 };
 
-const handle: MysticTechniqueHandler = async ({
-  workflow,
-  technique: mysticTechnique,
-}) => {
+const handle: MysticTechniqueHandler = async ({ workflow, technique }) => {
   const target = workflow.hitTargets.first()! as Token;
-  await runActivity(mysticTechnique, 'save', [target]);
+  await runActivity(technique, 'save', [target]);
 };
 
 addMysticTechniqueHandler({
