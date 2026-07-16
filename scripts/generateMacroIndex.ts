@@ -10,6 +10,9 @@ const CLASS_FEATURES_DIR = 'class-features';
 const SUBCLASSES_DIR = 'subclasses';
 const EXPLOIT_HANDLING_DIR = 'handling';
 const DEGREE_DIR_SUFFIX = '-degree';
+const HANDLE_FILENAME = 'handle.ts';
+
+const IGNORED_FILES = [UTILS_FILENAME, HANDLE_FILENAME];
 
 function toCamelCase(fileName: string): string {
   return fileName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
@@ -33,7 +36,8 @@ function generateMacrosIndex(
 ): string[] {
   const files = readdirSync(folderPath)
     .filter(
-      (f) => f.endsWith('.ts') && f !== indexFileName && f !== UTILS_FILENAME,
+      (f) =>
+        f.endsWith('.ts') && f !== indexFileName && !IGNORED_FILES.includes(f),
     )
     .sort();
 
