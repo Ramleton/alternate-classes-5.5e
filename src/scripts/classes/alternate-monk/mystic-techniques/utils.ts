@@ -1,5 +1,18 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
 
+export const getMysticTechniqueFromHandler = (
+  handler: Item<'feat'>,
+  cprIdentifier: string,
+): Item<'feat'> => {
+  const {
+    utils: { itemUtils },
+  } = chrisPremades;
+  return itemUtils.getItemByIdentifier(
+    handler.actor!,
+    cprIdentifier,
+  )! as Item<'feat'>;
+};
+
 export const getKiRemaining = (actor: Actor5e): number => {
   const {
     utils: { itemUtils },
