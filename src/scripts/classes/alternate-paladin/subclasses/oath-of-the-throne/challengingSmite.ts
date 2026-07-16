@@ -2,6 +2,8 @@ import subclassSmiteMacroFactory, {
   DuringSmiteCallback,
 } from '../utils/subclassSmiteFactory.js';
 
+const CHALLENGING_SMITE_EFFECT_DURATION_SECONDS = 60;
+
 const during: DuringSmiteCallback = async ({ feat, workflow }) => {
   const {
     utils: { effectUtils },
@@ -10,7 +12,7 @@ const during: DuringSmiteCallback = async ({ feat, workflow }) => {
     name: 'Challenging Smite: Source',
     img: feat.img!,
     origin: feat.uuid!,
-    duration: { seconds: 60 },
+    duration: { seconds: CHALLENGING_SMITE_EFFECT_DURATION_SECONDS },
     flags: {
       'chris-premades': {
         compelledDuel: {
