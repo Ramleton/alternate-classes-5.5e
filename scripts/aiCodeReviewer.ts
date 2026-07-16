@@ -227,6 +227,10 @@ This codebase uses:
 - CPR (chris-premades) macro framework for workflow automation
 - Inline function style (prefer single macro function over excessive helper decomposition)
 - Consistent naming and import patterns
+- Intentional Type Assertions & Casts: Explicit casts (e.g., \`as Actor5e\`, \`as any\`) and non-null assertions (\`!\`) are intentional and required due to ambient Foundry VTT / dnd5e type definitions.
+
+DO NOT FLAG (Strict Ignore List):
+- Type Casts & Assertions: NEVER suggest removing or refactoring type casts (\`as Actor5e\`, \`as any\`, etc.) or non-null assertions (\`!\`). Even if a type appears to be inferred from context, explicit assertions are required in this codebase to guarantee property access (such as \`classes\` or custom \`system\` fields) across ambient Foundry interfaces.
 
 Focus on these areas:
 
@@ -322,8 +326,9 @@ Before submitting, review each issue you identified:
 - Is this a genuine code quality issue, or just a description of working code?
 - Would removing this issue make the review clearer and more actionable?
 - Does the code already follow the pattern you're suggesting?
+- Does this issue flag a type assertion or cast (such as \`as any\` or \`as Actor5e\`) as redundant? If so, DELETE IT.
 
-If the answer to any of the above is "yes, this is already correct", DELETE that issue from your output. Only include genuine, actionable improvements.
+If the answer to any of the above indicates a false positive or an ignored issue, DELETE that issue from your output. Only include genuine, actionable improvements.
 
 Be direct and professional. Do NOT include commentary outside the structured sections.`;
 
