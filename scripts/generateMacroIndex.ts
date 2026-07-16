@@ -2,6 +2,15 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { basename, join, resolve } from 'path';
 import { format, resolveConfig } from 'prettier';
 
+// Directory & File Naming Constants
+const MACROS_FILENAME = 'macros.ts';
+const UTILS_FILENAME = 'utils.ts';
+const UTILS_DIRNAME = 'utils';
+const CLASS_FEATURES_DIR = 'class-features';
+const SUBCLASSES_DIR = 'subclasses';
+const EXPLOIT_HANDLING_DIR = 'handling';
+const DEGREE_DIR_SUFFIX = '-degree';
+
 function toCamelCase(fileName: string): string {
   return fileName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
@@ -19,11 +28,13 @@ function isDirectory(path: string): boolean {
  */
 function generateMacrosIndex(
   folderPath: string,
-  indexFileName = 'macros.ts',
+  indexFileName = MACROS_FILENAME,
   contextName = '',
 ): string[] {
   const files = readdirSync(folderPath)
-    .filter((f) => f.endsWith('.ts') && f !== indexFileName && f !== 'utils.ts')
+    .filter(
+      (f) => f.endsWith('.ts') && f !== indexFileName && f !== UTILS_FILENAME,
+    )
     .sort();
 
   if (files.length === 0) return [];
@@ -94,27 +105,27 @@ function processClassesFolder(
     console.log(`\nGenerating macros.ts for ${className}...`);
 
     const classFullPath = join(classesPath, classDir);
-    const featuresPath = join(classFullPath, 'class-features');
-    const subclassPath = join(classFullPath, 'subclasses');
+    const featuresPath = join(classFullPath, CLASS_FEATURES_DIR);
+    const subclassPath = join(classFullPath, SUBCLASSES_DIR);
 
     const classImports: string[] = [];
     const classSpreads: string[] = [];
 
-    const baseMacros = generateMacrosIndex(classFullPath, 'macros.ts');
+    const baseMacros = generateMacrosIndex(classFullPath, MACROS_FILENAME);
     if (baseMacros.length > 0) {
-      filesToFormat.push(join(classFullPath, 'macros.ts'));
+      filesToFormat.push(join(classFullPath, MACROS_FILENAME));
     }
 
     if (isDirectory(featuresPath)) {
       const featureMacros = generateMacrosIndex(
         featuresPath,
-        'macros.ts',
-        `${className} class-features`,
+        MACROS_FILENAME,
+        `${className} ${CLASS_FEATURES_DIR}`,
       );
       if (featureMacros.length > 0) {
-        filesToFormat.push(join(featuresPath, 'macros.ts'));
+        filesToFormat.push(join(featuresPath, MACROS_FILENAME));
         classImports.push(
-          `import classFeatures from './class-features/macros.js';`,
+          `import classFeatures from './${CLASS_FEATURES_DIR}/macros.js';`,
         );
         classSpreads.push('...classFeatures');
       }
@@ -122,7 +133,7 @@ function processClassesFolder(
 
     if (isDirectory(subclassPath)) {
       const subdirs = readdirSync(subclassPath).filter(
-        (f) => f !== 'utils' && isDirectory(join(subclassPath, f)),
+        (f) => f !== UTILS_DIRNAME && isDirectory(join(subclassPath, f)),
       );
       const activeSubclasses: string[] = [];
 
@@ -135,12 +146,12 @@ function processClassesFolder(
         );
         if (subMacros.length > 0) {
           activeSubclasses.push(subdir);
-          filesToFormat.push(join(path, 'macros.ts'));
+          filesToFormat.push(join(path, MACROS_FILENAME));
         }
       }
 
       if (activeSubclasses.length > 0) {
-        const subIndexFile = join(subclassPath, 'macros.ts');
+        const subIndexFile = join(subclassPath, MACROS_FILENAME);
         filesToFormat.push(subIndexFile);
 
         const imports = activeSubclasses
@@ -158,7 +169,9 @@ export default macros;
 `;
         writeFileSync(subIndexFile, content);
 
-        classImports.push(`import subclasses from './subclasses/macros.js';`);
+        classImports.push(
+          `import subclasses from './${SUBCLASSES_DIR}/macros.js';`,
+        );
         classSpreads.push('...subclasses');
       }
     }
@@ -218,39 +231,41 @@ function processExploitsFolder(
 
   const degreeDirs = readdirSync(exploitsPath).filter(
     (f) =>
-      f !== 'macros.ts' &&
-      f !== 'utils' &&
+      f !== MACROS_FILENAME &&
+      f !== UTILS_DIRNAME &&
       isDirectory(join(exploitsPath, f)) &&
-      f.endsWith('-degree'),
+      f.endsWith(DEGREE_DIR_SUFFIX),
   );
 
   for (const degreeDir of degreeDirs) {
     const degreeFullPath = join(exploitsPath, degreeDir);
     const degreeMacros = generateMacrosIndex(
       degreeFullPath,
-      'macros.ts',
+      MACROS_FILENAME,
       `exploits/${degreeDir}`,
     );
 
     if (
       degreeMacros.length > 0 ||
-      readdirSync(degreeFullPath).includes('macros.ts')
+      readdirSync(degreeFullPath).includes(MACROS_FILENAME)
     ) {
       registeredDegrees.push(degreeDir);
     }
   }
 
   const handlingMacros = generateMacrosIndex(
-    join(exploitsPath, 'handling'),
-    'macros.ts',
-    'exploits/handling',
+    join(exploitsPath, EXPLOIT_HANDLING_DIR),
+    MACROS_FILENAME,
+    `exploits/${EXPLOIT_HANDLING_DIR}`,
   );
 
   if (
     handlingMacros.length > 0 ||
-    readdirSync(join(exploitsPath, 'handling')).includes('macros.ts')
+    readdirSync(join(exploitsPath, EXPLOIT_HANDLING_DIR)).includes(
+      MACROS_FILENAME,
+    )
   ) {
-    registeredExploitHandlers.push('handling');
+    registeredExploitHandlers.push(EXPLOIT_HANDLING_DIR);
   }
 
   if (registeredDegrees.length > 0) {
@@ -258,7 +273,10 @@ function processExploitsFolder(
       .map((d) => `import degree${toCamelCase(d)} from './${d}/macros.js';`)
       .join('\n');
     const exploitHandlerImports = registeredExploitHandlers
-      .map((d) => `import ${toCamelCase(d)} from './handling/macros.js';`)
+      .map(
+        (d) =>
+          `import ${toCamelCase(d)} from './${EXPLOIT_HANDLING_DIR}/macros.js';`,
+      )
       .join('\n');
     const exploitsSpreads = registeredDegrees
       .map((d) => `...degree${toCamelCase(d)}`)
@@ -330,9 +348,9 @@ async function buildFromRoot(): Promise<void> {
   const classesPath = join(scriptsRoot, 'classes');
   const exploitsPath = join(scriptsRoot, 'exploits');
 
-  const classesIndexFile = join(classesPath, 'macros.ts');
-  const exploitsIndexFile = join(exploitsPath, 'macros.ts');
-  const rootIndexFile = join(scriptsRoot, 'macros.ts');
+  const classesIndexFile = join(classesPath, MACROS_FILENAME);
+  const exploitsIndexFile = join(exploitsPath, MACROS_FILENAME);
+  const rootIndexFile = join(scriptsRoot, MACROS_FILENAME);
 
   const filesToFormat = [rootIndexFile, classesIndexFile, exploitsIndexFile];
 
