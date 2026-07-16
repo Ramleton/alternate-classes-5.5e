@@ -2,11 +2,11 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { basename, join, resolve } from 'path';
 import { format, resolveConfig } from 'prettier';
 
-function toCamelCase(fileName: string) {
+function toCamelCase(fileName: string): string {
   return fileName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
-function isDirectory(path: string) {
+function isDirectory(path: string): boolean {
   try {
     return statSync(path).isDirectory();
   } catch {
@@ -18,7 +18,7 @@ function isDirectory(path: string) {
  * Generates a local macros.ts file for a directory containing raw macro files.
  */
 function generateMacrosIndex(
-  folderPath,
+  folderPath: string,
   indexFileName = 'macros.ts',
   contextName = '',
 ) {
@@ -55,7 +55,7 @@ export default macros;
 /**
  * Deeply formats all created index files using your local Prettier settings.
  */
-async function formatGeneratedFiles(filesToFormat) {
+async function formatGeneratedFiles(filesToFormat: string[]) {
   if (filesToFormat.length === 0) return;
   const prettierConfig = await resolveConfig(filesToFormat[0]);
 
@@ -76,7 +76,7 @@ async function formatGeneratedFiles(filesToFormat) {
 /**
  * Top-down aggregator script mapping classes and exploits safely
  */
-async function buildFromRoot() {
+async function buildFromRoot(): Promise<void> {
   const scriptsRoot = resolve('./src/scripts');
   const classesPath = join(scriptsRoot, 'classes');
   const exploitsPath = join(scriptsRoot, 'exploits');
