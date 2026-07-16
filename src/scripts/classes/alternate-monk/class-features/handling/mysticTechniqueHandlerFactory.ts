@@ -33,6 +33,7 @@ export const addMysticTechniqueHandler = (handler: MysticTechniqueHandler) => {
 const deriveNameFromIdentifier = (identifier: string): string => {
   return identifier
     .replace(/^ac55e/, '')
+    .replace(/MysticTechnique$/, '')
     .replace(/([A-Z])/g, ' $1')
     .trim();
 };
