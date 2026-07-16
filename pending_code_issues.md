@@ -379,3 +379,18 @@ interface ExploitSetMinRollFactoryArgs {
 - File: src/scripts/exploits/5th-degree/vorpalCritical.ts
 - Description: The number `50` used in `workflow.damageItem.newHP > 50` for the beheading threshold is a magic number.
 - Suggested Fix: Extract `50` into a named constant, e.g., `VORPAL_CRITICAL_BEHEAD_HP_THRESHOLD`.
+
+---
+
+- File: src/scripts/generateMacroIndex.ts
+- Description: The `generateMacrosIndex` function currently includes non-macro files like `utils.ts` in its `files` filter (`f !== indexFileName && !IGNORED_FILES.includes(f)`). While `IGNORED_FILES` correctly prevents `utils.ts` from being *imported* as a macro, its initial inclusion in the filter might be slightly misleading if the intent is strictly to find "raw macro files."
+- Suggested Fix: Clarify the intent of the `filter` or refine it to only select files that are truly intended to be individual macros. If `utils.ts` is explicitly handled elsewhere, the `!IGNORED_FILES.includes(f)` check is sufficient.
+
+---
+
+- File: src/scripts/classes/alternate-fighter/subclasses/runecarver/runicMight.ts
+- Description: The size `lg` for 'large' is an abbreviation. Foundry VTT typically uses the full string names for sizes (e.g., 'tiny', 'sm', 'med', 'large', 'huge', 'grg'). While `lg` might be implicitly converted, using the explicit string literal 'large' would improve consistency and readability.
+- Suggested Fix: Use the full string literal 'large' for the size.
+```typescript
+  const newSize = legendaryRuneLord ? 'huge' : 'large'; // Changed from 'lg'
+```
