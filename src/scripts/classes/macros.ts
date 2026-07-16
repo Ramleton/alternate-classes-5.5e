@@ -1,9 +1,16 @@
-import CPRMacro from '../../types/chris-premades/macro.js';
-import fighter from './alternate-fighter/macros.js';
-import paladin from './alternate-paladin/macros.js';
-import ranger from './alternate-ranger/macros.js';
-import rogue from './alternate-rogue/macros.js';
+import CPRMacro from 'chris-premades/macro.js';
+import alternateBarbarian from './alternate-barbarian/macros.js';
+import alternateFighter from './alternate-fighter/macros.js';
+import alternatePaladin from './alternate-paladin/macros.js';
+import alternateRanger from './alternate-ranger/macros.js';
+import alternateRogue from './alternate-rogue/macros.js';
 
-const classMacros: CPRMacro[] = [...fighter, ...paladin, ...ranger, ...rogue];
+const macros: CPRMacro[] = [
+  ...alternateBarbarian,
+  ...alternateFighter,
+  ...alternatePaladin,
+  ...alternateRanger,
+  ...alternateRogue,
+];
 
-export default classMacros;
+export default macros;

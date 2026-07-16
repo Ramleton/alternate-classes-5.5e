@@ -8,30 +8,22 @@ const pre = async (
   workflow: Workflow,
   ditem: DItem,
 ): Promise<boolean> => {
-  const { utils: {
-    constants,
-    dialogUtils,
-    itemUtils,
-    socketUtils,
-    workflowUtils,
-  } } = chrisPremades;
+  const {
+    utils: { constants, dialogUtils, itemUtils, socketUtils, workflowUtils },
+  } = chrisPremades;
   const actionType = workflowUtils.getActionType(workflow);
   // Check if the attack was a melee attack
-  if (!constants.meleeAttacks.some(a => a === actionType))
-    return false;
+  if (!constants.meleeAttacks.some((a) => a === actionType)) return false;
   // Check if the attack actually did damage
-  if (ditem.newHP === ditem.oldHP && ditem.newTempHP === ditem.oldTempHP)
-    return false;
+  if (!ditem.totalDamage) return false;
   const divineFervor = itemUtils.getItemByIdentifier(
     feat.actor!,
     'ac55eDivineFervor',
-  );
-  if (!divineFervor?.system?.uses?.value)
-    return false;
-  const selection = await dialogUtils.confirmUseItem(
-    feat,
-    { userId: socketUtils.firstOwner(feat.actor, true) },
-  );
+  ) as Item<'feat'> | undefined;
+  if (!divineFervor?.system?.uses?.value) return false;
+  const selection = await dialogUtils.confirmUseItem(feat, {
+    userId: socketUtils.firstOwner(feat.actor, true),
+  });
   return selection;
 };
 
@@ -49,10 +41,8 @@ const workflow: MidiMacroFunction = async ({
   ditem,
 }): Promise<void> => {
   const feat = entity as Item<'feat'>;
-  if (!feat.actor)
-    return;
-  if (!ditem)
-    return;
+  if (!feat.actor) return;
+  if (!ditem) return;
   const res1 = await pre(feat, workflow, ditem);
   if (!res1) return;
   const res2 = await during(feat, workflow);

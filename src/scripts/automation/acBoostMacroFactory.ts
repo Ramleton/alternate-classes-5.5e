@@ -61,7 +61,8 @@ export const duringACBoost: DuringACBoostCallback = async ({
     displayMessage = successMessage;
   }
   await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ actor: feat.actor }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    speaker: ChatMessage.getSpeaker({ actor: feat.actor as any }),
     content: displayMessage,
   });
   return displayMessage === successMessage;

@@ -1,8 +1,8 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
-import { CharacterDetails } from 'fvtt-types/ConfiguredActor.js';
 import { EffectData } from 'types/effects.js';
 
 const UNCANNY_DODGE_TELEPORT_DISTANCE_MULTIPLIER = 0.5;
+const UNCANNY_DODGE_TELEPORT_LEVEL = 14;
 
 const prompt: MidiMacroFunction = async ({
   trigger: { entity, token },
@@ -45,7 +45,8 @@ const prompt: MidiMacroFunction = async ({
   const effect = await effectUtils.createEffect(feat.actor!, effectData);
   await workflowUtils.addEntityRemoval(workflow, [effect]);
   await actorUtils.setReactionUsed(feat.actor!);
-  if ((feat.actor!.system.details as CharacterDetails).level < 14) return;
+  const classLevel = feat.actor!.classes['alternate-rogue'].system.levels;
+  if (classLevel < UNCANNY_DODGE_TELEPORT_LEVEL) return;
   const speed = feat.actor!.system.attributes.movement.speed;
   await Teleport.target([token], token, {
     range: Math.floor(speed * UNCANNY_DODGE_TELEPORT_DISTANCE_MULTIPLIER),

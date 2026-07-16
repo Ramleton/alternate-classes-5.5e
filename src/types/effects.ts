@@ -2,16 +2,17 @@ import { ScaleValueTypeDice } from 'fvtt-types/CharacterSystemData.js';
 import { DamageType } from './damage.js';
 
 export const STATUSES = [
+  'blinded',
+  'charmed',
+  'concentrating',
   'poisoned',
   'paralyzed',
-  'blinded',
   'deafened',
   'frightened',
   'stunned',
   'incapacitated',
   'unconscious',
   'diseased',
-  'charmed',
   'grappled',
   'petrified',
   'prone',
@@ -47,6 +48,7 @@ type DAESpecialDuration =
 export interface EffectFlags {
   'alternate-classes-55e'?: {
     macros?: {
+      wildSorcery?: number;
       chivalricMark?: {
         distance: number;
       };
@@ -70,6 +72,7 @@ export interface EffectFlags {
         targetUuid?: string;
       };
       origin?: string;
+      [key: string]: unknown;
     };
   };
   'chris-premades'?: {

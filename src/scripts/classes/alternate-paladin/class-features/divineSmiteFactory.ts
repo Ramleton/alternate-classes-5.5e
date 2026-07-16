@@ -1,37 +1,41 @@
 import { Workflow } from '@midi-qol/types/module/Workflow.js';
-import { CombinedKeys, DynamicSpells, getSpellData, isSpellObject, spendSpellSlot } from 'automation/spellUtils.js';
+import {
+  CombinedKeys,
+  DynamicSpells,
+  getSpellData,
+  isSpellObject,
+  spendSpellSlot,
+} from 'automation/spellUtils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { DamageType } from '../../../../types/damage.js';
 import damageWorkflow from './divineSmiteDamage.js';
+
+const MAX_DIVINE_SMITE_UPCAST = 5;
 
 const pre = async (
   feat: Item<'feat'>,
   workflow: Workflow,
 ): Promise<DynamicSpells[CombinedKeys] | undefined> => {
-  if (!workflow.hitTargets.size)
-    return;
-  const { utils: { dialogUtils, workflowUtils } } = chrisPremades;
+  if (!workflow.hitTargets.size) return;
+  const {
+    utils: { dialogUtils, workflowUtils },
+  } = chrisPremades;
   const actionType = workflowUtils.getActionType(workflow);
-  if (actionType !== 'mwak')
-    return;
+  if (actionType !== 'mwak') return;
   const spellDetails = getSpellData(feat.actor!);
-  if (!spellDetails.hasSpellSlots)
-    return;
-  const options: [`Level ${number}`, number][] = Object
-    .values(spellDetails)
-    .filter(d => isSpellObject(d))
-    .filter(d => d.value) // Only show spell levels with remaining slots
-    .map(d => [`Level ${d.level}`, d.level]);
+  if (!spellDetails.hasSpellSlots) return;
+  const options: [`Level ${number}`, string][] = Object.values(spellDetails)
+    .filter((d) => isSpellObject(d))
+    .filter((d) => d.value) // Only show spell levels with remaining slots
+    .map((d) => [`Level ${d.level}`, '' + d.level]);
   const useDivineSmite = await dialogUtils.confirmUseItem(feat);
-  if (!useDivineSmite)
-    return;
+  if (!useDivineSmite) return;
   const selection = await dialogUtils.buttonDialog(
     'Divine Smite',
     'Select a spell level',
     options,
   );
-  if (!selection)
-    return;
+  if (!selection) return;
   const spellData = spellDetails[`ac55eSpell${selection}` as CombinedKeys];
   return spellData;
 };
@@ -47,9 +51,11 @@ const during = async (
   spellData: DynamicSpells[CombinedKeys],
   damageType: DamageType,
 ) => {
-  const dmgSpellLevel = Math.min(spellData.level, 5);
+  const dmgSpellLevel = Math.min(spellData.level, MAX_DIVINE_SMITE_UPCAST);
   const dmgFormula = `${1 + dmgSpellLevel}d8` as `${number}d8`;
-  const { utils: { genericUtils } } = chrisPremades;
+  const {
+    utils: { genericUtils },
+  } = chrisPremades;
   const smiteData: DivineSmiteData = {
     formula: dmgFormula,
     damageType,
@@ -65,7 +71,9 @@ const during = async (
 };
 
 const postDivineSmite: MidiMacroFunction = async ({ trigger: { entity } }) => {
-  const { utils: { genericUtils } } = chrisPremades;
+  const {
+    utils: { genericUtils },
+  } = chrisPremades;
   const feat = entity as Item<'feat'>;
   await genericUtils.unsetFlag(
     feat.actor!,
@@ -76,19 +84,19 @@ const postDivineSmite: MidiMacroFunction = async ({ trigger: { entity } }) => {
 
 const divineSmiteMacroFactory = (damageType: DamageType): CPRMacro => {
   const workflow: MidiMacroFunction = async (data) => {
-    const { trigger: { entity }, workflow } = data;
+    const {
+      trigger: { entity },
+      workflow,
+    } = data;
     const feat = entity as Item<'feat'>;
-    if (!feat.actor)
-      return;
+    if (!feat.actor) return;
     const res1 = await pre(feat, workflow);
-    if (!res1)
-      return;
+    if (!res1) return;
     await during(feat, res1, damageType);
     await spendSpellSlot(feat.actor, res1.type, res1.level);
   };
 
-  const damageName = damageType.charAt(0).toUpperCase()
-    + damageType.slice(1);
+  const damageName = damageType.charAt(0).toUpperCase() + damageType.slice(1);
 
   return {
     identifier: `ac55eDivineSmite${damageName}`,

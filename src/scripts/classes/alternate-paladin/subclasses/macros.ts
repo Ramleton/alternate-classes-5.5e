@@ -11,16 +11,16 @@ import oathOfVigilance from './oath-of-vigilance/macros.js';
 import oathless from './oathless/macros.js';
 
 const macros: CPRMacro[] = [
-  ...oathOfTheAncients,
+  ...blackguard,
   ...oathOfConquest,
   ...oathOfGlory,
+  ...oathOfRepentance,
   ...oathOfSplendor,
+  ...oathOfTheAncients,
   ...oathOfTheThrone,
   ...oathOfVengeance,
   ...oathOfVigilance,
-  ...oathOfRepentance,
   ...oathless,
-  ...blackguard,
 ];
 
 export default macros;

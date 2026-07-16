@@ -3,10 +3,6 @@ import auraOfPenance from './auraOfPenance.js';
 import avatarOfRedemption from './avatarOfRedemption.js';
 import subduingSmite from './subduingSmite.js';
 
-const macros: CPRMacro[] = [
-  subduingSmite,
-  auraOfPenance,
-  avatarOfRedemption,
-];
+const macros: CPRMacro[] = [auraOfPenance, avatarOfRedemption, subduingSmite];
 
 export default macros;

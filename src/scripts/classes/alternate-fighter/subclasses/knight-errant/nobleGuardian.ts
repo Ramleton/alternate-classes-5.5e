@@ -59,7 +59,7 @@ const during = async (
   const {
     utils: { genericUtils, rollUtils },
   } = chrisPremades;
-  const res = await rollUtils.rollDice(`1d${exploitDie}`, {
+  const res = await rollUtils.rollDice(`1${exploitDie}`, {
     chatMessage: true,
   });
   await genericUtils.sleep(1500);

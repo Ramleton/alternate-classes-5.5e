@@ -3,7 +3,7 @@ import { DamageDetail } from 'chris-premades/macro.js';
 import Activity from 'fvtt-types/Activity.js';
 
 export const runActivity = async (
-  item: Item<'feat'>,
+  item: Item<'feat'> | Item<'weapon'>,
   activityIdentifier: string,
   targets: Token[],
   options = { consumeResources: true },
@@ -27,7 +27,7 @@ export const runActivity = async (
 };
 
 export const getActivityData = async (
-  item: Item<'feat'>,
+  item: Item<'feat'> | Item<'equipment'> | Item<'weapon'>,
   activityIdentifier: string,
 ): Promise<Activity | undefined> => {
   const {

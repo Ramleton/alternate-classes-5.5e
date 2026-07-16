@@ -227,6 +227,11 @@ This codebase uses:
 - CPR (chris-premades) macro framework for workflow automation
 - Inline function style (prefer single macro function over excessive helper decomposition)
 - Consistent naming and import patterns
+- Intentional Type Assertions & Casts: Explicit casts (e.g., \`as Actor5e\`, \`as any\`) and non-null assertions (\`!\`) are intentional and required due to ambient Foundry VTT / dnd5e type definitions.
+
+DO NOT FLAG (Strict Ignore List):
+- Type Casts & Assertions: NEVER suggest removing or refactoring type casts (\`as Actor5e\`, \`as any\`, etc.) or non-null assertions (\`!\`). Even if a type appears to be inferred from context, explicit assertions are required in this codebase to guarantee property access (such as \`classes\` or custom \`system\` fields) across ambient Foundry interfaces.
+- Already Fixed / Addressed Issues: NEVER flag or re-report issues that have already been resolved in the current git diff or updated code state—even if they appear in pending issue files or PR descriptions. Always check the actual *new* state of the code.
 
 Focus on these areas:
 
@@ -317,13 +322,15 @@ If you identify off-theme issues that are still valuable (e.g., style inconsiste
 (The script will extract this section and save it for future PRs.)
 
 **IMPORTANT - Final Validation:**
-Before submitting, review each issue you identified:
-- Is this actually a problem in the code, or is it already correctly implemented?
+Before submitting, review each issue you identified against the final version of the code in the diff:
+- Is this issue already resolved or fixed in the git diff or updated file content? If YES, DELETE IT.
+- Is this actually a problem in the current code, or is it already correctly implemented?
 - Is this a genuine code quality issue, or just a description of working code?
 - Would removing this issue make the review clearer and more actionable?
 - Does the code already follow the pattern you're suggesting?
+- Does this issue flag a type assertion or cast (such as \`as any\` or \`as Actor5e\`) as redundant? If YES, DELETE IT.
 
-If the answer to any of the above is "yes, this is already correct", DELETE that issue from your output. Only include genuine, actionable improvements.
+If the answer to any of the above indicates a false positive, a pre-existing fix, or an ignored issue, DELETE that issue from your output. Only include genuine, actionable improvements for code that currently exists.
 
 Be direct and professional. Do NOT include commentary outside the structured sections.`;
 

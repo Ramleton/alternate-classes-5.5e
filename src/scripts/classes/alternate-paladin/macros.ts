@@ -1,10 +1,7 @@
-import CPRMacro from '../../../types/chris-premades/macro.js';
+import CPRMacro from 'chris-premades/macro.js';
 import classFeatures from './class-features/macros.js';
 import subclasses from './subclasses/macros.js';
 
-const classMacros: CPRMacro[] = [
-  ...classFeatures,
-  ...subclasses,
-];
+const macros: CPRMacro[] = [...classFeatures, ...subclasses];
 
-export default classMacros;
+export default macros;
