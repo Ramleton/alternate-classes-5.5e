@@ -101,7 +101,9 @@ function processClassesFolder(
 
   const classDirs = readdirSync(classesPath).filter(
     (f) =>
-      f !== 'macros.ts' && f !== 'utils' && isDirectory(join(classesPath, f)),
+      f !== MACROS_FILENAME &&
+      f !== 'utils' &&
+      isDirectory(join(classesPath, f)),
   );
 
   for (const classDir of classDirs) {
@@ -145,7 +147,7 @@ function processClassesFolder(
         const path = join(subclassPath, subdir);
         const subMacros = generateMacrosIndex(
           path,
-          'macros.ts',
+          MACROS_FILENAME,
           `${className} subclass: ${subdir}`,
         );
         if (subMacros.length > 0) {
