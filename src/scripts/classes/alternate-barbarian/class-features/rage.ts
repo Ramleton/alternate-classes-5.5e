@@ -11,6 +11,9 @@ import { hasDivineAlignmentGood } from '../subclasses/path-of-the-zealot/divineA
 import { hasDivineAlignmentNeutral } from '../subclasses/path-of-the-zealot/divineAlignmentNeutral.js';
 import { extendRage } from './rageEffect.js';
 
+const RAGE_NORMAL_DURATION = 600; // 10 minutes
+const RAGE_LONG_DURATION = 3600; // 1 hour
+
 const getRageEffect = (feat: Item<'feat'>): ActiveEffect => {
   const {
     utils: { effectUtils },
@@ -34,7 +37,9 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
     return genericUtils.notify('Rage is out of uses', 'warn');
   const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   const seconds =
-    feat.actor!.classes['alternate-barbarian'].system.levels < 15 ? 600 : 3600;
+    feat.actor!.classes['alternate-barbarian'].system.levels < 15
+      ? RAGE_NORMAL_DURATION
+      : RAGE_LONG_DURATION;
   const spectralWarriors = itemUtils.getItemByIdentifier(
     feat.actor!,
     'ac55eSpectralWarriors',
