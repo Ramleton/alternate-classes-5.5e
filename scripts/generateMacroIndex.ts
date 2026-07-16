@@ -21,7 +21,7 @@ function generateMacrosIndex(
   folderPath: string,
   indexFileName = 'macros.ts',
   contextName = '',
-) {
+): string[] {
   const files = readdirSync(folderPath)
     .filter((f) => f.endsWith('.ts') && f !== indexFileName && f !== 'utils.ts')
     .sort();
@@ -55,7 +55,7 @@ export default macros;
 /**
  * Deeply formats all created index files using your local Prettier settings.
  */
-async function formatGeneratedFiles(filesToFormat: string[]) {
+async function formatGeneratedFiles(filesToFormat: string[]): Promise<void> {
   if (filesToFormat.length === 0) return;
   const prettierConfig = await resolveConfig(filesToFormat[0]);
 
@@ -74,108 +74,99 @@ async function formatGeneratedFiles(filesToFormat: string[]) {
 }
 
 /**
- * Top-down aggregator script mapping classes and exploits safely
+ * Processes class-related directories (features, subclasses) and compiles classes/macros.ts
  */
-async function buildFromRoot(): Promise<void> {
-  const scriptsRoot = resolve('./src/scripts');
-  const classesPath = join(scriptsRoot, 'classes');
-  const exploitsPath = join(scriptsRoot, 'exploits');
-
-  const classesIndexFile = join(classesPath, 'macros.ts');
-  const exploitsIndexFile = join(exploitsPath, 'macros.ts');
-  const rootIndexFile = join(scriptsRoot, 'macros.ts');
-
-  const filesToFormat = [rootIndexFile, classesIndexFile, exploitsIndexFile];
-
-  // ----------------------------------------------------
-  // 1. PROCESS CLASSES FOLDER
-  // ----------------------------------------------------
+function processClassesFolder(
+  classesPath: string,
+  classesIndexFile: string,
+  filesToFormat: string[],
+): string[] {
   const registeredClasses: string[] = [];
-  if (isDirectory(classesPath)) {
-    const classDirs = readdirSync(classesPath).filter(
-      (f) =>
-        f !== 'macros.ts' && f !== 'utils' && isDirectory(join(classesPath, f)),
-    );
+  if (!isDirectory(classesPath)) return registeredClasses;
 
-    for (const classDir of classDirs) {
-      const className = classDir;
-      console.log(`\nGenerating macros.ts for ${className}...`);
+  const classDirs = readdirSync(classesPath).filter(
+    (f) =>
+      f !== 'macros.ts' && f !== 'utils' && isDirectory(join(classesPath, f)),
+  );
 
-      const classFullPath = join(classesPath, classDir);
-      const featuresPath = join(classFullPath, 'class-features');
-      const subclassPath = join(classFullPath, 'subclasses');
+  for (const classDir of classDirs) {
+    const className = classDir;
+    console.log(`\nGenerating macros.ts for ${className}...`);
 
-      const classImports: string[] = [];
-      const classSpreads: string[] = [];
+    const classFullPath = join(classesPath, classDir);
+    const featuresPath = join(classFullPath, 'class-features');
+    const subclassPath = join(classFullPath, 'subclasses');
 
-      const baseMacros = generateMacrosIndex(classFullPath, 'macros.ts');
-      if (baseMacros.length > 0) {
-        filesToFormat.push(join(classFullPath, 'macros.ts'));
+    const classImports: string[] = [];
+    const classSpreads: string[] = [];
+
+    const baseMacros = generateMacrosIndex(classFullPath, 'macros.ts');
+    if (baseMacros.length > 0) {
+      filesToFormat.push(join(classFullPath, 'macros.ts'));
+    }
+
+    if (isDirectory(featuresPath)) {
+      const featureMacros = generateMacrosIndex(
+        featuresPath,
+        'macros.ts',
+        `${className} class-features`,
+      );
+      if (featureMacros.length > 0) {
+        filesToFormat.push(join(featuresPath, 'macros.ts'));
+        classImports.push(
+          `import classFeatures from './class-features/macros.js';`,
+        );
+        classSpreads.push('...classFeatures');
       }
+    }
 
-      if (isDirectory(featuresPath)) {
-        const featureMacros = generateMacrosIndex(
-          featuresPath,
+    if (isDirectory(subclassPath)) {
+      const subdirs = readdirSync(subclassPath).filter(
+        (f) => f !== 'utils' && isDirectory(join(subclassPath, f)),
+      );
+      const activeSubclasses: string[] = [];
+
+      for (const subdir of subdirs) {
+        const path = join(subclassPath, subdir);
+        const subMacros = generateMacrosIndex(
+          path,
           'macros.ts',
-          `${className} class-features`,
+          `${className} subclass: ${subdir}`,
         );
-        if (featureMacros.length > 0) {
-          filesToFormat.push(join(featuresPath, 'macros.ts'));
-          classImports.push(
-            `import classFeatures from './class-features/macros.js';`,
-          );
-          classSpreads.push('...classFeatures');
+        if (subMacros.length > 0) {
+          activeSubclasses.push(subdir);
+          filesToFormat.push(join(path, 'macros.ts'));
         }
       }
 
-      if (isDirectory(subclassPath)) {
-        const subdirs = readdirSync(subclassPath).filter(
-          (f) => f !== 'utils' && isDirectory(join(subclassPath, f)),
-        );
-        const activeSubclasses: string[] = [];
+      if (activeSubclasses.length > 0) {
+        const subIndexFile = join(subclassPath, 'macros.ts');
+        filesToFormat.push(subIndexFile);
 
-        for (const subdir of subdirs) {
-          const path = join(subclassPath, subdir);
-          const subMacros = generateMacrosIndex(
-            path,
-            'macros.ts',
-            `${className} subclass: ${subdir}`,
-          );
-          if (subMacros.length > 0) {
-            activeSubclasses.push(subdir);
-            filesToFormat.push(join(path, 'macros.ts'));
-          }
-        }
+        const imports = activeSubclasses
+          .map(
+            (name) => `import ${toCamelCase(name)} from './${name}/macros.js';`,
+          )
+          .join('\n');
 
-        if (activeSubclasses.length > 0) {
-          const subIndexFile = join(subclassPath, 'macros.ts');
-          filesToFormat.push(subIndexFile);
-
-          const imports = activeSubclasses
-            .map(
-              (name) =>
-                `import ${toCamelCase(name)} from './${name}/macros.js';`,
-            )
-            .join('\n');
-
-          const content = `import CPRMacro from 'chris-premades/macro.js';
+        const content = `import CPRMacro from 'chris-premades/macro.js';
 ${imports}
 
 const macros: CPRMacro[] = [${activeSubclasses.map((n) => `...${toCamelCase(n)}`).join(', ')}];
 
 export default macros;
 `;
-          writeFileSync(subIndexFile, content);
+        writeFileSync(subIndexFile, content);
 
-          classImports.push(`import subclasses from './subclasses/macros.js';`);
-          classSpreads.push('...subclasses');
-        }
+        classImports.push(`import subclasses from './subclasses/macros.js';`);
+        classSpreads.push('...subclasses');
       }
+    }
 
-      const classIndexFile = join(classFullPath, 'macros.ts');
-      filesToFormat.push(classIndexFile);
+    const classIndexFile = join(classFullPath, 'macros.ts');
+    filesToFormat.push(classIndexFile);
 
-      const classContent = `import CPRMacro from 'chris-premades/macro.js';
+    const classContent = `import CPRMacro from 'chris-premades/macro.js';
 ${classImports.join('\n')}
 
 const macros: CPRMacro[] = [
@@ -184,21 +175,20 @@ const macros: CPRMacro[] = [
 
 export default macros;
 `;
-      writeFileSync(classIndexFile, classContent);
-      registeredClasses.push(classDir);
+    writeFileSync(classIndexFile, classContent);
+    registeredClasses.push(classDir);
 
-      console.log(`Generated macros.ts for ${className}.`);
-    }
+    console.log(`Generated macros.ts for ${className}.`);
+  }
 
-    // Generate classes/macros.ts
-    const classesImports = registeredClasses
-      .map((c) => `import ${toCamelCase(c)} from './${c}/macros.js';`)
-      .join('\n');
-    const classesSpreads = registeredClasses
-      .map((c) => `...${toCamelCase(c)}`)
-      .join(',\n  ');
+  const classesImports = registeredClasses
+    .map((c) => `import ${toCamelCase(c)} from './${c}/macros.js';`)
+    .join('\n');
+  const classesSpreads = registeredClasses
+    .map((c) => `...${toCamelCase(c)}`)
+    .join(',\n  ');
 
-    const classesContent = `import CPRMacro from 'chris-premades/macro.js';
+  const classesContent = `import CPRMacro from 'chris-premades/macro.js';
 ${classesImports}
 
 const macros: CPRMacro[] = [
@@ -207,69 +197,77 @@ const macros: CPRMacro[] = [
 
 export default macros;
 `;
-    writeFileSync(classesIndexFile, classesContent);
-  }
+  writeFileSync(classesIndexFile, classesContent);
 
-  // ----------------------------------------------------
-  // 2. PROCESS EXPLOITS FOLDER (With Naming Fix Added)
-  // ----------------------------------------------------
+  return registeredClasses;
+}
+
+/**
+ * Processes degree exploits and handling subdirectories and compiles exploits/macros.ts
+ */
+function processExploitsFolder(
+  exploitsPath: string,
+  exploitsIndexFile: string,
+): string[] {
   const registeredDegrees: string[] = [];
   const registeredExploitHandlers: string[] = [];
-  if (isDirectory(exploitsPath)) {
-    console.log(`\nGenerating macros.ts for exploits...`);
 
-    const degreeDirs = readdirSync(exploitsPath).filter(
-      (f) =>
-        f !== 'macros.ts' &&
-        f !== 'utils' &&
-        isDirectory(join(exploitsPath, f)) &&
-        f.endsWith('-degree'),
-    );
+  if (!isDirectory(exploitsPath)) return registeredDegrees;
 
-    for (const degreeDir of degreeDirs) {
-      const degreeFullPath = join(exploitsPath, degreeDir);
-      const degreeMacros = generateMacrosIndex(
-        degreeFullPath,
-        'macros.ts',
-        `exploits/${degreeDir}`,
-      );
+  console.log(`\nGenerating macros.ts for exploits...`);
 
-      if (
-        degreeMacros.length > 0 ||
-        readdirSync(degreeFullPath).includes('macros.ts')
-      ) {
-        registeredDegrees.push(degreeDir);
-      }
-    }
+  const degreeDirs = readdirSync(exploitsPath).filter(
+    (f) =>
+      f !== 'macros.ts' &&
+      f !== 'utils' &&
+      isDirectory(join(exploitsPath, f)) &&
+      f.endsWith('-degree'),
+  );
 
-    const handlingMacros = generateMacrosIndex(
-      join(exploitsPath, 'handling'),
+  for (const degreeDir of degreeDirs) {
+    const degreeFullPath = join(exploitsPath, degreeDir);
+    const degreeMacros = generateMacrosIndex(
+      degreeFullPath,
       'macros.ts',
-      'exploits/handling',
+      `exploits/${degreeDir}`,
     );
 
     if (
-      handlingMacros.length > 0 ||
-      readdirSync(join(exploitsPath, 'handling')).includes('macros.ts')
-    )
-      registeredExploitHandlers.push('handling');
+      degreeMacros.length > 0 ||
+      readdirSync(degreeFullPath).includes('macros.ts')
+    ) {
+      registeredDegrees.push(degreeDir);
+    }
+  }
 
-    if (registeredDegrees.length > 0) {
-      // Prefixes 'degree' to guarantee variable string names pass JS token safety rules
-      const exploitsImports = registeredDegrees
-        .map((d) => `import degree${toCamelCase(d)} from './${d}/macros.js';`)
-        .join('\n');
-      const exploitHandlerImports = registeredExploitHandlers
-        .map((d) => `import ${toCamelCase(d)} from './handling/macros.js';`)
-        .join('\n');
-      const exploitsSpreads = registeredDegrees
-        .map((d) => `...degree${toCamelCase(d)}`)
-        .join(',\n  ');
-      const exploitHandlersSpreads = registeredExploitHandlers
-        .map((d) => `...${toCamelCase(d)}`)
-        .join(',\n  ');
+  const handlingMacros = generateMacrosIndex(
+    join(exploitsPath, 'handling'),
+    'macros.ts',
+    'exploits/handling',
+  );
 
-      const exploitsContent = `import CPRMacro from 'chris-premades/macro.js';
+  if (
+    handlingMacros.length > 0 ||
+    readdirSync(join(exploitsPath, 'handling')).includes('macros.ts')
+  ) {
+    registeredExploitHandlers.push('handling');
+  }
+
+  if (registeredDegrees.length > 0) {
+    const exploitsImports = registeredDegrees
+      .map((d) => `import degree${toCamelCase(d)} from './${d}/macros.js';`)
+      .join('\n');
+    const exploitHandlerImports = registeredExploitHandlers
+      .map((d) => `import ${toCamelCase(d)} from './handling/macros.js';`)
+      .join('\n');
+    const exploitsSpreads = registeredDegrees
+      .map((d) => `...degree${toCamelCase(d)}`)
+      .join(',\n  ');
+    const exploitHandlersSpreads = registeredExploitHandlers
+      .map((d) => `...${toCamelCase(d)}`)
+      .join(',\n  ');
+
+    const exploitsContent = `import CPRMacro from 'chris-premades/macro.js';
 ${exploitsImports}
 ${exploitHandlerImports}
 
@@ -280,24 +278,31 @@ const macros: CPRMacro[] = [
 
 export default macros;
 `;
-      writeFileSync(exploitsIndexFile, exploitsContent);
-      console.log(`Generated macros.ts for exploits.`);
-    } else {
-      writeFileSync(exploitsIndexFile, `export default [];\n`);
-    }
+    writeFileSync(exploitsIndexFile, exploitsContent);
+    console.log(`Generated macros.ts for exploits.`);
+  } else {
+    writeFileSync(exploitsIndexFile, `export default [];\n`);
   }
 
-  // ----------------------------------------------------
-  // 3. GENERATE ROOT ENTRYPOINT (src/scripts/macros.ts)
-  // ----------------------------------------------------
+  return registeredDegrees;
+}
+
+/**
+ * Compiles the root entrypoint macro file src/scripts/macros.ts
+ */
+function generateRootIndex(
+  rootIndexFile: string,
+  hasClasses: boolean,
+  hasExploits: boolean,
+): void {
   const rootImports: string[] = [];
   const rootSpreads: string[] = [];
 
-  if (registeredClasses.length > 0) {
+  if (hasClasses) {
     rootImports.push(`import classes from './classes/macros.js';`);
     rootSpreads.push('...classes');
   }
-  if (registeredDegrees.length > 0) {
+  if (hasExploits) {
     rootImports.push(`import exploits from './exploits/macros.js';`);
     rootSpreads.push('...exploits');
   }
@@ -315,8 +320,38 @@ export default macros;
   console.log(
     `\nSuccessfully compiled all class layouts and degree exploit structural branches!`,
   );
+}
 
-  // 4. Clean formatting
+/**
+ * Top-down orchestrator script mapping classes and exploits safely
+ */
+async function buildFromRoot(): Promise<void> {
+  const scriptsRoot = resolve('./src/scripts');
+  const classesPath = join(scriptsRoot, 'classes');
+  const exploitsPath = join(scriptsRoot, 'exploits');
+
+  const classesIndexFile = join(classesPath, 'macros.ts');
+  const exploitsIndexFile = join(exploitsPath, 'macros.ts');
+  const rootIndexFile = join(scriptsRoot, 'macros.ts');
+
+  const filesToFormat = [rootIndexFile, classesIndexFile, exploitsIndexFile];
+
+  const registeredClasses = processClassesFolder(
+    classesPath,
+    classesIndexFile,
+    filesToFormat,
+  );
+  const registeredDegrees = processExploitsFolder(
+    exploitsPath,
+    exploitsIndexFile,
+  );
+
+  generateRootIndex(
+    rootIndexFile,
+    registeredClasses.length > 0,
+    registeredDegrees.length > 0,
+  );
+
   await formatGeneratedFiles(filesToFormat);
 }
 
