@@ -9,7 +9,8 @@ type MysticTechniqueMacroPass =
 
 export interface MysticTechniqueHandler {
   pass: MysticTechniqueMacroPass;
-  name: string;
+  cprIdentifier: string;
+  name?: string;
   preCheck: (data: MidiMacroFunctionArgs) => Promise<boolean>;
   handle: (data: MidiMacroFunctionArgs) => Promise<void>;
 }
@@ -29,6 +30,13 @@ export const addMysticTechniqueHandler = (handler: MysticTechniqueHandler) => {
   mysticTechniqueHandlers.push(handler);
 };
 
+const deriveNameFromIdentifier = (identifier: string): string => {
+  return identifier
+    .replace(/^ac55e/, '')
+    .replace(/([A-Z])/g, ' $1')
+    .trim();
+};
+
 const handlerFactory: MysticTechniqueHandlerFactory = ({
   pass,
   priority = 0,
@@ -40,27 +48,34 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
 
     const preCheckResults = await Promise.all(
       potentialHandlers.map(async (handler) => ({
+        cprIdentifier: handler.cprIdentifier,
         handler,
         canUse: await handler.preCheck(data),
       })),
     );
+    const {
+      utils: { dialogUtils, itemUtils, socketUtils },
+    } = chrisPremades;
+
+    const feat = data.trigger.entity as Item<'feat'>;
+    const actor = feat.actor!;
 
     const usableHandlers = preCheckResults
       .filter(({ canUse }) => canUse)
+      .filter(({ cprIdentifier }) =>
+        itemUtils.getItemByIdentifier(actor, cprIdentifier),
+      )
       .map(({ handler }) => handler);
 
     if (!usableHandlers.length) return;
-    const {
-      utils: { dialogUtils, socketUtils },
-    } = chrisPremades;
     const options: [string, string][] = usableHandlers.map((handler) => [
-      handler.name,
-      handler.name,
+      handler.name ?? deriveNameFromIdentifier(handler.cprIdentifier),
+      handler.cprIdentifier,
     ]);
     const passName = pass
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, (s: string) => s.toUpperCase());
-    const selection = await dialogUtils.buttonDialog(
+    const selectedID = await dialogUtils.buttonDialog(
       'Mystic Techniques',
       passName,
       options,
@@ -68,17 +83,17 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
         userId: socketUtils.firstOwner(data.workflow.actor, true),
       },
     );
-    if (!selection) return;
+    if (!selectedID) return;
     try {
       await usableHandlers
-        .find((handler) => handler.name === selection)!
+        .find((handler) => handler.cprIdentifier === selectedID)!
         .handle(data);
     } catch (_: unknown) {
       const {
         utils: { genericUtils },
       } = chrisPremades;
       genericUtils.notify(
-        `Mystic Techniques: Could not find handler for ${selection}`,
+        `Mystic Techniques: Could not find handler for ${selectedID}`,
         'error',
       );
     }
