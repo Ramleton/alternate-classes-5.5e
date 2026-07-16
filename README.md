@@ -112,5 +112,5 @@ This module is heavily inspired by the exceptional work of **Laserllama**. Their
 
 ---
 
-**Current Module Version:** v1.5.3  
+**Current Module Version:** 1.5.3  
 **Latest Release Date:** July 16, 2026
