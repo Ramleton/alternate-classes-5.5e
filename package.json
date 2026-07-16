@@ -27,6 +27,7 @@
     "@ethaks/fvtt-quench": "^0.10.0",
     "@google/genai": "^2.10.0",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "^26.1.1",
     "@typescript-eslint/parser": "^8.60.0",
     "dnd5e": "github:adriangaro/dnd5e-types",
     "eslint": "^10.4.0",
