@@ -48,17 +48,22 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
     );
   }
   let overrideRageDamageType = '';
-  const pathOfElementalChaosElement = getElementDamage(feat.actor!, true);
-  if (pathOfElementalChaosElement)
-    overrideRageDamageType = `[${pathOfElementalChaosElement}]`;
-  const wildSorceryResult = getWildSorceryResult(feat.actor!);
-  if (wildSorceryResult === 1) overrideRageDamageType = '[necrotic]';
-  if (hasDivineAlignmentGood(feat.actor!, true))
-    overrideRageDamageType = '[radiant]';
-  if (hasDivineAlignmentNeutral(feat.actor!, true))
-    overrideRageDamageType = '[thunder]';
-  if (hasDivineAlignmentEvil(feat.actor!, true))
+  if (hasDivineAlignmentEvil(feat.actor!, true)) {
     overrideRageDamageType = '[necrotic]';
+  } else if (hasDivineAlignmentNeutral(feat.actor!, true)) {
+    overrideRageDamageType = '[thunder]';
+  } else if (hasDivineAlignmentGood(feat.actor!, true)) {
+    overrideRageDamageType = '[radiant]';
+  } else {
+    const wildSorceryResult = getWildSorceryResult(feat.actor!);
+    if (wildSorceryResult === 1) {
+      overrideRageDamageType = '[necrotic]';
+    } else {
+      const pathOfElementalChaosElement = getElementDamage(feat.actor!, true);
+      if (pathOfElementalChaosElement)
+        overrideRageDamageType = `[${pathOfElementalChaosElement}]`;
+    }
+  }
   const effectData: EffectData = {
     name: 'Rage',
     icon: feat.img,
