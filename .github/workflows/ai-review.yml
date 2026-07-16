@@ -52,7 +52,7 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BRANCH: ${{ github.head_ref }}
           PR_BODY: ${{ github.event.pull_request.body }}
-        run: npx tsx scripts/aiCodeReviewer.ts
+        run: pnpm tsx .github/scripts/aiCodeReviewer.ts
 
       - name: Post review to PR
         if: always()
