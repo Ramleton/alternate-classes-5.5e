@@ -55,7 +55,6 @@ const endRage: MacroFunction = async ({
   trigger: { entity, currentRound },
 }) => {
   const effect = entity as unknown as ActiveEffect;
-  const lastRound = effect.flags['alternate-classes-55e']?.lastRound;
   const {
     utils: { genericUtils, itemUtils },
   } = chrisPremades;
@@ -64,7 +63,10 @@ const endRage: MacroFunction = async ({
     'ac55eFeralInstinct',
   );
   if (feralInstinct) return;
+
+  let lastRound = effect.flags['alternate-classes-55e']?.lastRound;
   if (!lastRound) {
+    lastRound = currentRound! + 1;
     await genericUtils.setFlag(
       effect,
       'alternate-classes-55e',
@@ -72,6 +74,7 @@ const endRage: MacroFunction = async ({
       currentRound! + 1,
     );
   }
+
   if (lastRound === currentRound! + 1) return;
   await effect.delete();
 };
