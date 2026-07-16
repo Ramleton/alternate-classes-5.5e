@@ -356,8 +356,11 @@ This codebase uses:
 - Intentional Type Assertions & Casts: Explicit casts (e.g., \`as Actor5e\`, \`as any\`) and non-null assertions (\`!\`) are intentional and required due to ambient Foundry VTT / dnd5e type definitions.
 
 DO NOT FLAG (Strict Ignore List):
-- Type Casts & Assertions: NEVER suggest removing or refactoring type casts (\`as Actor5e\`, \`as any\`, etc.) or non-null assertions (\`!\`). Even if a type appears to be inferred from context, explicit assertions are required in this codebase to guarantee property access (such as \`classes\` or custom \`system\` fields) across ambient Foundry interfaces.
-- Already Fixed / Addressed Issues: NEVER flag or re-report issues that have already been resolved in the current git diff or updated code state—even if they appear in pending issue files or PR descriptions. Always check the actual *new* state of the code.
+- Type Casts & Assertions: NEVER suggest removing or refactoring type casts ('as Actor5e', 'as any', etc.) or non-null assertions ('!').
+- Already Fixed / Addressed Issues: NEVER flag or re-report issues that have already been resolved.
+- Single-Use Strings & UI Labels: DO NOT flag single-use dialog titles, localized display strings, or string literal union types (e.g., 'error', 'warning', 'info', 'Mystic Techniques').
+- Trivial / Pedantic Extracting: DO NOT suggest creating constants for single-use string literals or obvious function arguments. Only flag repeated domain constants (used 3+ times across files) or unexplained magic numbers (e.g., raw millisecond calculations, arbitrary physics constants).
+- Personal Style Preferences: If code is readable, safe, and works, do NOT suggest refactoring just to fit a theoretical "clean code" ideal. Ask: "Would a human senior dev block a PR over this?" If no, omit it.
 
 Focus on these areas:
 
@@ -379,7 +382,7 @@ Focus on these areas:
 4. Code Style & Readability:
 - Flag overly nested conditionals that could be flattened with early returns.
 - Suggest breaking down long function bodies into logical sub-sections or helper functions.
-- Recommend extracting magic numbers or strings into named constants.
+- Recommend extracting unexplained, raw magic numbers (e.g. '86400000', '0.05') or domain values repeated 3+ times into named constants
 
 5. Logic Flow & Control Flow:
 - Suggest simplifications in conditional chains.
@@ -396,6 +399,9 @@ Focus on these areas:
 - Identify cases where Builder pattern could simplify complex object construction.
 - Look for opportunities to extract shared behavior into base classes or mixins.
 - Suggest applying established patterns from the codebase (e.g., if sibling files use Factory pattern, new code should too).
+
+Rule of Thumb for Issues:
+Quality over quantity. It is MUCH BETTER to return "No issues detected" than to output minor, pedantic, or low-value nitpicks. Only output actionable suggestions that meaningfully improve maintainability or prevent bugs.
 
 Output Format:
 Structure your response exactly as follows:
