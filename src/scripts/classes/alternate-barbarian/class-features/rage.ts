@@ -25,6 +25,17 @@ const getRageEffect = (feat: Item<'feat'>): ActiveEffect => {
   return effect as unknown as ActiveEffect;
 };
 
+const getRageDamageType = (actor: Actor5e): string => {
+  if (hasDivineAlignmentEvil(actor, true)) return '[necrotic]';
+  if (hasDivineAlignmentNeutral(actor, true)) return '[thunder]';
+  if (hasDivineAlignmentGood(actor, true)) return '[radiant]';
+  const wildSorceryResult = getWildSorceryResult(actor);
+  if (wildSorceryResult === 1) return '[necrotic]';
+  const pathOfElementalChaosElement = getElementDamage(actor, true);
+  if (pathOfElementalChaosElement) return `[${pathOfElementalChaosElement}]`;
+  return '';
+};
+
 const use: MacroFunction = async ({ trigger: { entity } }) => {
   const feat = entity as Item<'feat'>;
   const {
@@ -52,23 +63,8 @@ const use: MacroFunction = async ({ trigger: { entity } }) => {
       feat.actor!.uuid!,
     );
   }
-  let overrideRageDamageType = '';
-  if (hasDivineAlignmentEvil(feat.actor!, true)) {
-    overrideRageDamageType = '[necrotic]';
-  } else if (hasDivineAlignmentNeutral(feat.actor!, true)) {
-    overrideRageDamageType = '[thunder]';
-  } else if (hasDivineAlignmentGood(feat.actor!, true)) {
-    overrideRageDamageType = '[radiant]';
-  } else {
-    const wildSorceryResult = getWildSorceryResult(feat.actor!);
-    if (wildSorceryResult === 1) {
-      overrideRageDamageType = '[necrotic]';
-    } else {
-      const pathOfElementalChaosElement = getElementDamage(feat.actor!, true);
-      if (pathOfElementalChaosElement)
-        overrideRageDamageType = `[${pathOfElementalChaosElement}]`;
-    }
-  }
+  const overrideRageDamageType = getRageDamageType(feat.actor!);
+
   const effectData: EffectData = {
     name: 'Rage',
     icon: feat.img,
