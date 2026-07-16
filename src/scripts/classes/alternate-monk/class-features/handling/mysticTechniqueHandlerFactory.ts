@@ -31,17 +31,29 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
   priority = 0,
 }) => {
   const macro: MidiMacroFunction = async (data) => {
-    const usableMysticTechniques = mysticTechniqueHandlers
-      .filter((handler) => handler.pass === pass)
-      .filter((handler) => handler.preCheck(data))
-      .map((handler) => handler.handle);
-    if (!usableMysticTechniques.length) return;
+    const potentialHandlers = mysticTechniqueHandlers.filter(
+      (handler) => handler.pass === pass,
+    );
+
+    const preCheckResults = await Promise.all(
+      potentialHandlers.map(async (handler) => ({
+        handler,
+        canUse: await handler.preCheck(data),
+      })),
+    );
+
+    const usableHandlers = preCheckResults
+      .filter(({ canUse }) => canUse)
+      .map(({ handler }) => handler);
+
+    if (!usableHandlers.length) return;
     const {
       utils: { dialogUtils, socketUtils },
     } = chrisPremades;
-    const options: [string, string][] = usableMysticTechniques.map(
-      (handler) => [handler.name, handler.name],
-    );
+    const options: [string, string][] = usableHandlers.map((handler) => [
+      handler.name,
+      handler.name,
+    ]);
     const passName = pass
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, (s: string) => s.toUpperCase());
@@ -55,9 +67,9 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
     );
     if (!selection) return;
     try {
-      await usableMysticTechniques.find(
-        (handler) => handler.name === selection,
-      )!(data);
+      await usableHandlers
+        .find((handler) => handler.name === selection)!
+        .handle(data);
     } catch (_: unknown) {
       const {
         utils: { genericUtils },
