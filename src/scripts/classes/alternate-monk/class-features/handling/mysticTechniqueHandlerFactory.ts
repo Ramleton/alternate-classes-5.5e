@@ -8,11 +8,11 @@ type MysticTechniqueMacroPass =
   'attackRollComplete' | 'targetAttackRollComplete';
 
 export type MysticTechniquePreCheck = (
-  data: MidiMacroFunctionArgs,
+  data: MidiMacroFunctionArgs & { technique: Item<'feat'> },
 ) => Promise<boolean>;
 
 export type MysticTechniqueHandler = (
-  data: MidiMacroFunctionArgs,
+  data: MidiMacroFunctionArgs & { technique: Item<'feat'> },
 ) => Promise<void>;
 
 export interface MysticTechniqueData {
@@ -51,17 +51,6 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
   priority = 0,
 }) => {
   const macro: MidiMacroFunction = async (data) => {
-    const potentialHandlers = mysticTechniqueHandlers.filter(
-      (handler) => handler.pass === pass,
-    );
-
-    const preCheckResults = await Promise.all(
-      potentialHandlers.map(async (handler) => ({
-        cprIdentifier: handler.cprIdentifier,
-        handler,
-        canUse: await handler.preCheck(data),
-      })),
-    );
     const {
       utils: { dialogUtils, itemUtils, socketUtils },
     } = chrisPremades;
@@ -69,15 +58,38 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
     const feat = data.trigger.entity as Item<'feat'>;
     const actor = feat.actor!;
 
-    const usableHandlers = preCheckResults
-      .filter(({ canUse }) => canUse)
-      .filter(({ cprIdentifier }) =>
-        itemUtils.getItemByIdentifier(actor, cprIdentifier),
-      )
-      .map(({ handler }) => handler);
+    const candidates = mysticTechniqueHandlers
+      .filter((handler) => handler.pass === pass)
+      .map((handler) => ({
+        handler,
+        technique: itemUtils.getItemByIdentifier(
+          actor,
+          handler.cprIdentifier,
+        ) as Item<'feat'> | null,
+      }))
+      .filter(
+        (
+          entry,
+        ): entry is { handler: MysticTechniqueData; technique: Item<'feat'> } =>
+          entry.technique !== null,
+      );
 
-    if (!usableHandlers.length) return;
-    const options: [string, string][] = usableHandlers.map((handler) => [
+    if (!candidates.length) return;
+
+    const preCheckResults = await Promise.all(
+      candidates.map(async (entry) => ({
+        ...entry,
+        canUse: await entry.handler.preCheck({
+          ...data,
+          technique: entry.technique,
+        }),
+      })),
+    );
+
+    const usable = preCheckResults.filter(({ canUse }) => canUse);
+
+    if (!usable.length) return;
+    const options: [string, string][] = usable.map(({ handler }) => [
       handler.name ?? deriveNameFromIdentifier(handler.cprIdentifier),
       handler.cprIdentifier,
     ]);
@@ -93,10 +105,17 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
       },
     );
     if (!selectedID) return;
+
+    const target = usable.find(
+      ({ handler }) => handler.cprIdentifier === selectedID,
+    );
+    if (!target) return;
+
     try {
-      await usableHandlers
-        .find((handler) => handler.cprIdentifier === selectedID)!
-        .handle(data);
+      await target.handler.handle({
+        ...data,
+        technique: target.technique,
+      });
     } catch (_: unknown) {
       const {
         utils: { genericUtils },

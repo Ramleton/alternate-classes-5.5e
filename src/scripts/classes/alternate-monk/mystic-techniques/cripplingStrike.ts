@@ -6,34 +6,27 @@ import {
   MysticTechniqueHandler,
   MysticTechniquePreCheck,
 } from '../class-features/handling/mysticTechniqueHandlerFactory.js';
-import {
-  getKiRemaining,
-  getMysticTechniqueFromHandler,
-  isMeleeMartialArtsAttack,
-} from './utils.js';
+import { getKiRemaining, isMeleeMartialArtsAttack } from './utils.js';
 
 const CPRIdentifier = 'ac55eCripplingStrikeMysticTechnique';
 
 const preCheck: MysticTechniquePreCheck = async ({
-  trigger: { entity },
   workflow,
+  technique: mysticTechnique,
 }) => {
   if (!workflow.hitTargets.size) return false;
-  const feat = entity as Item<'feat'>;
-  if (!feat.system.uses?.value) return false;
+  if (!mysticTechnique.system.uses?.value) return false;
   if (!getKiRemaining(workflow.actor)) return false;
   if (!isMeleeMartialArtsAttack(workflow.item, workflow)) return false;
   return true;
 };
 
 const handle: MysticTechniqueHandler = async ({
-  trigger: { entity },
   workflow,
+  technique: mysticTechnique,
 }) => {
-  const handler = entity as Item<'feat'>;
-  const feat = getMysticTechniqueFromHandler(handler, CPRIdentifier);
   const target = workflow.hitTargets.first()! as Token;
-  const saveWorkflow = await runActivity(feat, 'save', [target]);
+  const saveWorkflow = await runActivity(mysticTechnique, 'save', [target]);
   if (!saveWorkflow?.failedSaves?.size) return;
   const {
     utils: { dialogUtils, effectUtils, socketUtils },
@@ -44,19 +37,19 @@ const handle: MysticTechniqueHandler = async ({
     ['Silenced', 'silenced'],
   ];
   const selection = await dialogUtils.buttonDialog(
-    feat.name,
+    mysticTechnique.name,
     'Select a condition',
     options,
     {
-      userId: socketUtils.firstOwner(feat.actor!, true),
+      userId: socketUtils.firstOwner(mysticTechnique.actor!, true),
     },
   );
   if (!selection) return;
   const effectData: EffectData = {
-    name: `${feat.name}: ${selection.capitalize()}`,
-    icon: feat.img,
+    name: `${mysticTechnique.name}: ${selection.capitalize()}`,
+    icon: mysticTechnique.img,
     duration: { rounds: 2 },
-    origin: feat.uuid!,
+    origin: mysticTechnique.uuid!,
     flags: {
       dae: {
         stackable: 'noneName',
