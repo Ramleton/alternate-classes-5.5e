@@ -1,6 +1,8 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { EffectData } from 'types/effects.js';
 
+const RECKLESS_ATTACK_DURATION_ROUNDS = 2;
+
 const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
   if (workflow.advantage) return;
   const {
@@ -15,7 +17,7 @@ const prompt: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
   const effectData: EffectData = {
     name: feat.name,
     icon: feat.img!,
-    duration: { rounds: 2 },
+    duration: { rounds: RECKLESS_ATTACK_DURATION_ROUNDS },
     origin: feat.uuid!,
     flags: {
       dae: {

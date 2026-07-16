@@ -7,6 +7,8 @@ import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 import { getExploitUsesRemaining } from 'exploits/utils/exploitUtils.js';
 import { DamageActivity } from 'fvtt-types/Activity.js';
 
+const GRAPPLE_DAMAGE_ACTIVITY_IDENTIFIER = 'PathOfBloodAndIron.grappleDamage';
+
 const handleSpikedRetribution: MidiMacroFunction = async ({
   trigger: { entity },
   workflow,
@@ -68,7 +70,7 @@ const handleGrappleDamage: MacroFunction = async ({
   const activity = Object.values(item.system.activities.contents).find(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (a: any) =>
-      a.midiProperties.identifier === 'PathOfBloodAndIron.grappleDamage',
+      a.midiProperties.identifier === GRAPPLE_DAMAGE_ACTIVITY_IDENTIFIER,
   ) as DamageActivity | null;
   if (!activity) return;
   const grappleDamageActivity = genericUtils.duplicate(

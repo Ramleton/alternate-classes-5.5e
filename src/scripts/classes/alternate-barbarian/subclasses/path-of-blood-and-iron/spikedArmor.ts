@@ -1,6 +1,8 @@
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 import { getAlternateMartialExploitDie } from 'exploits/utils.js';
 
+const SPIKED_ARMOR_UNARMED_STRIKE_ITEM_NAME = 'Unarmed Strike: Spiked Armor';
+
 const handle: MidiMacroFunction = async ({ trigger: { entity } }) => {
   const {
     utils: { compendiumUtils, genericUtils, itemUtils },
@@ -12,7 +14,7 @@ const handle: MidiMacroFunction = async ({ trigger: { entity } }) => {
   if (!unarmedStrike) return;
   const feat = entity as Item<'feat'>;
   const oldUnarmedStrikeItem = feat.actor!.items.find(
-    (i) => i.name === 'Unarmed Strike: Spiked Armor',
+    (i) => i.name === SPIKED_ARMOR_UNARMED_STRIKE_ITEM_NAME,
   );
   const [unarmedStrikeItem] = (await itemUtils.createItems(feat.actor!, [
     unarmedStrike,
@@ -21,7 +23,7 @@ const handle: MidiMacroFunction = async ({ trigger: { entity } }) => {
   const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
   await genericUtils.update(unarmedStrikeItem, {
-    name: 'Unarmed Strike: Spiked Armor',
+    name: SPIKED_ARMOR_UNARMED_STRIKE_ITEM_NAME,
     system: {
       damage: {
         base: {
