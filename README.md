@@ -30,7 +30,7 @@ This module adds comprehensive D&D 5e alternate class and subclass options with 
 1. In FoundryVTT, go to **Add-on Modules** → **Install Module**
 2. Paste the module manifest URL:
    ```
-   https://github.com/Ramleton/alternate-classes-5.5e/releases/download/1.5.2/module.json
+   https://github.com/Ramleton/alternate-classes-5.5e/releases/download/1.5.3/module.json
    ```
 3. Click **Install** and activate in your world
 
