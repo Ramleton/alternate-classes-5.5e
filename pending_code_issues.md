@@ -271,3 +271,16 @@ interface ExploitSetMinRollFactoryArgs {
 }
 ```
 ---
+
+---
+
+- File: src/scripts/exploits/utils/exploitSetMinRollFactory.ts
+- Description: The `macros` property in the `ExploitSetMinRollFactoryArgs` interface uses an overly specific tuple type `[MacroKey] | [MacroKey, MacroKey?] | [MacroKey, MacroKey?, MacroKey?]`. A simpler and more flexible `MacroKey[]` type would be sufficient and would improve the clarity and maintainability of the type definition.
+- Suggested Fix: Simplify the type definition for `macros` to `MacroKey[]`.
+```typescript
+interface ExploitSetMinRollFactoryArgs {
+  // ...other properties
+  macros: MacroKey[]; // Simplified type
+  // ...other properties
+}
+```
