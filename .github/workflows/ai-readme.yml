@@ -6,11 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       version_tag:
-        description: 'Version Tag (e.g., 1.2.4)'
-        required: true
+        description: 'Version Tag (leave blank to use latest release)'
+        required: false
+        default: ''
       release_body:
-        description: 'Changelog / Release Notes summary text'
-        required: true
+        description: 'Changelog text (leave blank to use latest release)'
+        required: false
+        default: ''
 
 jobs:
   build-readme:
@@ -18,18 +20,36 @@ jobs:
     permissions:
       contents: write
 
-    env:
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      VERSION_INPUT: ${{ github.event.release.tag_name || github.event.inputs.version_tag }}
-      RELEASE_INPUT: ${{ github.event.release.body || github.event.inputs.release_body }}
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.repository.default_branch }}
 
+      - name: Resolve Version and Release Notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.event.inputs.version_tag }}"
+          RELEASE_TEXT="${{ github.event.release.body || github.event.inputs.release_body }}"
+
+          # If triggered manually with blank inputs, fetch the latest release from GitHub
+          if [ -z "$VERSION" ]; then
+            echo "No inputs provided. Fetching latest release details..."
+            VERSION=$(gh release view --json tagName -q .tagName)
+            RELEASE_TEXT=$(gh release view --json body -q .body)
+          fi
+
+          echo "VERSION_INPUT=$VERSION" >> $GITHUB_ENV
+          {
+            echo "RELEASE_INPUT<<EOF"
+            echo "$RELEASE_TEXT"
+            echo "EOF"
+          } >> $GITHUB_ENV
+
       - name: Generate New README via Gemini API
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npx tsx .github/scripts/updateREADME.ts
 
       - name: Validate README Formatting
