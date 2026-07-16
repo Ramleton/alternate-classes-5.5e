@@ -4,15 +4,18 @@ import {
   MidiMacroFunctionArgs,
 } from 'chris-premades/macro.js';
 
+type MysticTechniqueMacroPass =
+  'attackRollComplete' | 'targetAttackRollComplete';
+
 export interface MysticTechniqueHandler {
-  pass: 'attackRollComplete' | unknown;
+  pass: MysticTechniqueMacroPass;
   name: string;
   preCheck: (data: MidiMacroFunctionArgs) => Promise<boolean>;
   handle: (data: MidiMacroFunctionArgs) => Promise<void>;
 }
 
 interface MysticTechniqueHandlerFactoryArgs {
-  pass: 'attackRollComplete' | 'targetAttackRollComplete';
+  pass: MysticTechniqueMacroPass;
   priority?: number;
 }
 
