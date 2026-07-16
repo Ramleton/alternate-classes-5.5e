@@ -135,20 +135,22 @@ export const promptSpellSlotChoice = async (
 
   const buttons = availableLevels.map((level) => {
     const slotData = spellData[`ac55eSpell${level}` as CombinedKeys];
-    return [slotData.label + ` (${slotData.value}/${slotData.max})`, level] as [
-      string,
-      SpellLevel,
-    ];
+    return [
+      slotData.label + ` (${slotData.value}/${slotData.max})`,
+      '' + level,
+    ] as [string, string];
   });
 
-  const chosenLevel = (await dialogUtils.buttonDialog(
+  const chosenLevelRaw = await dialogUtils.buttonDialog(
     'Spend Spell Slot',
     'Choose a spell slot level to spend:',
     buttons,
     { userId: socketUtils.firstOwner(actor, true) },
-  )) as SpellLevel | null;
+  );
 
-  if (!chosenLevel) return null;
+  if (!chosenLevelRaw) return null;
+
+  const chosenLevel = Number(chosenLevelRaw) as SpellLevel;
 
   await spendSpellSlot(actor, 'ac55eSpell', chosenLevel);
   return chosenLevel;

@@ -22,7 +22,7 @@ const bonus: MacroFunction = async ({
     { userId },
   );
   if (!selection) return;
-  await rollUtils.addToRoll(roll, `1d${exploitDie}`);
+  await rollUtils.addToRoll(roll, `1${exploitDie}`);
 };
 
 const macro: CPRMacro = {

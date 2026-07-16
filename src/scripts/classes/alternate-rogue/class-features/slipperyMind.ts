@@ -9,7 +9,7 @@ const bonus: MacroFunction = async ({ trigger: { entity, roll, saveId } }) => {
   const feat = entity as Item<'feat'>;
   const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
-  const formula = `1d${exploitDie}`;
+  const formula = `1${exploitDie}`;
   return await rollUtils.addToRoll(roll, formula);
 };
 

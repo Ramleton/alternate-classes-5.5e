@@ -9,6 +9,8 @@ import {
   qualifiesForSneakAttack,
 } from '../utils/sneakAttackUtils.js';
 
+const INVESTIGATOR_EXPLOIT_WEAKNESS_LEVEL = 17;
+
 const prompt: MidiMacroFunction = async ({
   trigger: { entity, token },
   workflow,
@@ -55,9 +57,10 @@ const damageBonus: MidiMacroFunction = async ({
   const sneakAttack = getSneakAttack(feat.actor!);
   const sneakAttackDice = sneakAttack.number! - sneakAttackReduction;
   let formula = `${sneakAttackDice}${sneakAttack.die}`;
+  const classLevel = feat.actor!.classes['alternate-rogue'].system.levels;
   // Alternate Rogue - Investigator - Exploit Weakness
   if (
-    feat.actor!.classes['alternate-rogue'].system.levels >= 17 &&
+    classLevel >= INVESTIGATOR_EXPLOIT_WEAKNESS_LEVEL &&
     predictiveFightingTarget &&
     predictiveFightingTarget.origin!.includes(feat.actor!.id!)
   ) {

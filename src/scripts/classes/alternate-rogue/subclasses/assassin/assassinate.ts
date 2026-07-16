@@ -69,7 +69,7 @@ const prompt: MacroFunction = async ({ trigger: { entity, token } }) => {
   await spendAlternateMartialExploitUses(1, feat);
   const exploitDie = getAlternateMartialExploitDie(feat.actor!);
   if (!exploitDie) return;
-  const formula = `1d${exploitDie}`;
+  const formula = `1${exploitDie}`;
   const roll = await rollUtils.rollDice(formula, {
     entity: feat.actor!,
     chatMessage: true,

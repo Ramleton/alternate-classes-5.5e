@@ -7,7 +7,7 @@ const checkRest = async (item: Item<'feat'>, roll: D20Roll) => {
   const {
     utils: { rollUtils },
   } = chrisPremades;
-  return await rollUtils.addToRoll(roll, `1d${exploitDie}`);
+  return await rollUtils.addToRoll(roll, `1${exploitDie}`);
 };
 const saveBonus: MacroFunction = async ({
   trigger: { entity: item, roll, saveId },

@@ -13,8 +13,8 @@ import {
   setWorkflowProperty,
 } from 'automation/workflowUtils.js';
 import CPRMacro from 'chris-premades/macro.js';
-import { genericARCWorkflow } from 'exploits/handling/genericARCExploit.js';
-import { useWorkflow } from 'exploits/handling/genericUseExploit.js';
+import genericARCWorkflow from 'exploits/generics/genericARCExploit.js';
+import useWorkflow from 'exploits/generics/genericUseExploit.js';
 import { getExploitUsesRemaining } from 'exploits/utils/exploitUtils.js';
 import { handleMindRend } from '../subclasses/psiknife/empoweredBlades.js';
 import { handlePanache } from '../subclasses/swashbuckler/panache.js';

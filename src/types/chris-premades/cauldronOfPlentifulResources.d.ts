@@ -125,6 +125,39 @@ export default interface CauldronOfPlentifulResources {
       giveHeroicInspiration(actor: Actor): Promise<void>;
     };
 
+    regionUtils: {
+      createRegions(
+        regionDatas: object[],
+        scene: Scene,
+        options?: {
+          parentEntity?: any;
+          excludeGPSRegionHandling?: boolean;
+          origin?: any;
+        },
+      ): Promise<object[]>;
+
+      templateToRegionShape(
+        template: any,
+        options?: { hole?: boolean },
+      ): {
+        hole: boolean;
+        type: 'polygon' | unknown;
+        points: { x: number; y: number }[];
+      };
+
+      getCastData(region: any): any;
+      getCastLevel(region: any): any;
+      getBaseLevel(region: any): any;
+      setCastData(region, data): Promise<void>;
+      setCastLevel(region, level): Promise<void>;
+      setBaseLevel(region, level): Promise<void>;
+      getSaveDC(region): any;
+      setSaveDC(region, dc): Promise<void>;
+      rayIntersectsRegion(region, ray): any;
+      getIntersections(region, A, B, boolOnly?: boolean): any;
+      getOrigin(region): any;
+    };
+
     constants: {
       summonAnimationOptions: [
         {
@@ -588,7 +621,7 @@ export default interface CauldronOfPlentifulResources {
           buttons?: string;
           userId?: string;
         },
-      ): Promise<object>;
+      ): Promise<number | undefined>;
 
       selectDialog(
         title: string,

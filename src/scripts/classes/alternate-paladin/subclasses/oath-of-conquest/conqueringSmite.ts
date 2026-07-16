@@ -1,31 +1,38 @@
 import { runActivity } from 'automation/utils.js';
 import { EffectData, Status } from 'types/effects.js';
-import subclassSmiteMacroFactory, { DuringCallbackArgs } from '../utils/subclassSmiteFactory.js';
+import subclassSmiteMacroFactory, {
+  DuringCallbackArgs,
+} from '../utils/subclassSmiteFactory.js';
 
-type StatusOption = (['Command', 'command'] | [string, Status]);
+type StatusOption = ['Command', 'command'] | [string, Status];
 
-const during = async (
-  { feat, workflow }: DuringCallbackArgs,
-): Promise<void> => {
+const CONQUERING_SMITE_EFFECT_DURATION_ROUNDS = 2;
+
+const during = async ({
+  feat,
+  workflow,
+}: DuringCallbackArgs): Promise<void> => {
   const targets = Array.from(workflow.hitTargets) as Token[];
   const saveWorkflow = await runActivity(feat, 'save', targets);
-  if (!saveWorkflow)
-    return;
+  if (!saveWorkflow) return;
   const options: StatusOption[] = [
     ['Knock prone', 'prone'],
     ['Frighten', 'frightened'],
     ['Command', 'command'],
   ];
-  const { utils: { dialogUtils } } = chrisPremades;
-  const selection = await dialogUtils.buttonDialog(
-    feat.name,
-    'Choose effect to apply',
-    options,
-  ) ?? 'prone';
+  const {
+    utils: { dialogUtils },
+  } = chrisPremades;
+  const selection =
+    (await dialogUtils.buttonDialog(
+      feat.name,
+      'Choose effect to apply',
+      options,
+    )) ?? 'prone';
   const effectData: EffectData = {
     name: `${feat.name}: ${selection[0].toUpperCase() + selection.slice(1)}`,
     icon: feat.img!,
-    duration: { rounds: 2 },
+    duration: { rounds: CONQUERING_SMITE_EFFECT_DURATION_ROUNDS },
     origin: feat.uuid!,
     flags: {
       dae: {
@@ -45,10 +52,11 @@ const during = async (
     default:
       effectData.flags.dae = { specialDuration: ['turnEndTarget'] };
   }
-  const { utils: { effectUtils } } = chrisPremades;
+  const {
+    utils: { effectUtils },
+  } = chrisPremades;
   for (const target of saveWorkflow.failedSaves) {
-    if (!target.actor)
-      continue;
+    if (!target.actor) continue;
     await effectUtils.createEffect(target.actor, effectData);
   }
 };

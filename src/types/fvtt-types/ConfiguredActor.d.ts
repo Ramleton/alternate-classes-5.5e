@@ -261,6 +261,26 @@ declare global {
 
   interface NPCData extends ActorDataCommon {
     details: ActorData['details'] & NPCDetails;
+    resources: {
+      lair: {
+        initiative: null;
+        inside: boolean;
+        value: boolean;
+      };
+      legact: {
+        label: string;
+        lr: true;
+        max: number;
+        spent: number;
+        value: number;
+      };
+      legres: {
+        lr: true;
+        max: number;
+        spent: number;
+        value: number;
+      };
+    };
   }
   class Actor5e<
     SubType extends Actor.SubType = Actor.SubType,

@@ -20,7 +20,7 @@ const skillBonus: MacroFunction = async ({
     { userId: socketUtils.firstOwner(item, true) },
   );
   if (!selection) return;
-  return await rollUtils.addToRoll(roll, `1d${exploitDie}`);
+  return await rollUtils.addToRoll(roll, `1${exploitDie}`);
 };
 const macro: CPRMacro = {
   identifier: 'ac55eCombatTheorist',

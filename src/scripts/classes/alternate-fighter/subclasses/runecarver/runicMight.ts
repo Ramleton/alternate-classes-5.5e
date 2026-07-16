@@ -53,7 +53,7 @@ const workflow: MidiMacroFunction = async ({
       await workflowUtils.syntheticActivityRoll(invokeActivity, [token]);
     }
   }
-  const formula = `1d${exploitDie}`;
+  const formula = `1${exploitDie}`;
   const newSize = legendaryRuneLord ? 'huge' : 'lg';
   const runicMightEffectData = {
     name: 'Runic Might',

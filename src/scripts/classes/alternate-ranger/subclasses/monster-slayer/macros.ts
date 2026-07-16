@@ -4,6 +4,11 @@ import knowledgeOfTheHunt from './knowledgeOfTheHunt.js';
 import monstersNemesis from './monstersNemesis.js';
 import ruthlessCounter from './ruthlessCounter.js';
 
-const macros: CPRMacro[] = [ironFocus, knowledgeOfTheHunt, monstersNemesis, ruthlessCounter];
+const macros: CPRMacro[] = [
+  ironFocus,
+  knowledgeOfTheHunt,
+  monstersNemesis,
+  ruthlessCounter,
+];
 
 export default macros;
