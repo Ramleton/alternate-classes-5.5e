@@ -4,6 +4,7 @@ import cripplingStrike from './cripplingStrike.js';
 import dazingStrike from './dazingStrike.js';
 import deflectStrike from './deflectStrike.js';
 import empoweredStrike from './empoweredStrike.js';
+import enhancedGrip from './enhancedGrip.js';
 
 const macros: CPRMacro[] = [
   arrestingStrike,
@@ -11,6 +12,7 @@ const macros: CPRMacro[] = [
   dazingStrike,
   deflectStrike,
   empoweredStrike,
+  enhancedGrip,
 ];
 
 export default macros;
