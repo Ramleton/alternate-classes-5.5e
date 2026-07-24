@@ -2,13 +2,18 @@ import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 
 const SLOW_FALL_MULTIPLIER = 5;
 
-const handle: MidiMacroFunction = async ({ trigger: { entity }, ditem }) => {
+const handle: MidiMacroFunction = async ({
+  trigger: { entity },
+  workflow,
+  ditem,
+}) => {
   const feat = entity as Item<'feat'>;
-  if (feat.flags['chris-premades']?.info?.identifier !== 'fall') return;
+  if (!ditem) return;
+  if (workflow.item.flags['chris-premades']?.info?.identifier !== 'fall')
+    return;
   if (feat.actor!.statuses.has('restrained')) return;
   if (feat.actor!.statuses.has('grappled')) return;
   if (feat.actor!.statuses.has('incapacitated')) return;
-  if (!ditem) return;
   const {
     utils: { workflowUtils },
   } = chrisPremades;
@@ -26,7 +31,7 @@ const macro: CPRMacro = {
   midi: {
     actor: [
       {
-        pass: 'damageRollComplete',
+        pass: 'targetApplyDamage',
         macro: handle,
         priority: 0,
       },
