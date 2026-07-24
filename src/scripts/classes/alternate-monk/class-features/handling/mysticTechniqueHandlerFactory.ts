@@ -73,7 +73,7 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
         (
           entry,
         ): entry is { handler: MysticTechniqueData; technique: Item<'feat'> } =>
-          entry.technique !== null,
+          Boolean(entry.technique),
       );
 
     if (!candidates.length) return;

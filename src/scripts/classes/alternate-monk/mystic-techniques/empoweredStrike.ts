@@ -53,7 +53,7 @@ const handle: MysticTechniqueHandler = async ({
     };
     effect = await effectUtils.createEffect(target.actor!, effectData);
   }
-  const saveWorkflow = await runActivity(feat, 'save', [target]);
+  const saveWorkflow = await runActivity(technique, 'save', [target]);
   if (effect) await effect.delete();
   if (!saveWorkflow?.failedSaves?.size) return;
   const wisMod = feat.actor!.system.abilities.wis.mod ?? 0;
