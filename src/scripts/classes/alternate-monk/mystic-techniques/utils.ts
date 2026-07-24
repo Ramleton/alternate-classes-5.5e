@@ -11,7 +11,7 @@ export const getKiRemaining = (actor: Actor5e): number => {
   return mysticTechniques.system.uses!.value;
 };
 
-export const isMartialArtsAttack = (weapon: Item<'weapon'>): boolean => {
+export const isMartialArtsWeapon = (weapon: Item<'weapon'>): boolean => {
   const {
     utils: { itemUtils },
   } = chrisPremades;
@@ -19,6 +19,11 @@ export const isMartialArtsAttack = (weapon: Item<'weapon'>): boolean => {
     weapon,
     'ac55eMartialArtsEnchantment',
   );
+};
+
+export const isMeleeMartialArtsWeapon = (weapon: Item<'weapon'>): boolean => {
+  if (!weapon.system.range.reach) return false;
+  return isMartialArtsWeapon(weapon);
 };
 
 export const isMeleeMartialArtsAttack = (
@@ -31,5 +36,5 @@ export const isMeleeMartialArtsAttack = (
   const actionType = workflowUtils.getActionType(workflow);
   if (!constants.meleeAttacks.some((attackType) => attackType === actionType))
     return false;
-  return isMartialArtsAttack(weapon);
+  return isMeleeMartialArtsWeapon(weapon);
 };
