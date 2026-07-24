@@ -1,0 +1,30 @@
+# Project: Alternate Classes 5.5e (Foundry VTT Module)
+
+## Tech Stack & Tooling
+- Environment: Foundry VTT Module (D&D 5e / 5.5e system)
+- Language: TypeScript (.ts / .mts)
+- Build System: Vite (`vite.config.ts`)
+- Package Manager: pnpm (`pnpm-workspace.yaml`)
+- Code Style: Strict TypeScript, ESLint (`eslint.config.mts`), Prettier (`.prettierrc`)
+
+## Core Project Guidelines
+1. Language & Typing:
+   - Always write modern, strict TypeScript for any new code in `src/`.
+   - Prefer strongly-typed interfaces over `any` for Foundry VTT entities, hooks, and item data.
+   - Respect ES Module (ESM) import/export syntax.
+
+2. Architecture & File Structure:
+   - `src/`: Core module TypeScript source code, Foundry hooks, and custom logic.
+   - `packs/`: Compendium pack data for 5.5e alternate class features and items.
+   - `lang/`: Localization JSON files. Keep string keys organized and modular.
+   - `scripts/` / `syncToFoundry.ts`: Local sync and build automation scripts.
+   - DO NOT manually edit build output in `dist/` or `chunks/`.
+
+3. D&D 5.5e & Foundry Domain Rules:
+   - Maintain compatibility with 5.5e character class feature progression, scaling, and system data models.
+   - When referencing or creating compendium items, preserve existing schema structures and `_id` conventions.
+   - Ensure event listeners and hook callbacks (`Hooks.on`, `Hooks.once`) adhere to standard Foundry VTT lifecycle patterns.
+
+4. Tooling & Workspace Rules:
+   - Always use `pnpm` commands for package management.
+   - Follow formatting rules defined in `.prettierrc`.
