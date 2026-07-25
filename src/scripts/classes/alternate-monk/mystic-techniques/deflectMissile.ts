@@ -85,7 +85,7 @@ addMysticTechniqueHandler({
 
 const macro: CPRMacro = {
   identifier: CPRIdentifier,
-  name: 'Mystic Techniques: Deflect Strike',
+  name: 'Mystic Techniques: Deflect Missile',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',
