@@ -63,7 +63,7 @@ const handle: MysticTechniqueHandler = async ({
     },
   );
   if (!selection) return;
-  const nearbyTokens = await tokenUtils.findNearby(token, 60, 'any');
+  const nearbyTokens = tokenUtils.findNearby(token, 60, 'any');
   const selectedTarget = await dialogUtils.selectTargetDialog(
     technique.name,
     'Select a target to deflect the attack at',
