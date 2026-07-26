@@ -6,6 +6,7 @@ import deflectMissile from './deflectMissile.js';
 import deflectStrike from './deflectStrike.js';
 import empoweredStrike from './empoweredStrike.js';
 import enhancedGrip from './enhancedGrip.js';
+import gentlingTouch from './gentlingTouch.js';
 import slowFall from './slowFall.js';
 import typhoonStrike from './typhoonStrike.js';
 
@@ -17,6 +18,7 @@ const macros: CPRMacro[] = [
   deflectStrike,
   empoweredStrike,
   enhancedGrip,
+  gentlingTouch,
   slowFall,
   typhoonStrike,
 ];
