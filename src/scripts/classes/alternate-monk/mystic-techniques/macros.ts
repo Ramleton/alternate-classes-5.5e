@@ -10,6 +10,7 @@ import gentlingTouch from './gentlingTouch.js';
 import seekingStrike from './seekingStrike.js';
 import slowFall from './slowFall.js';
 import slowingStrike from './slowingStrike.js';
+import stunningStrike from './stunningStrike.js';
 import typhoonStrike from './typhoonStrike.js';
 
 const macros: CPRMacro[] = [
@@ -24,6 +25,7 @@ const macros: CPRMacro[] = [
   seekingStrike,
   slowFall,
   slowingStrike,
+  stunningStrike,
   typhoonStrike,
 ];
 
