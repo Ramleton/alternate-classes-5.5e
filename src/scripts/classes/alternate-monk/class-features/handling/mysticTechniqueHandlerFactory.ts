@@ -5,6 +5,7 @@ import {
 } from 'chris-premades/macro.js';
 
 type MysticTechniqueMacroPass =
+  | 'postAttackRoll'
   | 'attackRollComplete'
   | 'targetAttackRollComplete'
   | 'targetDamageRollComplete';
@@ -21,6 +22,7 @@ export interface MysticTechniqueData {
   pass: MysticTechniqueMacroPass;
   cprIdentifier: string;
   name?: string;
+  exclusive: boolean;
   preCheck: MysticTechniquePreCheck;
   handle: MysticTechniqueHandler;
 }
@@ -60,8 +62,13 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
     const feat = data.trigger.entity as Item<'feat'>;
     const actor = feat.actor!;
 
+    const hasUsedExclusive = Boolean(
+      data.workflow['alternate-classes-55e'].exclusiveMysticTechniqueUsed,
+    );
+
     const candidates = mysticTechniqueHandlers
       .filter((handler) => handler.pass === pass)
+      .filter((handler) => !hasUsedExclusive || !handler.exclusive)
       .map((handler) => ({
         handler,
         technique: itemUtils.getItemByIdentifier(
@@ -118,6 +125,11 @@ const handlerFactory: MysticTechniqueHandlerFactory = ({
         ...data,
         technique: target.technique,
       });
+
+      if (target.handler.exclusive) {
+        data.workflow['alternate-classes-55e'].exclusiveMysticTechniqueUsed =
+          true;
+      }
     } catch (_: unknown) {
       const {
         utils: { genericUtils },

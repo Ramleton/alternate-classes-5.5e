@@ -79,6 +79,7 @@ const handle: MysticTechniqueHandler = async ({
 addMysticTechniqueHandler({
   pass: 'targetDamageRollComplete',
   cprIdentifier: CPRIdentifier,
+  exclusive: true,
   preCheck,
   handle,
 });

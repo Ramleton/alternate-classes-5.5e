@@ -59,6 +59,7 @@ const handle: MysticTechniqueHandler = async ({ workflow, technique }) => {
 addMysticTechniqueHandler({
   pass: 'attackRollComplete',
   cprIdentifier: CPRIdentifier,
+  exclusive: true,
   preCheck,
   handle,
 });

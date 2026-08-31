@@ -64,6 +64,7 @@ addMysticTechniqueHandler({
   pass: 'attackRollComplete',
   cprIdentifier: CPRIdentifier,
   preCheck,
+  exclusive: true,
   handle,
 });
 

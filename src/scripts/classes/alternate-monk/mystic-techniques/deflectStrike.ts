@@ -99,6 +99,7 @@ addMysticTechniqueHandler({
   pass: 'targetDamageRollComplete',
   cprIdentifier: CPRIdentifier,
   preCheck,
+  exclusive: true,
   handle,
 });
 
