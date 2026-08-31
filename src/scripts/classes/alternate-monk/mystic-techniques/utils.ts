@@ -11,6 +11,19 @@ export const getKiRemaining = (actor: Actor5e): number => {
   return mysticTechniques.system.uses!.value;
 };
 
+export const spendKi = async (actor: Actor5e, amount = 1): Promise<void> => {
+  const {
+    utils: { genericUtils, itemUtils },
+  } = chrisPremades;
+  const mysticTechniques = itemUtils.getItemByIdentifier(
+    actor,
+    'ac55eMysticTechniques',
+  )! as Item<'feat'>;
+  await genericUtils.update(mysticTechniques, {
+    'system.uses.spent': mysticTechniques.system.uses!.spent + amount,
+  });
+};
+
 export const isMartialArtsWeapon = (weapon: Item<'weapon'>): boolean => {
   const {
     utils: { itemUtils },
