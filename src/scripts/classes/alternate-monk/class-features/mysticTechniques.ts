@@ -8,7 +8,12 @@ const macro: CPRMacro = {
   version: '1.0.0',
   rules: 'modern',
   midi: {
-    actor: [mysticTechniqueHandlerFactory({ pass: 'attackRollComplete' })],
+    actor: [
+      mysticTechniqueHandlerFactory({ pass: 'postAttackRoll' }),
+      mysticTechniqueHandlerFactory({ pass: 'attackRollComplete' }),
+      mysticTechniqueHandlerFactory({ pass: 'targetAttackRollComplete' }),
+      mysticTechniqueHandlerFactory({ pass: 'targetDamageRollComplete' }),
+    ],
   },
 };
 

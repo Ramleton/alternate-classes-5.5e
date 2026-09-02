@@ -13,9 +13,13 @@
     "source.fixAll.eslint": "explicit"
   },
   "triggerTaskOnSave.tasks": {
-    "Generate Macro Index": ["src/scripts/**/*.ts"]
+    "Generate Macro Index": [
+      "src/scripts/**/*.ts"
+    ]
   },
-  "editor.rulers": [80],
+  "editor.rulers": [
+    80
+  ],
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "cSpell.words": [
@@ -63,6 +67,8 @@
     "TPAR",
     "tremorsense",
     "truesight",
+    "unarmedstrike",
+    "Vite",
     "warcry"
   ],
   "files.insertFinalNewline": false,

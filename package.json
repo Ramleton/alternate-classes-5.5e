@@ -45,11 +45,6 @@
     "vite": "^8.0.16"
   },
   "pnpm": {
-    "packageExtensions": {
-      "dnd5e@*": {},
-      "fvtt-types@*": {},
-      "sequencer@*": {}
-    },
     "ignoredBuiltDependencies": [
       "@google/genai",
       "protobufjs"
