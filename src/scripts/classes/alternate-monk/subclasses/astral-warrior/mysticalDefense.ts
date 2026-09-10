@@ -1,3 +1,4 @@
+import CPRMacro from 'chris-premades/macro.js';
 import { ScaleValueTypeDice } from 'fvtt-types/CharacterSystemData.js';
 import { EffectData } from 'types/effects.js';
 import { MysticTechniqueHandler } from '../../class-features/handling/mysticTechniqueHandlerFactory.js';
@@ -31,3 +32,13 @@ export const handleMysticalDefense: MysticTechniqueHandler = async ({
   };
   await effectUtils.createEffect(technique.actor!, effectData);
 };
+
+const macro: CPRMacro = {
+  name: 'Mystical Defense',
+  version: '1.0.0',
+  rules: 'modern',
+  identifier: 'ac55eMysticalDefense',
+  source: 'Alternate Classes 5.5e',
+};
+
+export default macro;

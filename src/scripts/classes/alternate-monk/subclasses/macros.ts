@@ -1,6 +1,6 @@
 import CPRMacro from 'chris-premades/macro.js';
-import Astral Warrior from './Astral Warrior/macros.js';
+import astralWarrior from './astral-warrior/macros.js';
 
-const macros: CPRMacro[] = [...Astral Warrior];
+const macros: CPRMacro[] = [...astralWarrior];
 
 export default macros;

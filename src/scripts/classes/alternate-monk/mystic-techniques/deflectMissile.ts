@@ -6,7 +6,7 @@ import {
   MysticTechniqueHandler,
   MysticTechniquePreCheck,
 } from '../class-features/handling/mysticTechniqueHandlerFactory.js';
-import { handleMysticalDefense } from '../subclasses/Astral Warrior/mysticalDefense.js';
+import { handleMysticalDefense } from '../subclasses/astral-warrior/mysticalDefense.js';
 import { getKiRemaining, spendKi } from './utils.js';
 
 const CPRIdentifier = 'ac55eDeflectMissileMysticTechnique';
