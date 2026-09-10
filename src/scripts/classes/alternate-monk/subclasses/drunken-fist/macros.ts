@@ -1,7 +1,7 @@
 import CPRMacro from 'chris-premades/macro.js';
 import drunkenStyle from './drunkenStyle.js';
-import tipsyStrike from './tipsyStrike.js';
+import unpredictableSway from './unpredictableSway.js';
 
-const macros: CPRMacro[] = [drunkenStyle, tipsyStrike];
+const macros: CPRMacro[] = [drunkenStyle, unpredictableSway];
 
 export default macros;

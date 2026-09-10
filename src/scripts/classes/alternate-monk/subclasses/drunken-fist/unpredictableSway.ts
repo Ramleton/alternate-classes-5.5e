@@ -59,8 +59,8 @@ const handle: MidiMacroFunction = async ({
 };
 
 const macro: CPRMacro = {
-  identifier: 'ac55eTipsyStrike',
-  name: 'Way of the Drunken Fist: Tipsy Strike',
+  identifier: 'ac55eUnpredictableSway',
+  name: 'Way of the Drunken Fist: Unpredictable Sway',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',
