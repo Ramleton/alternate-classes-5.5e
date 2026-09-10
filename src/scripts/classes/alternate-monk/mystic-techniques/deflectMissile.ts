@@ -6,28 +6,38 @@ import {
   MysticTechniqueHandler,
   MysticTechniquePreCheck,
 } from '../class-features/handling/mysticTechniqueHandlerFactory.js';
-import { getKiRemaining } from './utils.js';
+import { handleMysticalDefense } from '../subclasses/Astral Warrior/mysticalDefense.js';
+import { getKiRemaining, spendKi } from './utils.js';
 
 const CPRIdentifier = 'ac55eDeflectMissileMysticTechnique';
 
 const preCheck: MysticTechniquePreCheck = async ({ workflow, technique }) => {
   if (!workflow.hitTargets.size) return false;
   const {
-    utils: { actorUtils, constants, workflowUtils },
+    utils: { actorUtils, constants, effectUtils, itemUtils, workflowUtils },
   } = chrisPremades;
   const actionType = workflowUtils.getActionType(workflow);
   const monkLevel = technique.actor!.classes['alternate-monk'].system.levels;
+  const astralArmorEffect = effectUtils.getEffectByIdentifier(
+    technique.actor!,
+    'ac55eAstralArmorEffect',
+  );
+  const astralWarrior = itemUtils.getItemByIdentifier(
+    technique.actor!,
+    'ac55eAstralWarrior',
+  );
+  const minLevel = astralWarrior ? 10 : 11;
   const isValidAttack =
-    monkLevel >= 11
+    monkLevel >= minLevel
       ? constants.rangedAttacks.some((type) => type === actionType)
       : actionType === 'rwak';
   if (!isValidAttack) return false;
   if (actorUtils.hasUsedReaction(technique.actor!)) return false;
-  if (!getKiRemaining(technique.actor!)) return false;
+  if (!getKiRemaining(technique.actor!) && !astralArmorEffect) return false;
   return true;
 };
 
-const handle: MysticTechniqueHandler = async ({
+const handleTechnique: MysticTechniqueHandler = async ({
   trigger: { token },
   technique,
   ditem,
@@ -42,6 +52,7 @@ const handle: MysticTechniqueHandler = async ({
   const {
     utils: {
       dialogUtils,
+      effectUtils,
       genericUtils,
       rollUtils,
       socketUtils,
@@ -52,6 +63,11 @@ const handle: MysticTechniqueHandler = async ({
   const res = await rollUtils.rollDice(martialArtsDie, { chatMessage: true });
   await genericUtils.sleep(2000);
   const damageReduction = monkLevel + res.roll.total + dexMod;
+  const astralArmorEffect = effectUtils.getEffectByIdentifier(
+    technique.actor!,
+    'ac55eAstralArmorEffect',
+  );
+  if (!astralArmorEffect) await spendKi(technique.actor!, 1);
   workflowUtils.modifyDamageAppliedFlat(ditem!, -damageReduction);
   if (ditem!.totalDamage) return;
   const userId = socketUtils.firstOwner(technique.actor!, true);
@@ -74,6 +90,19 @@ const handle: MysticTechniqueHandler = async ({
   );
   if (!selectedTarget || !selectedTarget[0]) return;
   await runActivity(technique, 'attack', [selectedTarget[0]]);
+};
+
+const handle: MysticTechniqueHandler = async (data) => {
+  await handleTechnique(data);
+  const {
+    utils: { effectUtils },
+  } = chrisPremades;
+  const astralArmorEffect = effectUtils.getEffectByIdentifier(
+    data.technique.actor!,
+    'ac55eAstralArmorEffect',
+  );
+  if (!astralArmorEffect) return;
+  await handleMysticalDefense(data);
 };
 
 addMysticTechniqueHandler({
