@@ -26,7 +26,7 @@ async function manifestSave({ trigger: { entity: item }, workflow }) {
 }
 
 export const macro: CPRMacro = {
-  name: 'Astral Armor',
+  name: 'Way of the Astral Warrior: Astral Armor',
   version: '1.0.0',
   identifier: 'ac55eAstralArmor',
   source: 'Alternate Classes 5.5e',

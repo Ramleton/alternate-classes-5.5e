@@ -34,7 +34,7 @@ export const handleMysticalDefense: MysticTechniqueHandler = async ({
 };
 
 const macro: CPRMacro = {
-  name: 'Mystical Defense',
+  name: 'Way of the Astral Warrior: Mystical Defense',
   version: '1.0.0',
   rules: 'modern',
   identifier: 'ac55eMysticalDefense',
