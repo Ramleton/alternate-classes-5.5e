@@ -1,4 +1,6 @@
+import { getActivityData } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
+import { DamageActivity } from 'fvtt-types/Activity.js';
 import { getKiRemaining } from '../../mystic-techniques/utils.js';
 
 const handle: MidiMacroFunction = async ({
@@ -29,15 +31,14 @@ const handle: MidiMacroFunction = async ({
     userId: socketUtils.firstOwner(feat.actor, true),
   });
   if (!selection) return;
-  const dmgActivity = activityUtils.getActivityByIdentifier(feat, 'damage', {
-    strict: true,
-  });
-  const activityData = genericUtils.duplicate(dmgActivity.toObject());
+  const dmgActivity = (await getActivityData(feat, 'damage')) as
+    DamageActivity | undefined;
+  if (!dmgActivity) return;
   // Override damage type to radiant if target is undead
   if (opponent.actor!.system.details.type.value === 'undead')
-    activityData.damage.parts[0].types = ['radiant'];
+    dmgActivity.damage.parts[0].types = ['radiant'];
   await workflowUtils.syntheticActivityDataRoll(
-    activityData,
+    dmgActivity,
     feat,
     feat.actor!,
     [opponent],
