@@ -25,7 +25,7 @@ const handle: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
 
 const macro: CPRMacro = {
   identifier: 'ac55eMasterOfShiningSteel',
-  name: 'Shining Steel: Master of Shining Steel',
+  name: 'Way of Shining Steel: Master of Shining Steel',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',

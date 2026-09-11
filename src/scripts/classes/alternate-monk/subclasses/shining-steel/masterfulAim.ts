@@ -16,7 +16,7 @@ const handle: MidiMacroFunction = async ({ workflow }) => {
 
 const macro: CPRMacro = {
   identifier: 'ac55eMasterfulAim',
-  name: 'Shining Steel: Masterful Aim',
+  name: 'Way of Shining Steel: Masterful Aim',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',

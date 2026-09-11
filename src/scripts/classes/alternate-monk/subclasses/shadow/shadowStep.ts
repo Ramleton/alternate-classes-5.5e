@@ -18,7 +18,7 @@ const handle: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
 
 const macro: CPRMacro = {
   identifier: 'ac55eShadowStep',
-  name: 'Way of the Shadow: Shadow Step',
+  name: 'Way of the Shadow Arts: Shadow Step',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',
