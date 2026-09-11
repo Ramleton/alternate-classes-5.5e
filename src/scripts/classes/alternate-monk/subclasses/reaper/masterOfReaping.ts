@@ -19,7 +19,7 @@ const handle: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
 
 const macro: CPRMacro = {
   identifier: 'ac55eMasterOfReaping',
-  name: 'Reaper: Master of Reaping',
+  name: 'Way of the Reaper: Master of Reaping',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',

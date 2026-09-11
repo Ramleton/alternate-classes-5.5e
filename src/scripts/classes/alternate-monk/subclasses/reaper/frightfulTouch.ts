@@ -40,7 +40,7 @@ const handle: MidiMacroFunction = async ({ trigger: { entity }, workflow }) => {
 
 const macro: CPRMacro = {
   identifier: 'ac55eFrightfulTouch',
-  name: 'Reaper: Frightful Touch',
+  name: 'Way of the Reaper: Frightful Touch',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',
