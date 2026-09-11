@@ -71,7 +71,7 @@ const handle: MidiMacroFunction = async ({
 
 const macro: CPRMacro = {
   identifier: 'ac55eTouchOfDeath',
-  name: 'Way of Harmony: Touch Of Death',
+  name: 'Way of Harmony: Touch of Death',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',
