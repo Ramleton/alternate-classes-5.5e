@@ -8,14 +8,7 @@ const handle: MidiMacroFunction = async ({
   workflow,
 }) => {
   const {
-    utils: {
-      activityUtils,
-      dialogUtils,
-      genericUtils,
-      socketUtils,
-      effectUtils,
-      workflowUtils,
-    },
+    utils: { dialogUtils, socketUtils, effectUtils, workflowUtils },
   } = chrisPremades;
   if (workflowUtils.getActionType(workflow) !== 'mwak') return;
   if (
