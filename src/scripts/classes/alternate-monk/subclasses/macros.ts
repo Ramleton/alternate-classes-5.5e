@@ -5,6 +5,7 @@ import harmony from './harmony/macros.js';
 import openHand from './open-hand/macros.js';
 import reaper from './reaper/macros.js';
 import shadow from './shadow/macros.js';
+import shiningSteel from './shining-steel/macros.js';
 
 const macros: CPRMacro[] = [
   ...astralWarrior,
@@ -13,6 +14,7 @@ const macros: CPRMacro[] = [
   ...openHand,
   ...reaper,
   ...shadow,
+  ...shiningSteel,
 ];
 
 export default macros;
