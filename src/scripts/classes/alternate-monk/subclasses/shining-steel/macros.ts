@@ -1,7 +1,7 @@
 import CPRMacro from 'chris-premades/macro.js';
+import deadlyPerfection from './deadlyPerfection.js';
 import masterOfShiningSteel from './masterOfShiningSteel.js';
-import masterfulAim from './masterfulAim.js';
 
-const macros: CPRMacro[] = [masterOfShiningSteel, masterfulAim];
+const macros: CPRMacro[] = [deadlyPerfection, masterOfShiningSteel];
 
 export default macros;
