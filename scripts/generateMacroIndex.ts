@@ -7,12 +7,16 @@ const MACROS_FILENAME = 'macros.ts';
 const UTILS_FILENAME = 'utils.ts';
 const UTILS_DIRNAME = 'utils';
 const CLASS_FEATURES_DIR = 'class-features';
+const MYSTIC_TECHNIQUES_DIR = 'mystic-techniques';
 const SUBCLASSES_DIR = 'subclasses';
 const EXPLOIT_HANDLING_DIR = 'handling';
 const DEGREE_DIR_SUFFIX = '-degree';
 const HANDLE_FILENAME = 'handle.ts';
 
 const IGNORED_FILES = [UTILS_FILENAME, HANDLE_FILENAME];
+
+// Feature subdirectories directly beneath a class folder
+const FEATURE_DIRS = [CLASS_FEATURES_DIR, MYSTIC_TECHNIQUES_DIR];
 
 function toCamelCase(fileName: string): string {
   return fileName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
@@ -89,6 +93,34 @@ async function formatGeneratedFiles(filesToFormat: string[]): Promise<void> {
 }
 
 /**
+ * Helper to process a flat subfolder of macros within a class directory (e.g. class-features, mystic-techniques).
+ */
+function processMacrosDirectory(
+  parentPath: string,
+  dirName: string,
+  className: string,
+  classImports: string[],
+  classSpreads: string[],
+  filesToFormat: string[],
+): void {
+  const dirFullPath = join(parentPath, dirName);
+  if (!isDirectory(dirFullPath)) return;
+
+  const macros = generateMacrosIndex(
+    dirFullPath,
+    MACROS_FILENAME,
+    `${className} ${dirName}`,
+  );
+
+  if (macros.length > 0) {
+    filesToFormat.push(join(dirFullPath, MACROS_FILENAME));
+    const importName = toCamelCase(dirName);
+    classImports.push(`import ${importName} from './${dirName}/macros.js';`);
+    classSpreads.push(`...${importName}`);
+  }
+}
+
+/**
  * Processes class-related directories (features, subclasses) and compiles classes/macros.ts
  */
 function processClassesFolder(
@@ -111,7 +143,6 @@ function processClassesFolder(
     console.log(`\nGenerating macros.ts for ${className}...`);
 
     const classFullPath = join(classesPath, classDir);
-    const featuresPath = join(classFullPath, CLASS_FEATURES_DIR);
     const subclassPath = join(classFullPath, SUBCLASSES_DIR);
 
     const classImports: string[] = [];
@@ -122,21 +153,19 @@ function processClassesFolder(
       filesToFormat.push(join(classFullPath, MACROS_FILENAME));
     }
 
-    if (isDirectory(featuresPath)) {
-      const featureMacros = generateMacrosIndex(
-        featuresPath,
-        MACROS_FILENAME,
-        `${className} ${CLASS_FEATURES_DIR}`,
+    // Process single-level feature directories
+    for (const featureDir of FEATURE_DIRS) {
+      processMacrosDirectory(
+        classFullPath,
+        featureDir,
+        className,
+        classImports,
+        classSpreads,
+        filesToFormat,
       );
-      if (featureMacros.length > 0) {
-        filesToFormat.push(join(featuresPath, MACROS_FILENAME));
-        classImports.push(
-          `import classFeatures from './${CLASS_FEATURES_DIR}/macros.js';`,
-        );
-        classSpreads.push('...classFeatures');
-      }
     }
 
+    // Process nested subclass directories
     if (isDirectory(subclassPath)) {
       const subdirs = readdirSync(subclassPath).filter(
         (f) => f !== UTILS_DIRNAME && isDirectory(join(subclassPath, f)),

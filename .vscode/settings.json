@@ -42,6 +42,7 @@
     "mwak",
     "nodamage",
     "Oathless",
+    "optin",
     "premades",
     "Psiblade",
     "Psiknife",
@@ -63,6 +64,8 @@
     "TPAR",
     "tremorsense",
     "truesight",
+    "unarmedstrike",
+    "Vite",
     "warcry"
   ],
   "files.insertFinalNewline": false,

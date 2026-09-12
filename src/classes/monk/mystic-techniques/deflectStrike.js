@@ -28,17 +28,17 @@ function preDeflectStrike({
    * bonus one level early
    */
   const minLevel = astralWarrior ? 10 : 11;
-  const allowedAttacks
-    = altMonkLevels >= minLevel ? ['mwak', 'msak'] : ['mwak'];
+  const allowedAttacks =
+    altMonkLevels >= minLevel ? ['mwak', 'msak'] : ['mwak'];
   if (!allowedAttacks.includes(actionType)) return false;
   /**
    * If the monk is a 10th level Astral Warrior, and they have the Astral Armor
    * effect, then they can use this technique for free
    */
   if (
-    !mysticTechniques?.system?.uses?.value
-    && !astralArmorEffect
-    && altMonkLevels >= 10
+    !mysticTechniques?.system?.uses?.value &&
+    !astralArmorEffect &&
+    altMonkLevels >= 10
   )
     return false;
   return true;
@@ -67,9 +67,9 @@ async function deflectStrike({ trigger: { entity: item }, workflow, ditem }) {
     workflow.hitTargets.first(),
   );
   let validWeapons = item.actor.items.filter(
-    i =>
-      i.flags['chris-premades']?.info?.identifier === 'unarmedStrike'
-      && i.system.range.reach >= distance,
+    (i) =>
+      i.flags['chris-premades']?.info?.identifier === 'unarmedStrike' &&
+      i.system.range.reach >= distance,
   );
   if (!validWeapons.length) {
     genericUtils.notify('CHRISPREMADES.Macros.TrueStrike.NoWeapons', 'warn');
@@ -78,8 +78,7 @@ async function deflectStrike({ trigger: { entity: item }, workflow, ditem }) {
   let selectedWeapon;
   if (validWeapons.length === 1) {
     selectedWeapon = validWeapons[0];
-  }
-  else {
+  } else {
     selectedWeapon = await dialogUtils.selectDocumentDialog(
       item.name,
       'CHRISPREMADES.Macros.TrueStrike.SelectWeapon',
@@ -186,9 +185,9 @@ function mysticalDefenseBonus({ trigger: { entity: item } }) {
         key: 'flags.automated-conditions-5e.damage.bonus',
         mode: 0,
         value:
-          'bonus=@scale.alternate-monk.martial-arts; once; \
-          item.flags[\'chris-premades\']?.info?.identifier === \
-          \'unarmedStrike\';',
+          "bonus=@scale.alternate-monk.martial-arts; once; \
+          item.flags['chris-premades']?.info?.identifier === \
+          'unarmedStrike';",
       },
     ],
   };
