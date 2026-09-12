@@ -76,13 +76,16 @@ module.json           # Module initialization and hooks
 ## Changelog
 
 ### Version 1.5.4 (September 12, 2026)
-*   General development and internal improvements.
+*   **Alternate Monk:** Fully implemented and automated the Alternate Monk class.
+   *   Includes comprehensive automation for base class features.
+   *   Added full automation for all subclass features.
+   *   Integrated Mystic Techniques with CPR, AC5E, and MidiQoL.
 
 ### Version 1.5.3 (July 16, 2026)
 *   **Alternate Barbarian:** Fully implemented and automated the Alternate Barbarian class.
     *   Includes comprehensive automation for base class features.
     *   Added full automation for all subclass features.
-    *   Integrated Savage Exploit mechanics with automated workflows.
+    *   Integrated Savage Exploit mechanics with CPR, AC5E, and MidiQoL.
 
 ### Version 1.5.2 (July 2026)
 
