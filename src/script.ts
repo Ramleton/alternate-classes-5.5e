@@ -127,6 +127,24 @@ Hooks.once('init', () => {
     Initialized rest recovery for Alternate Classes spellcasting types',
   );
 
+  CONFIG.DND5E.armorClasses.ac55eArmorOfShadowsIntelligence = {
+    label: 'Armor of Shadows: Intelligence',
+    formula: '10 + @abilities.int.mod + @abilities.dex.mod',
+  };
+  CONFIG.DND5E.armorClasses.ac55eArmorOfShadowsWisdom = {
+    label: 'Armor of Shadows: Wisdom',
+    formula: '10 + @abilities.wis.mod + @abilities.dex.mod',
+  };
+  CONFIG.DND5E.armorClasses.ac55eArmorOfShadowsCharisma = {
+    label: 'Armor of Shadows: Charisma',
+    formula: '10 + @abilities.cha.mod + @abilities.dex.mod',
+  };
+
+  CONFIG.DND5E.armorClasses.ac55eCharismaAC = {
+    label: 'Charisma AC',
+    formula: '@attributes.ac.armor + @abilities.cha.mod',
+  };
+
   CONFIG.DND5E.armorClasses.ac55eCharismaAC = {
     label: 'Charisma AC',
     formula: '@attributes.ac.armor + @abilities.cha.mod',

@@ -7,6 +7,7 @@ const MACROS_FILENAME = 'macros.ts';
 const UTILS_FILENAME = 'utils.ts';
 const UTILS_DIRNAME = 'utils';
 const CLASS_FEATURES_DIR = 'class-features';
+const ELDRITCH_INVOCATIONS_DIR = 'eldritch-invocations';
 const MYSTIC_TECHNIQUES_DIR = 'mystic-techniques';
 const SUBCLASSES_DIR = 'subclasses';
 const EXPLOIT_HANDLING_DIR = 'handling';
@@ -16,7 +17,11 @@ const HANDLE_FILENAME = 'handle.ts';
 const IGNORED_FILES = [UTILS_FILENAME, HANDLE_FILENAME];
 
 // Feature subdirectories directly beneath a class folder
-const FEATURE_DIRS = [CLASS_FEATURES_DIR, MYSTIC_TECHNIQUES_DIR];
+const FEATURE_DIRS = [
+  CLASS_FEATURES_DIR,
+  MYSTIC_TECHNIQUES_DIR,
+  ELDRITCH_INVOCATIONS_DIR,
+];
 
 function toCamelCase(fileName: string): string {
   return fileName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
