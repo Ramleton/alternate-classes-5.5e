@@ -10,6 +10,50 @@ Hooks.once('init', () => {
   CONFIG.DND5E.featureTypes.class.subtypes.enchantedShot = 'Enchanted Shot';
   console.log('Alternate Classes 5e | Initialized class feature types');
 
+  class AC55ePactMagicSpellcasting
+    extends dnd5e.dataModels.spellcasting.SingleLevelSpellcasting
+  {
+    /** @override */
+    // eslint-disable-next-line @typescript-eslint/class-literal-property-style
+    static get TYPE() {
+      return 'ac55ePact';
+    }
+  }
+
+  dnd5e.dataModels.spellcasting.SpellcastingModel.TYPES.ac55ePact =
+    AC55ePactMagicSpellcasting;
+
+  CONFIG.DND5E.spellcasting.ac55ePact = {
+    label: 'Pact Magic (AC55e)',
+    type: 'single',
+    order: 12,
+    cantrips: true,
+    prepares: false,
+    img: 'icons/magic/air/air-smoke-casting.webp',
+    progression: {
+      ac55ePact: {
+        label: 'Pact Magic (AC55e)',
+        divisor: 1,
+        roundUp: true,
+      },
+    },
+    exclusive: {
+      slots: false,
+      spells: false,
+    },
+    table: {
+      2: { slots: 2, level: 1 },
+      3: { slots: 2, level: 2 },
+      5: { slots: 2, level: 3 },
+      7: { slots: 2, level: 4 },
+      9: { slots: 2, level: 5 },
+      11: { slots: 3, level: 5 },
+      17: { slots: 4, level: 5 },
+    },
+  };
+
+  console.log('Alternate Classes 5e | Initialized Pact Magic Spellcasting');
+
   class WuJenSpellcasting
     extends dnd5e.dataModels.spellcasting.SingleLevelSpellcasting
   {
@@ -73,6 +117,8 @@ Hooks.once('init', () => {
   /**
    * Add Rest Recovery for Alternate Classes Spellcasting Types
    */
+  CONFIG.DND5E.restTypes.short.recoverSpellSlotTypes.add('ac55ePact');
+  CONFIG.DND5E.restTypes.long.recoverSpellSlotTypes.add('ac55ePact');
   CONFIG.DND5E.restTypes.short.recoverSpellSlotTypes.add('wuJen');
   CONFIG.DND5E.restTypes.long.recoverSpellSlotTypes.add('wuJen');
   // CONFIG.DND5E.restTypes.long.recoverSpellSlotTypes.add('ac55eSpell');

@@ -7,7 +7,8 @@
   "esmodules": [
     "script.js",
     "hooks/alternateMartialCharSheet.js",
-    "hooks/alternateMartialLevelUpdate.js"
+    "hooks/alternateMartialLevelUpdate.js",
+    "hooks/alternateWarlockSpellcastingAbility.js"
   ],
   "styles": [
     "assets/styles/exploitsTab.css",
