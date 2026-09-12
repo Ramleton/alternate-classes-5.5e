@@ -5,7 +5,8 @@ import {
   MysticTechniqueHandler,
   MysticTechniquePreCheck,
 } from '../class-features/handling/mysticTechniqueHandlerFactory.js';
-import { getKiRemaining } from './utils.js';
+import { handleMysticalDefense } from '../subclasses/astral-warrior/mysticalDefense.js';
+import { getKiRemaining, spendKi } from './utils.js';
 
 const CPRIdentifier = 'ac55eDeflectStrikeMysticTechnique';
 
@@ -26,9 +27,9 @@ const preCheck: MysticTechniquePreCheck = async ({ workflow, technique }) => {
   return true;
 };
 
-const handle: MysticTechniqueHandler = async ({
-  trigger: { token },
+const handleTechnique: MysticTechniqueHandler = async ({
   workflow,
+  trigger: { token },
   technique,
   ditem,
 }) => {
@@ -43,6 +44,7 @@ const handle: MysticTechniqueHandler = async ({
     utils: {
       activityUtils,
       dialogUtils,
+      effectUtils,
       genericUtils,
       rollUtils,
       socketUtils,
@@ -53,6 +55,11 @@ const handle: MysticTechniqueHandler = async ({
   const res = await rollUtils.rollDice(martialArtsDie, { chatMessage: true });
   await genericUtils.sleep(2000);
   const damageReduction = monkLevel + res.roll.total + dexMod;
+  const astralArmorEffect = effectUtils.getEffectByIdentifier(
+    technique.actor!,
+    'ac55eAstralArmorEffect',
+  );
+  if (!astralArmorEffect) await spendKi(technique.actor!, 1);
   workflowUtils.modifyDamageAppliedFlat(ditem!, -damageReduction);
   if (ditem!.totalDamage) return;
   const distance = tokenUtils.getDistance(token, workflow.token!);
@@ -93,6 +100,19 @@ const handle: MysticTechniqueHandler = async ({
     [workflow.token!],
     { consumeResources: true },
   );
+};
+
+const handle: MysticTechniqueHandler = async (data) => {
+  await handleTechnique(data);
+  const {
+    utils: { effectUtils },
+  } = chrisPremades;
+  const astralArmorEffect = effectUtils.getEffectByIdentifier(
+    data.technique.actor!,
+    'ac55eAstralArmorEffect',
+  );
+  if (!astralArmorEffect) return;
+  await handleMysticalDefense(data);
 };
 
 addMysticTechniqueHandler({
