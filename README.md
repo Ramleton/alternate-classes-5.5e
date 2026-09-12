@@ -30,7 +30,7 @@ This module adds comprehensive D&D 5e alternate class and subclass options with 
 1. In FoundryVTT, go to **Add-on Modules** → **Install Module**
 2. Paste the module manifest URL:
    ```
-   https://github.com/Ramleton/alternate-classes-5.5e/releases/download/1.5.3/module.json
+   https://github.com/Ramleton/alternate-classes-5.5e/releases/download/1.5.4/module.json
    ```
 3. Click **Install** and activate in your world
 
@@ -75,6 +75,9 @@ module.json           # Module initialization and hooks
 
 ## Changelog
 
+### Version 1.5.4 (September 12, 2026)
+*   General development and internal improvements.
+
 ### Version 1.5.3 (July 16, 2026)
 *   **Alternate Barbarian:** Fully implemented and automated the Alternate Barbarian class.
     *   Includes comprehensive automation for base class features.
@@ -112,5 +115,5 @@ This module is heavily inspired by the exceptional work of **Laserllama**. Their
 
 ---
 
-**Current Module Version:** 1.5.3  
-**Latest Release Date:** July 16, 2026
+**Current Module Version:** 1.5.4  
+**Latest Release Date:** September 12, 2026
