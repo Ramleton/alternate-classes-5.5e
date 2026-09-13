@@ -17,6 +17,14 @@ Hooks.on('createItem', async (item, options, userId) => {
 
     if (chosenAbility) {
       await item.update({ 'system.spellcasting.ability': chosenAbility });
+      await item.actor.update({
+        'flags.alternate-classes-55e.alternate-warlock.pactAbility':
+          chosenAbility,
+      });
+      await item.actor.update({
+        'flags.alternate-classes-55e.alternate-warlock.pactModifier':
+          item.actor.system.abilities[chosenAbility].mod,
+      });
       ui.notifications.info(
         `Set Pact Ability to ${chosenAbility.toUpperCase()}.`,
       );

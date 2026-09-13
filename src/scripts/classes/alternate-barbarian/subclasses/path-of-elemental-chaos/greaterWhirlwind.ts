@@ -12,7 +12,6 @@ const startOfTurnDamage: MacroFunction = async ({
   const {
     utils: { tokenUtils, workflowUtils },
   } = chrisPremades;
-  if (!target) return;
   const whirlwindRadius = feat.actor!.system.scale['path-of-elemental-chaos']?.[
     'elemental-whirlwind-radius'
   ] as string | undefined;
