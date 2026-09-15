@@ -8,6 +8,7 @@ type EldritchBlastMacroPass =
   | 'postAttackRoll'
   | 'attackRollComplete'
   | 'targetAttackRollComplete'
+  | 'damageRollComplete'
   | 'targetDamageRollComplete';
 
 export type EldritchBlastPreCheck = (
