@@ -18,7 +18,7 @@ const handle: EldritchBlastHandler = async ({
   const target = workflow.hitTargets.first() as Token;
   const ray = new foundry.canvas.geometry.Ray(target.center, token.center);
   const targetSize = actorUtils.getSize(target.actor!, false);
-  const divisor = targetSize - 2;
+  const divisor = Math.max(1, targetSize - 2);
   await tokenUtils.moveTokenAlongRay(target, ray, 10 / divisor);
 };
 

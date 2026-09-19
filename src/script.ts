@@ -24,7 +24,7 @@ Hooks.once('init', () => {
     AC55ePactMagicSpellcasting;
 
   CONFIG.DND5E.spellcasting.ac55ePact = {
-    label: 'Pact Magic (AC55e)',
+    label: 'Pact Magic',
     type: 'single',
     order: 12,
     cantrips: true,

@@ -24,6 +24,7 @@ export interface EldritchBlastData {
   cprIdentifier: string;
   name?: string;
   exclusive: boolean;
+  automatic?: boolean;
   preCheck: EldritchBlastPreCheck;
   handle: EldritchBlastHandler;
 }
@@ -117,6 +118,32 @@ const promptCheckboxDialog = async (
   }
 };
 
+const isEldritchAttack = async ({
+  workflow,
+}: MidiMacroFunctionArgs): Promise<boolean> => {
+  const {
+    utils: { constants, itemUtils, workflowUtils },
+  } = chrisPremades;
+  const actionType = workflowUtils.getActionType(workflow);
+  if (!constants.attacks.some((attackType) => actionType === attackType))
+    return false;
+  if (
+    workflow.item.flags['chris-premades']?.info?.identifier ===
+    'ac55eEldritchBlast'
+  )
+    return true;
+  const enspelledBlade = itemUtils.getItemByIdentifier(
+    workflow.actor!,
+    'ac55eEnspelledBlade',
+  );
+  const eldritchBladeEnchant = itemUtils.getEffectByIdentifier(
+    workflow.item,
+    'ac55eEldritchBladeEnchantment',
+  );
+  if (enspelledBlade && eldritchBladeEnchant) return true;
+  return false;
+};
+
 const handlerFactory: EldritchBlastHandlerFactory = ({
   pass,
   priority = 0,
@@ -158,16 +185,47 @@ const handlerFactory: EldritchBlastHandlerFactory = ({
     const preCheckResults = await Promise.all(
       candidates.map(async (entry) => ({
         ...entry,
-        canUse: await entry.handler.preCheck({
-          ...data,
-          feature: entry.technique,
-        }),
+        canUse:
+          (await isEldritchAttack(data)) &&
+          (await entry.handler.preCheck({
+            ...data,
+            feature: entry.technique,
+          })),
       })),
     );
 
     const usable = preCheckResults.filter(({ canUse }) => canUse);
-
     if (!usable.length) return;
+
+    const autoHandlers = usable.filter(({ handler }) => handler.automatic);
+
+    for (const entry of autoHandlers) {
+      if (
+        entry.handler.exclusive &&
+        data.workflow['alternate-classes-55e'].exclusiveEldritchBlastFeatureUsed
+      ) {
+        continue;
+      }
+
+      try {
+        await entry.handler.handle({
+          ...data,
+          feature: entry.technique,
+        });
+
+        if (entry.handler.exclusive) {
+          data.workflow[
+            'alternate-classes-55e'
+          ].exclusiveEldritchBlastFeatureUsed = true;
+        }
+      } catch (err) {
+        console.error(
+          `Alternate Classes 5.5e | Error executing automatic feature (${entry.handler.cprIdentifier}):`,
+          err,
+        );
+      }
+    }
+
     const dialogOptions: [string, string][] = usable.map(({ handler }) => [
       handler.name ?? deriveNameFromIdentifier(handler.cprIdentifier),
       handler.cprIdentifier,

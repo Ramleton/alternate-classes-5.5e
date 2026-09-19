@@ -44,10 +44,21 @@ function generateMacrosIndex(
   contextName = '',
 ): string[] {
   const files = readdirSync(folderPath)
-    .filter(
-      (f) =>
-        f.endsWith('.ts') && f !== indexFileName && !IGNORED_FILES.includes(f),
-    )
+    .filter((f) => {
+      if (!f.endsWith('.ts') || f === indexFileName) return false;
+
+      const lowerFileName = f.toLowerCase();
+      if (IGNORED_FILES.includes(lowerFileName)) return false;
+
+      const filePath = join(folderPath, f);
+      const content = readFileSync(filePath, 'utf-8');
+      if (
+        content.includes('addEldritchBlastHandler') ||
+        content.includes('EldritchBlastHandlerFactory')
+      )
+        return false;
+      return true;
+    })
     .sort();
 
   if (files.length === 0) return [];

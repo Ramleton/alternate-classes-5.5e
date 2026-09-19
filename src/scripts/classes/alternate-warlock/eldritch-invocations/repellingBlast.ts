@@ -17,7 +17,7 @@ const handle: EldritchBlastHandler = async ({
   } = chrisPremades;
   const target = workflow.hitTargets.first() as Token;
   const targetSize = actorUtils.getSize(target.actor!, false);
-  const divisor = targetSize - 2;
+  const divisor = Math.max(1, targetSize - 2);
   await tokenUtils.pushToken(token, target, 10 / divisor);
 };
 
