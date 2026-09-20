@@ -52,7 +52,7 @@ interface TraitDamageResistanceImmunityVulnerability extends TraitResistanceImmu
 }
 
 interface TraitConditionImmunity extends TraitResistanceImmunityVulnerability {
-  value: Status[];
+  value: Set<Status>;
 }
 
 export type CreatureType =

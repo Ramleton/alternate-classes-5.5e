@@ -1,7 +1,9 @@
 import Activity from './Activity.js';
+import Advancement from './Advancement.js';
 import ItemUses from './ItemUses.js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class FeatSystemData extends foundry.abstract.DataModel<any, any> {
+  advancement: Advancement;
   activities?: Record<string, Activity>;
   uses?: ItemUses;
   actor?: Actor;

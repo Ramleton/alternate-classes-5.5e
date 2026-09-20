@@ -5,6 +5,7 @@ import alternateMonk from './alternate-monk/macros.js';
 import alternatePaladin from './alternate-paladin/macros.js';
 import alternateRanger from './alternate-ranger/macros.js';
 import alternateRogue from './alternate-rogue/macros.js';
+import alternateWarlock from './alternate-warlock/macros.js';
 
 const macros: CPRMacro[] = [
   ...alternateBarbarian,
@@ -13,6 +14,7 @@ const macros: CPRMacro[] = [
   ...alternatePaladin,
   ...alternateRanger,
   ...alternateRogue,
+  ...alternateWarlock,
 ];
 
 export default macros;
