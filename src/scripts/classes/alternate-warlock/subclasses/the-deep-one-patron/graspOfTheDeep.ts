@@ -12,10 +12,10 @@ import { getRemainingPactMagicSlots } from '../../utils.js';
 const preCheck: EldritchBlastPreCheck = async ({
   trigger: { entity },
   workflow,
+  feature,
   ditem,
 }) => {
-  const feat = entity as Item<'feat'>;
-  const actor = feat.actor;
+  const actor = feature.actor;
   if (!actor) return false;
   const target = workflow.hitTargets.first() as Token;
 
@@ -39,11 +39,20 @@ const preCheck: EldritchBlastPreCheck = async ({
 
   // If Oceanic Grasp has at least 2 stacks, Grasp of the Deep can be used for free
   if ((oceanicGraspEffect?.flags?.dae?.stacks || 0) >= 2) return true;
-  return !!feat.system.uses!.value || !!getRemainingPactMagicSlots(actor);
+  return !!feature.system.uses!.value || !!getRemainingPactMagicSlots(actor);
 };
 
 const handle: EldritchBlastHandler = async ({ workflow, feature }) => {
   const target = workflow.hitTargets.first() as Token;
+  if (!feature.system.uses!.value) {
+    const {
+      utils: { genericUtils },
+    } = chrisPremades;
+    const currentSlots = feature.actor!.system.spells['ac55ePact'].value;
+    await genericUtils.update(feature.actor!, {
+      'system.spells.ac55ePact.value': currentSlots - 1,
+    });
+  }
   await runActivity(feature, 'apply', [target]);
   const {
     utils: { itemUtils, effectUtils },
