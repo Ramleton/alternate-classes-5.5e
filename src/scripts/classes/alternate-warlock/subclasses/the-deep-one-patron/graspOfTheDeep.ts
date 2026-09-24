@@ -10,7 +10,6 @@ import {
 import { getRemainingPactMagicSlots } from '../../utils.js';
 
 const preCheck: EldritchBlastPreCheck = async ({
-  trigger: { entity },
   workflow,
   feature,
   ditem,
