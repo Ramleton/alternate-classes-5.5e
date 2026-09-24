@@ -1,4 +1,10 @@
-import { readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from 'fs';
 import { basename, join, resolve } from 'path';
 import { format, resolveConfig } from 'prettier';
 
@@ -12,9 +18,9 @@ const MYSTIC_TECHNIQUES_DIR = 'mystic-techniques';
 const SUBCLASSES_DIR = 'subclasses';
 const EXPLOIT_HANDLING_DIR = 'handling';
 const DEGREE_DIR_SUFFIX = '-degree';
-const HANDLE_FILENAME = 'handle.ts';
+const HANDLERS_FILENAME = 'handlers.ts';
 
-const IGNORED_FILES = [UTILS_FILENAME, HANDLE_FILENAME];
+const IGNORED_FILES = [UTILS_FILENAME, HANDLERS_FILENAME];
 
 // Feature subdirectories directly beneath a class folder
 const FEATURE_DIRS = [
@@ -43,33 +49,53 @@ function generateMacrosIndex(
   indexFileName = MACROS_FILENAME,
   contextName = '',
 ): string[] {
-  const files = readdirSync(folderPath)
+  const allFiles = readdirSync(folderPath)
     .filter((f) => {
       if (!f.endsWith('.ts') || f === indexFileName) return false;
 
       const lowerFileName = f.toLowerCase();
       if (IGNORED_FILES.includes(lowerFileName)) return false;
 
-      const filePath = join(folderPath, f);
-      const content = readFileSync(filePath, 'utf-8');
-      if (
-        content.includes('addEldritchBlastHandler') ||
-        content.includes('EldritchBlastHandlerFactory')
-      )
-        return false;
       return true;
     })
     .sort();
 
-  if (files.length === 0) return [];
+  const macroFiles: string[] = [];
+  const handlerFiles: string[] = [];
 
-  const names = files.map((f) => toCamelCase(basename(f, '.ts')));
-  const imports = files
+  // Categorize files into standard CPRMacros vs Side-Effect Handlers
+  for (const file of allFiles) {
+    const filePath = join(folderPath, file);
+    const content = readFileSync(filePath, 'utf-8');
+
+    if (
+      content.includes('addEldritchBlastHandler') ||
+      content.includes('EldritchBlastHandlerFactory')
+    ) {
+      handlerFiles.push(file);
+    } else {
+      macroFiles.push(file);
+    }
+  }
+
+  if (macroFiles.length === 0 && handlerFiles.length === 0) return [];
+
+  const names = macroFiles.map((f) => toCamelCase(basename(f, '.ts')));
+
+  // Direct side-effect imports for handler files
+  const handlerImports = handlerFiles
+    .map((f) => `import './${basename(f, '.ts')}.js';`)
+    .join('\n');
+
+  // Standard imports for regular CPRMacros
+  const macroImports = macroFiles
     .map((f, i) => `import ${names[i]} from './${basename(f, '.ts')}.js';`)
     .join('\n');
 
+  const handlerSection = handlerImports ? `${handlerImports}\n` : '';
+
   const content = `import CPRMacro from 'chris-premades/macro.js';
-${imports}
+${handlerSection}${macroImports}
 
 const macros: CPRMacro[] = [${names.join(', ')}];
 
@@ -80,7 +106,7 @@ export default macros;
 
   if (contextName) {
     console.log(
-      `  -> Processed raw macros for ${contextName} (${names.length} found)`,
+      `   -> Processed raw macros for ${contextName} (${macroFiles.length} macros, ${handlerFiles.length} handlers found)`,
     );
   }
 
@@ -128,8 +154,9 @@ function processMacrosDirectory(
     `${className} ${dirName}`,
   );
 
-  if (macros.length > 0) {
-    filesToFormat.push(join(dirFullPath, MACROS_FILENAME));
+  const indexFilePath = join(dirFullPath, MACROS_FILENAME);
+  if (macros.length > 0 || existsSync(indexFilePath)) {
+    filesToFormat.push(indexFilePath);
     const importName = toCamelCase(dirName);
     classImports.push(`import ${importName} from './${dirName}/macros.js';`);
     classSpreads.push(`...${importName}`);
@@ -195,9 +222,12 @@ function processClassesFolder(
           MACROS_FILENAME,
           `${className} subclass: ${subdir}`,
         );
-        if (subMacros.length > 0) {
+
+        const subIndexFile = join(path, MACROS_FILENAME);
+        // Include subclass if it generated macros OR created an index file for handlers
+        if (subMacros.length > 0 || existsSync(subIndexFile)) {
           activeSubclasses.push(subdir);
-          filesToFormat.push(join(path, MACROS_FILENAME));
+          filesToFormat.push(subIndexFile);
         }
       }
 

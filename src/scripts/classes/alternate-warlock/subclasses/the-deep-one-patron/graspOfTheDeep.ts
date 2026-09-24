@@ -42,18 +42,14 @@ const preCheck: EldritchBlastPreCheck = async ({
   return !!feat.system.uses!.value || !!getRemainingPactMagicSlots(actor);
 };
 
-const handle: EldritchBlastHandler = async ({
-  trigger: { entity },
-  workflow,
-}) => {
-  const feat = entity as Item<'feat'>;
+const handle: EldritchBlastHandler = async ({ workflow, feature }) => {
   const target = workflow.hitTargets.first() as Token;
-  await runActivity(feat, 'apply', [target]);
+  await runActivity(feature, 'apply', [target]);
   const {
     utils: { itemUtils, effectUtils },
   } = chrisPremades;
   const greaterTendrils = itemUtils.getItemByIdentifier(
-    feat.actor!,
+    feature.actor!,
     'ac55eGreaterTendrils',
   );
   if (!greaterTendrils) return;
@@ -85,7 +81,7 @@ const handle: EldritchBlastHandler = async ({
 };
 
 addEldritchBlastHandler({
-  pass: 'damageRollComplete',
+  pass: 'applyDamage',
   cprIdentifier: 'ac55eGraspOfTheDeep',
   exclusive: false,
   automatic: false,

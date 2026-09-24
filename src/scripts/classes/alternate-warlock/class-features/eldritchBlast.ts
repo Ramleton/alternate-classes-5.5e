@@ -15,6 +15,7 @@ const macro: CPRMacro = {
       handlerFactory({ pass: 'targetAttackRollComplete', priority: 10 }),
       handlerFactory({ pass: 'damageRollComplete', priority: 10 }),
       handlerFactory({ pass: 'targetDamageRollComplete', priority: 10 }),
+      handlerFactory({ pass: 'applyDamage', priority: 10 }),
     ],
   },
 };

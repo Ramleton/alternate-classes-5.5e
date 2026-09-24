@@ -9,7 +9,8 @@ type EldritchBlastMacroPass =
   | 'attackRollComplete'
   | 'targetAttackRollComplete'
   | 'damageRollComplete'
-  | 'targetDamageRollComplete';
+  | 'targetDamageRollComplete'
+  | 'applyDamage';
 
 export type EldritchBlastPreCheck = (
   data: MidiMacroFunctionArgs & { feature: Item<'feat'> },
@@ -157,16 +158,21 @@ const handlerFactory: EldritchBlastHandlerFactory = ({
     const actor = feat.actor;
     if (!actor) return;
 
-    const hasUsedExclusive = Boolean(
-      data.workflow['alternate-classes-55e'].exclusiveEldritchBlastFeatureUsed,
-    );
+    // Ensure state container exists on workflow
+    data.workflow['alternate-classes-55e'] ??= {};
+
+    const hasUsedExclusive = () =>
+      Boolean(
+        data.workflow['alternate-classes-55e']
+          .exclusiveEldritchBlastFeatureUsed,
+      );
 
     const candidates = eldritchBlastHandlers
       .filter((handler) => handler.pass === pass)
-      .filter((handler) => !hasUsedExclusive || !handler.exclusive)
+      .filter((handler) => !hasUsedExclusive() || !handler.exclusive)
       .map((handler) => ({
         handler,
-        technique: itemUtils.getItemByIdentifier(
+        feature: itemUtils.getItemByIdentifier(
           actor,
           handler.cprIdentifier,
         ) as Item<'feat'> | null,
@@ -176,8 +182,8 @@ const handlerFactory: EldritchBlastHandlerFactory = ({
           entry,
         ): entry is {
           handler: EldritchBlastData;
-          technique: Item<'feat'>;
-        } => Boolean(entry.technique),
+          feature: Item<'feat'>;
+        } => Boolean(entry.feature),
       );
 
     if (!candidates.length) return;
@@ -189,7 +195,7 @@ const handlerFactory: EldritchBlastHandlerFactory = ({
           (await isEldritchAttack(data)) &&
           (await entry.handler.preCheck({
             ...data,
-            feature: entry.technique,
+            feature: entry.feature,
           })),
       })),
     );
@@ -197,20 +203,18 @@ const handlerFactory: EldritchBlastHandlerFactory = ({
     const usable = preCheckResults.filter(({ canUse }) => canUse);
     if (!usable.length) return;
 
+    // 1. Run Automatic Handlers
     const autoHandlers = usable.filter(({ handler }) => handler.automatic);
 
     for (const entry of autoHandlers) {
-      if (
-        entry.handler.exclusive &&
-        data.workflow['alternate-classes-55e'].exclusiveEldritchBlastFeatureUsed
-      ) {
+      if (entry.handler.exclusive && hasUsedExclusive()) {
         continue;
       }
 
       try {
         await entry.handler.handle({
           ...data,
-          feature: entry.technique,
+          feature: entry.feature,
         });
 
         if (entry.handler.exclusive) {
@@ -226,14 +230,27 @@ const handlerFactory: EldritchBlastHandlerFactory = ({
       }
     }
 
-    const dialogOptions: [string, string][] = usable.map(({ handler }) => [
-      handler.name ?? deriveNameFromIdentifier(handler.cprIdentifier),
-      handler.cprIdentifier,
-    ]);
+    // 2. Filter for Manual Handlers
+    // Exclude automatic handlers & re-verify exclusive status in case an auto feature used it
+    const manualHandlers = usable.filter(
+      ({ handler }) =>
+        !handler.automatic && (!hasUsedExclusive() || !handler.exclusive),
+    );
+
+    if (!manualHandlers.length) return;
+
+    const dialogOptions: [string, string][] = manualHandlers.map(
+      ({ handler }) => [
+        handler.name ?? deriveNameFromIdentifier(handler.cprIdentifier),
+        handler.cprIdentifier,
+      ],
+    );
+
     const passName = pass
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, (s: string) => s.toUpperCase());
-    // Prompt user with checkbox multi-select dialog
+
+    // Prompt user with checkbox multi-select dialog for manual choices
     const selectedIDs = await promptCheckboxDialog(
       'Eldritch Blast Features',
       `<p><strong>${passName}:</strong> Select the features to apply:</p>`,
@@ -241,18 +258,14 @@ const handlerFactory: EldritchBlastHandlerFactory = ({
     );
     if (!selectedIDs.length) return;
 
-    // Sequentially process each selected feature
+    // 3. Sequentially process manual selections
     for (const selectedID of selectedIDs) {
-      const target = usable.find(
+      const target = manualHandlers.find(
         ({ handler }) => handler.cprIdentifier === selectedID,
       );
       if (!target) continue;
 
-      // Skip subsequent exclusive features if an exclusive one was already applied in this pass
-      if (
-        target.handler.exclusive &&
-        data.workflow['alternate-classes-55e'].exclusiveEldritchBlastFeatureUsed
-      ) {
+      if (target.handler.exclusive && hasUsedExclusive()) {
         genericUtils.notify(
           `Skipped ${
             target.handler.name ?? selectedID
@@ -265,7 +278,7 @@ const handlerFactory: EldritchBlastHandlerFactory = ({
       try {
         await target.handler.handle({
           ...data,
-          feature: target.technique,
+          feature: target.feature,
         });
 
         if (target.handler.exclusive) {
@@ -285,6 +298,7 @@ const handlerFactory: EldritchBlastHandlerFactory = ({
       }
     }
   };
+
   return {
     pass,
     macro,

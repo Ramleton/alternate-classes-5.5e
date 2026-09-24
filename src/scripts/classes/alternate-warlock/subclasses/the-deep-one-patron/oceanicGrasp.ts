@@ -9,13 +9,15 @@ const preCheck: EldritchBlastPreCheck = async ({ ditem }) => {
   return ditem!.damageDetail.some((d) => d.type === 'cold');
 };
 
-const handle: EldritchBlastHandler = async ({ trigger: { entity, token } }) => {
-  const feat = entity as Item<'feat'>;
-  await runActivity(feat, 'apply', [token]);
+const handle: EldritchBlastHandler = async ({
+  trigger: { token },
+  feature,
+}) => {
+  await runActivity(feature, 'apply', [token]);
 };
 
 addEldritchBlastHandler({
-  pass: 'damageRollComplete',
+  pass: 'applyDamage',
   cprIdentifier: 'ac55eOceanicGrasp',
   exclusive: false,
   automatic: true,
