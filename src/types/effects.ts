@@ -110,6 +110,7 @@ export interface EffectFlags {
     showIcon?: boolean;
     specialDuration?: DAESpecialDuration[];
     stackable?: 'noneName' | string;
+    stacks?: number;
     [key: string]: unknown;
   };
   dnd5e?: {
