@@ -2,29 +2,24 @@ import { runActivity } from 'automation/utils.js';
 import CPRMacro, { MidiMacroFunction } from 'chris-premades/macro.js';
 
 const handle: MidiMacroFunction = async ({
-  trigger: { entity },
+  trigger: { entity, roll },
   workflow,
-  ditem,
 }) => {
-  if (!ditem || !ditem.damageDetail.some((d) => d.type === 'fire')) return;
+  if (!roll.isSuccess) return;
   const feat = entity as Item<'feat'>;
-  await runActivity(
-    feat,
-    'apply',
-    Array.from(workflow.hitTargets as Set<Token>),
-  );
+  await runActivity(feat, 'damage', [workflow.token!]);
 };
 
 const macro: CPRMacro = {
-  identifier: 'ac55eAccursedFlames',
-  name: 'The Fiend: Accursed Flames',
+  identifier: 'ac55eThoughtShield',
+  name: 'Great Old One: Thought Shield',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',
   midi: {
     actor: [
       {
-        pass: 'applyDamage',
+        pass: 'targetSavesComplete',
         macro: handle,
         priority: 0,
       },

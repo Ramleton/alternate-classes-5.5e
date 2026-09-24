@@ -52,7 +52,7 @@ const handleReaction: MidiMacroFunction = async (data) => {
 
 const macro: CPRMacro = {
   identifier: 'ac55eDarkVitality',
-  name: 'The Fiend: Dark Vitality',
+  name: 'Fiend: Dark Vitality',
   source: 'Alternate Classes 5.5e',
   version: '1.0.0',
   rules: 'modern',
