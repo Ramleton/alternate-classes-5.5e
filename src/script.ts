@@ -10,30 +10,26 @@ Hooks.once('init', () => {
   CONFIG.DND5E.featureTypes.class.subtypes.enchantedShot = 'Enchanted Shot';
   console.log('Alternate Classes 5e | Initialized class feature types');
 
-  CONFIG.DND5E.abilityActivationTypes = {
-    onHit: {
-      label: 'DND5E.ACTIVATION.Type.OnHit.Label',
-      header: 'DND5E.ACTIVATION.Type.OnHit.Header',
-      group: 'DND5E.ACTIVATION.Category.AltClasses',
-    },
-    oneAttack: {
-      label: 'DND5E.ACTIVATION.Type.OneAttack.Label',
-      header: 'DND5E.ACTIVATION.Type.OneAttack.Header',
-      group: 'DND5E.ACTIVATION.Category.AltClasses',
-    },
+  CONFIG.DND5E.abilityActivationTypes.onHit = {
+    label: 'DND5E.ACTIVATION.Type.OnHit.Label',
+    header: 'DND5E.ACTIVATION.Type.OnHit.Header',
+    group: 'DND5E.ACTIVATION.Category.AltClasses',
+  };
+  CONFIG.DND5E.abilityActivationTypes.oneAttack = {
+    label: 'DND5E.ACTIVATION.Type.OneAttack.Label',
+    header: 'DND5E.ACTIVATION.Type.OneAttack.Header',
+    group: 'DND5E.ACTIVATION.Category.AltClasses',
   };
   console.log('Alternate Classes 5e | Initialized ability activation types');
-  CONFIG.DND5E.activityActivationTypes = {
-    onHit: {
-      label: 'DND5E.ACTIVATION.Type.OnHit.Label',
-      header: 'DND5E.ACTIVATION.Type.OnHit.Header',
-      group: 'DND5E.ACTIVATION.Category.AltClasses',
-    },
-    oneAttack: {
-      label: 'DND5E.ACTIVATION.Type.OneAttack.Label',
-      header: 'DND5E.ACTIVATION.Type.OneAttack.Header',
-      group: 'DND5E.ACTIVATION.Category.AltClasses',
-    },
+  CONFIG.DND5E.activityActivationTypes.onHit = {
+    label: 'DND5E.ACTIVATION.Type.OnHit.Label',
+    header: 'DND5E.ACTIVATION.Type.OnHit.Header',
+    group: 'DND5E.ACTIVATION.Category.AltClasses',
+  };
+  CONFIG.DND5E.activityActivationTypes.oneAttack = {
+    label: 'DND5E.ACTIVATION.Type.OneAttack.Label',
+    header: 'DND5E.ACTIVATION.Type.OneAttack.Header',
+    group: 'DND5E.ACTIVATION.Category.AltClasses',
   };
   console.log('Alternate Classes 5e | Initialized activity activation types');
 

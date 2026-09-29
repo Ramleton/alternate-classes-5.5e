@@ -85,6 +85,17 @@
       }
     },
     {
+      "name": "spells",
+      "label": "Spells",
+      "path": "packs/spells",
+      "type": "Item",
+      "system": "dnd5e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
       "name": "actors",
       "label": "Actors",
       "path": "packs/actors",
@@ -119,6 +130,7 @@
         "character-origins",
         "equipment",
         "feats",
+        "spells",
         "macros"
       ],
       "folders": []

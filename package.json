@@ -10,10 +10,10 @@
     "type": "git",
     "url": "git+https://github.com/Ramleton/alternate-classes-55e.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "",
-  "type": "commonjs",
-  "main": "eslint.config.js",
+  "type": "module",
+  "main": "eslint.config.mjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
