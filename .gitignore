@@ -3,3 +3,5 @@ dist
 subrepos/*
 types/*
 src/test
+
+.env.local
